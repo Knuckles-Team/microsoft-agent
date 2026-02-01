@@ -739,7 +739,6 @@ def create_agent_server(
         version=__version__,
         skills=skills,
         debug=debug,
-        deps=RunContext,
     )
 
     @asynccontextmanager
