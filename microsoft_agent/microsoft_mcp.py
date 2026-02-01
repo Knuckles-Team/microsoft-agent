@@ -103,7 +103,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="login",
         description="Authenticate with Microsoft using device code flow",
-        tags=["auth"],
+        tags={"auth"},
     )
     def login(
         force: bool = Field(
@@ -115,7 +115,7 @@ def register_tools(mcp: FastMCP):
         return client.login(force=force)
 
     @mcp.tool(
-        name="logout", description="Log out from Microsoft account", tags=["auth"]
+        name="logout", description="Log out from Microsoft account", tags={"auth"}
     )
     def logout() -> Any:
         """Log out from Microsoft account"""
@@ -125,7 +125,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="verify_login",
         description="Check current Microsoft authentication status",
-        tags=["auth"],
+        tags={"auth"},
     )
     def verify_login() -> Any:
         """Check current Microsoft authentication status"""
@@ -135,7 +135,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_accounts",
         description="List all available Microsoft accounts",
-        tags=["auth"],
+        tags={"auth"},
     )
     def list_accounts() -> Any:
         """List all available Microsoft accounts"""
@@ -145,7 +145,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="search_tools",
         description="Search available Microsoft Graph API tools",
-        tags=["meta"],
+        tags={"meta"},
     )
     def search_tools(
         query: str = Field(..., description="Search query"),
@@ -158,7 +158,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_mail_messages",
         description="list_mail_messages: GET /me/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
-        tags=["mail", "files", "user"],
+        tags={"mail", "files", "user"},
     )
     def list_mail_messages(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -173,7 +173,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_mail_folders",
         description="list_mail_folders: GET /me/mailFolders",
-        tags=["mail", "files"],
+        tags={"mail", "files"},
     )
     def list_mail_folders(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -185,7 +185,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_mail_folder_messages",
         description="list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
-        tags=["mail", "files", "user"],
+        tags={"mail", "files", "user"},
     )
     def list_mail_folder_messages(
         mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
@@ -205,7 +205,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_mail_message",
         description="get_mail_message: GET /me/messages/{message-id}",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def get_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -220,7 +220,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="send_mail",
         description="send_mail: POST /me/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags=["mail"],
+        tags={"mail"},
     )
     def send_mail(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -238,7 +238,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_shared_mailbox_messages",
         description="list_shared_mailbox_messages: GET /users/{user-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
-        tags=["mail", "files", "user"],
+        tags={"mail", "files", "user"},
     )
     def list_shared_mailbox_messages(
         user_id: str = Field(..., description="Parameter for user-id"),
@@ -256,7 +256,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_shared_mailbox_folder_messages",
         description="list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
-        tags=["mail", "files", "user"],
+        tags={"mail", "files", "user"},
     )
     def list_shared_mailbox_folder_messages(
         user_id: str = Field(..., description="Parameter for user-id"),
@@ -277,7 +277,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_shared_mailbox_message",
         description="get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def get_shared_mailbox_message(
         user_id: str = Field(..., description="Parameter for user-id"),
@@ -295,7 +295,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="send_shared_mailbox_mail",
         description="send_shared_mailbox_mail: POST /users/{user-id}/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags=["mail"],
+        tags={"mail"},
     )
     def send_shared_mailbox_mail(
         user_id: str = Field(..., description="Parameter for user-id"),
@@ -316,7 +316,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_users",
         description="list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
-        tags=["files", "user"],
+        tags={"files", "user"},
     )
     def list_users(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -331,7 +331,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_draft_email",
         description="create_draft_email: POST /me/messages",
-        tags=["mail"],
+        tags={"mail"},
     )
     def create_draft_email(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -346,7 +346,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_mail_message",
         description="delete_mail_message: DELETE /me/messages/{message-id}",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def delete_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -361,7 +361,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="move_mail_message",
         description="move_mail_message: POST /me/messages/{message-id}/move",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def move_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -377,7 +377,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_mail_message",
         description="update_mail_message: PATCH /me/messages/{message-id}",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def update_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -395,7 +395,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="add_mail_attachment",
         description="add_mail_attachment: POST /me/messages/{message-id}/attachments",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def add_mail_attachment(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -413,7 +413,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_mail_attachments",
         description="list_mail_attachments: GET /me/messages/{message-id}/attachments",
-        tags=["mail", "files", "user"],
+        tags={"mail", "files", "user"},
     )
     def list_mail_attachments(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -428,7 +428,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_mail_attachment",
         description="get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def get_mail_attachment(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -446,7 +446,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_mail_attachment",
         description="delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}",
-        tags=["mail", "user"],
+        tags={"mail", "user"},
     )
     def delete_mail_attachment(
         message_id: str = Field(..., description="Parameter for message-id"),
@@ -464,7 +464,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_calendar_events",
         description="list_calendar_events: GET /me/events",
-        tags=["calendar", "files"],
+        tags={"calendar", "files"},
     )
     def list_calendar_events(
         params: Optional[Dict[(str, Any)]] = Field(
@@ -479,7 +479,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_calendar_event",
         description="get_calendar_event: GET /me/events/{event-id}",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def get_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
@@ -497,7 +497,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_calendar_event",
         description="create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def create_calendar_event(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -515,7 +515,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_calendar_event",
         description="update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def update_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
@@ -534,7 +534,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_calendar_event",
         description="delete_calendar_event: DELETE /me/events/{event-id}",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def delete_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
@@ -549,7 +549,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_specific_calendar_events",
         description="list_specific_calendar_events: GET /me/calendars/{calendar-id}/events",
-        tags=["calendar", "files"],
+        tags={"calendar", "files"},
     )
     def list_specific_calendar_events(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
@@ -567,7 +567,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_specific_calendar_event",
         description="get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def get_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
@@ -586,7 +586,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_specific_calendar_event",
         description="create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def create_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
@@ -607,7 +607,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_specific_calendar_event",
         description="update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def update_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
@@ -629,7 +629,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_specific_calendar_event",
         description="delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def delete_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
@@ -647,7 +647,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_calendar_view",
         description="get_calendar_view: GET /me/calendarView",
-        tags=["calendar"],
+        tags={"calendar"},
     )
     def get_calendar_view(
         params: Optional[Dict[(str, Any)]] = Field(
@@ -662,7 +662,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_calendars",
         description="list_calendars: GET /me/calendars",
-        tags=["calendar", "files"],
+        tags={"calendar", "files"},
     )
     def list_calendars(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -674,7 +674,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="find_meeting_times",
         description="find_meeting_times: POST /me/findMeetingTimes",
-        tags=["calendar", "user"],
+        tags={"calendar", "user"},
     )
     def find_meeting_times(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -687,7 +687,7 @@ def register_tools(mcp: FastMCP):
         return client.find_meeting_times(data=data, params=params)
 
     @mcp.tool(
-        name="list_drives", description="list_drives: GET /me/drives", tags=["files"]
+        name="list_drives", description="list_drives: GET /me/drives", tags={"files"}
     )
     def list_drives(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -699,7 +699,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_drive_root_item",
         description="get_drive_root_item: GET /drives/{drive-id}/root",
-        tags=["files"],
+        tags={"files"},
     )
     def get_drive_root_item(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -714,7 +714,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_root_folder",
         description="get_root_folder: GET /drives/{drive-id}/root",
-        tags=["mail", "files"],
+        tags={"mail", "files"},
     )
     def get_root_folder(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -729,7 +729,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_folder_files",
         description="list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children",
-        tags=["mail", "files"],
+        tags={"mail", "files"},
     )
     def list_folder_files(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -747,7 +747,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="download_onedrive_file_content",
         description="download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content",
-        tags=["files"],
+        tags={"files"},
     )
     def download_onedrive_file_content(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -765,7 +765,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_onedrive_file",
         description="delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}",
-        tags=["files"],
+        tags={"files"},
     )
     def delete_onedrive_file(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -783,7 +783,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="upload_file_content",
         description="upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content",
-        tags=["files"],
+        tags={"files"},
     )
     def upload_file_content(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -802,7 +802,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_excel_chart",
         description="create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add",
-        tags=["files"],
+        tags={"files"},
     )
     def create_excel_chart(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -828,7 +828,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="format_excel_range",
         description="format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format",
-        tags=["files"],
+        tags={"files"},
     )
     def format_excel_range(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -854,7 +854,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="sort_excel_range",
         description="sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort",
-        tags=["files"],
+        tags={"files"},
     )
     def sort_excel_range(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -880,7 +880,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_excel_range",
         description="get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')",
-        tags=["files"],
+        tags={"files"},
     )
     def get_excel_range(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -906,7 +906,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_excel_worksheets",
         description="list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets",
-        tags=["files"],
+        tags={"files"},
     )
     def list_excel_worksheets(
         drive_id: str = Field(..., description="Parameter for drive-id"),
@@ -924,7 +924,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_onenote_notebooks",
         description="list_onenote_notebooks: GET /me/onenote/notebooks",
-        tags=["files", "notes"],
+        tags={"files", "notes"},
     )
     def list_onenote_notebooks(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -936,7 +936,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_onenote_notebook_sections",
         description="list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections",
-        tags=["files", "notes"],
+        tags={"files", "notes"},
     )
     def list_onenote_notebook_sections(
         notebook_id: str = Field(..., description="Parameter for notebook-id"),
@@ -953,7 +953,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_onenote_section_pages",
         description="list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages",
-        tags=["files", "notes"],
+        tags={"files", "notes"},
     )
     def list_onenote_section_pages(
         onenoteSection_id: str = Field(
@@ -972,7 +972,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_onenote_page_content",
         description="get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content",
-        tags=["notes"],
+        tags={"notes"},
     )
     def get_onenote_page_content(
         onenotePage_id: str = Field(..., description="Parameter for onenotePage-id"),
@@ -989,7 +989,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_onenote_page",
         description="create_onenote_page: POST /me/onenote/pages",
-        tags=["notes"],
+        tags={"notes"},
     )
     def create_onenote_page(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -1004,7 +1004,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_todo_task_lists",
         description="list_todo_task_lists: GET /me/todo/lists",
-        tags=["files", "tasks"],
+        tags={"files", "tasks"},
     )
     def list_todo_task_lists(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1016,7 +1016,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_todo_tasks",
         description="list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks",
-        tags=["files", "tasks"],
+        tags={"files", "tasks"},
     )
     def list_todo_tasks(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
@@ -1031,7 +1031,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_todo_task",
         description="get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def get_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
@@ -1049,7 +1049,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_todo_task",
         description="create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def create_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
@@ -1067,7 +1067,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_todo_task",
         description="update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def update_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
@@ -1089,7 +1089,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_todo_task",
         description="delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def delete_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
@@ -1107,7 +1107,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_planner_tasks",
         description="list_planner_tasks: GET /me/planner/tasks",
-        tags=["files", "tasks"],
+        tags={"files", "tasks"},
     )
     def list_planner_tasks(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1119,7 +1119,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_planner_plan",
         description="get_planner_plan: GET /planner/plans/{plannerPlan-id}",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def get_planner_plan(
         plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
@@ -1134,7 +1134,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_plan_tasks",
         description="list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks",
-        tags=["files", "tasks"],
+        tags={"files", "tasks"},
     )
     def list_plan_tasks(
         plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
@@ -1149,7 +1149,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_planner_task",
         description="get_planner_task: GET /planner/tasks/{plannerTask-id}",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def get_planner_task(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
@@ -1164,7 +1164,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_planner_task",
         description="create_planner_task: POST /planner/tasks",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def create_planner_task(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -1179,7 +1179,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_planner_task",
         description="update_planner_task: PATCH /planner/tasks/{plannerTask-id}",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def update_planner_task(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
@@ -1197,7 +1197,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_planner_task_details",
         description="update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details",
-        tags=["tasks"],
+        tags={"tasks"},
     )
     def update_planner_task_details(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
@@ -1215,7 +1215,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_outlook_contacts",
         description="list_outlook_contacts: GET /me/contacts",
-        tags=["files", "contacts"],
+        tags={"files", "contacts"},
     )
     def list_outlook_contacts(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1227,7 +1227,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_outlook_contact",
         description="get_outlook_contact: GET /me/contacts/{contact-id}",
-        tags=["contacts"],
+        tags={"contacts"},
     )
     def get_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
@@ -1242,7 +1242,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_outlook_contact",
         description="create_outlook_contact: POST /me/contacts",
-        tags=["contacts"],
+        tags={"contacts"},
     )
     def create_outlook_contact(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
@@ -1257,7 +1257,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="update_outlook_contact",
         description="update_outlook_contact: PATCH /me/contacts/{contact-id}",
-        tags=["contacts"],
+        tags={"contacts"},
     )
     def update_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
@@ -1275,7 +1275,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="delete_outlook_contact",
         description="delete_outlook_contact: DELETE /me/contacts/{contact-id}",
-        tags=["contacts"],
+        tags={"contacts"},
     )
     def delete_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
@@ -1288,7 +1288,7 @@ def register_tools(mcp: FastMCP):
         return client.delete_outlook_contact(contact_id=contact_id, params=params)
 
     @mcp.tool(
-        name="get_current_user", description="get_current_user: GET /me", tags=["user"]
+        name="get_current_user", description="get_current_user: GET /me", tags={"user"}
     )
     def get_current_user(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1300,7 +1300,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_chats",
         description="list_chats: GET /me/chats",
-        tags=["files", "chat"],
+        tags={"files", "chat"},
     )
     def list_chats(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1310,7 +1310,7 @@ def register_tools(mcp: FastMCP):
         return client.list_chats(params=params)
 
     @mcp.tool(
-        name="get_chat", description="get_chat: GET /chats/{chat-id}", tags=["chat"]
+        name="get_chat", description="get_chat: GET /chats/{chat-id}", tags={"chat"}
     )
     def get_chat(
         chat_id: str = Field(..., description="Parameter for chat-id"),
@@ -1325,7 +1325,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_chat_messages",
         description="list_chat_messages: GET /chats/{chat-id}/messages",
-        tags=["mail", "files", "user", "chat"],
+        tags={"mail", "files", "user", "chat"},
     )
     def list_chat_messages(
         chat_id: str = Field(..., description="Parameter for chat-id"),
@@ -1340,7 +1340,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_chat_message",
         description="get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}",
-        tags=["mail", "user", "chat"],
+        tags={"mail", "user", "chat"},
     )
     def get_chat_message(
         chat_id: str = Field(..., description="Parameter for chat-id"),
@@ -1358,7 +1358,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="send_chat_message",
         description="send_chat_message: POST /chats/{chat-id}/messages",
-        tags=["mail", "user", "chat"],
+        tags={"mail", "user", "chat"},
     )
     def send_chat_message(
         chat_id: str = Field(..., description="Parameter for chat-id"),
@@ -1374,7 +1374,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_joined_teams",
         description="list_joined_teams: GET /me/joinedTeams",
-        tags=["files", "teams"],
+        tags={"files", "teams"},
     )
     def list_joined_teams(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1384,7 +1384,7 @@ def register_tools(mcp: FastMCP):
         return client.list_joined_teams(params=params)
 
     @mcp.tool(
-        name="get_team", description="get_team: GET /teams/{team-id}", tags=["teams"]
+        name="get_team", description="get_team: GET /teams/{team-id}", tags={"teams"}
     )
     def get_team(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1399,7 +1399,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_team_channels",
         description="list_team_channels: GET /teams/{team-id}/channels",
-        tags=["files", "teams"],
+        tags={"files", "teams"},
     )
     def list_team_channels(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1414,7 +1414,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_team_channel",
         description="get_team_channel: GET /teams/{team-id}/channels/{channel-id}",
-        tags=["teams"],
+        tags={"teams"},
     )
     def get_team_channel(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1432,7 +1432,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_channel_messages",
         description="list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages",
-        tags=["mail", "files", "user", "teams"],
+        tags={"mail", "files", "user", "teams"},
     )
     def list_channel_messages(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1450,7 +1450,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_channel_message",
         description="get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}",
-        tags=["mail", "user", "teams"],
+        tags={"mail", "user", "teams"},
     )
     def get_channel_message(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1472,7 +1472,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="send_channel_message",
         description="send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages",
-        tags=["mail", "user", "teams"],
+        tags={"mail", "user", "teams"},
     )
     def send_channel_message(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1491,7 +1491,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_team_members",
         description="list_team_members: GET /teams/{team-id}/members",
-        tags=["files", "user", "teams"],
+        tags={"files", "user", "teams"},
     )
     def list_team_members(
         team_id: str = Field(..., description="Parameter for team-id"),
@@ -1506,7 +1506,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_chat_message_replies",
         description="list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies",
-        tags=["mail", "files", "user", "chat"],
+        tags={"mail", "files", "user", "chat"},
     )
     def list_chat_message_replies(
         chat_id: str = Field(..., description="Parameter for chat-id"),
@@ -1524,7 +1524,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="reply_to_chat_message",
         description="reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies",
-        tags=["mail", "user", "chat"],
+        tags={"mail", "user", "chat"},
     )
     def reply_to_chat_message(
         chat_id: str = Field(..., description="Parameter for chat-id"),
@@ -1543,7 +1543,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="search_sharepoint_sites",
         description="search_sharepoint_sites: GET /sites",
-        tags=["search", "sites"],
+        tags={"search", "sites"},
     )
     def search_sharepoint_sites(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1555,7 +1555,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_site",
         description="get_sharepoint_site: GET /sites/{site-id}",
-        tags=["sites"],
+        tags={"sites"},
     )
     def get_sharepoint_site(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1570,7 +1570,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_sharepoint_site_drives",
         description="list_sharepoint_site_drives: GET /sites/{site-id}/drives",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def list_sharepoint_site_drives(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1585,7 +1585,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_site_drive_by_id",
         description="get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def get_sharepoint_site_drive_by_id(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1603,7 +1603,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_sharepoint_site_items",
         description="list_sharepoint_site_items: GET /sites/{site-id}/items",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def list_sharepoint_site_items(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1618,7 +1618,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_site_item",
         description="get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def get_sharepoint_site_item(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1636,7 +1636,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_sharepoint_site_lists",
         description="list_sharepoint_site_lists: GET /sites/{site-id}/lists",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def list_sharepoint_site_lists(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1651,7 +1651,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_site_list",
         description="get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def get_sharepoint_site_list(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1669,7 +1669,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_sharepoint_site_list_items",
         description="list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def list_sharepoint_site_list_items(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1687,7 +1687,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_site_list_item",
         description="get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}",
-        tags=["files", "sites"],
+        tags={"files", "sites"},
     )
     def get_sharepoint_site_list_item(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1706,7 +1706,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_site_by_path",
         description="get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')",
-        tags=["sites"],
+        tags={"sites"},
     )
     def get_sharepoint_site_by_path(
         site_id: str = Field(..., description="Parameter for site-id"),
@@ -1724,7 +1724,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_sharepoint_sites_delta",
         description="get_sharepoint_sites_delta: GET /sites/delta()",
-        tags=["sites"],
+        tags={"sites"},
     )
     def get_sharepoint_sites_delta(
         params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
@@ -1736,7 +1736,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(
         name="search_query",
         description="search_query: POST /search/query",
-        tags=["search"],
+        tags={"search"},
     )
     def search_query(
         data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
