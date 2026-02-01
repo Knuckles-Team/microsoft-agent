@@ -1,9 +1,33 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
+import sys
 import requests
 from typing import Dict, Optional, Any
 from urllib.parse import urljoin
+from pydantic import Field
+from microsoft_agent.auth import AuthManager
+
+# Initialize AuthManager
+CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
+AUTHORITY = "https://login.microsoftonline.com/common"
+SCOPES = [
+    "User.Read",
+    "Mail.ReadWrite",
+    "Calendars.ReadWrite",
+    "Files.ReadWrite",
+    "Tasks.ReadWrite",
+    "Contacts.ReadWrite",
+    "Group.ReadWrite.All",
+    "Directory.Read.All",
+    "Sites.Read.All",
+    "Chat.Read",
+    "ChatMessage.Read.All",
+    "ChannelMessage.Read.All",
+]
+
+auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
 
 
 class Api:
@@ -23,16 +47,23 @@ class Api:
         return headers
 
     def request(
-        self, method: str, endpoint: str, data: Dict = None, params: Dict = None
+        self,
+        method: str,
+        endpoint: str,
+        data: Dict = None,
+        params: Dict = None,
+        headers: Dict = None,
     ) -> Any:
         url = (
             urljoin(self.base_url, endpoint.lstrip("/"))
             if not endpoint.startswith("http")
             else endpoint
         )
-        headers = self.get_headers()
+        request_headers = self.get_headers()
+        if headers:
+            request_headers.update(headers)
         response = self._session.request(
-            method=method, url=url, headers=headers, json=data, params=params
+            method=method, url=url, headers=request_headers, json=data, params=params
         )
         if response.status_code >= 400:
             try:
@@ -1239,3 +1270,1953 @@ class Api:
         """Delete event"""
         endpoint = f"/groups/{group_id}/events/{event_id}"
         return self.request("DELETE", endpoint, data=None, params=params)
+
+    def login(
+        self,
+        force: bool = Field(
+            False, description="Force a new login even if already logged in"
+        ),
+    ) -> Any:
+        """Authenticate with Microsoft using device code flow"""
+        if not force:
+            token = auth_manager.get_token()
+            if token:
+                account = auth_manager.get_current_account()
+                username = account.get("username", "Unknown") if account else "Unknown"
+                return f"Already logged in as {username}. Use force=True to login with a different account."
+
+        def print_code(msg):
+            print(f"""
+        {msg}
+        """)
+
+        try:
+            return auth_manager.acquire_token_by_device_code(print_code)
+        except Exception as e:
+            return f"Authentication failed: {str(e)}"
+
+    def logout(self) -> Any:
+        """Log out from Microsoft account"""
+        auth_manager.logout()
+        return "Logged out successfully"
+
+    def verify_login(self) -> Any:
+        """Check current Microsoft authentication status"""
+        token = auth_manager.get_token()
+        if token:
+            account = auth_manager.get_current_account()
+            username = account.get("username", "Unknown") if account else "Unknown"
+            return f"Logged in as {username}"
+        return "Not logged in"
+
+    def list_accounts(self) -> Any:
+        """List all available Microsoft accounts"""
+        accounts = auth_manager.list_accounts()
+        if not accounts:
+            return "No accounts found"
+        result = []
+        current = auth_manager.get_current_account()
+        current_id = current.get("home_account_id") if current else None
+        for acc in accounts:
+            is_selected = "*" if (acc.get("home_account_id") == current_id) else " "
+            result.append(f"{is_selected} {acc.get('username')} ({acc.get('name')})")
+        return result
+
+    def search_tools(
+        self,
+        query: str = Field(..., description="Search query"),
+        limit: int = Field(20, description="Max results"),
+    ) -> Any:
+        """Search available Microsoft Graph API tools"""
+        import inspect
+
+        results = []
+        query = query.lower()
+        functions = inspect.getmembers(sys.modules[__name__], inspect.isfunction)
+        for name, func in functions:
+            if (
+                ("_" in name)
+                and (not name.startswith("_"))
+                and (
+                    name
+                    not in [
+                        "health_check",
+                        "register_tools",
+                        "to_boolean",
+                        "to_integer",
+                        "get_logger",
+                        "login",
+                        "logout",
+                        "verify_login",
+                        "list_accounts",
+                        "search_tools",
+                    ]
+                )
+            ):
+                doc = inspect.getdoc(func) or ""
+                if (query in name.lower()) or (doc and (query in doc.lower())):
+                    results.append(
+                        f"{name}: {(doc.splitlines()[0] if doc else 'No description')}"
+                    )
+                    if len(results) >= limit:
+                        break
+        if not results:
+            return "No tools found matching query"
+        return results
+
+    def list_mail_messages(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_mail_messages: GET /me/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
+        path = "/me/messages"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_mail_folders(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_mail_folders: GET /me/mailFolders"""
+        path = "/me/mailFolders"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_mail_folder_messages(
+        self,
+        mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
+        path = "/me/mailFolders/{mailFolder-id}/messages"
+        for k, v in {"mailFolder-id": mailFolder_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_mail_message(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_mail_message: GET /me/messages/{message-id}"""
+        path = "/me/messages/{message-id}"
+        for k, v in {"message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def send_mail(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """send_mail: POST /me/sendMail
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        path = "/me/sendMail"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_shared_mailbox_messages(
+        self,
+        user_id: str = Field(..., description="Parameter for user-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_shared_mailbox_messages: GET /users/{user-id}/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
+        path = "/users/{user-id}/messages"
+        for k, v in {"user-id": user_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_shared_mailbox_folder_messages(
+        self,
+        user_id: str = Field(..., description="Parameter for user-id"),
+        mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
+        path = "/users/{user-id}/mailFolders/{mailFolder-id}/messages"
+        for k, v in {"user-id": user_id, "mailFolder-id": mailFolder_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_shared_mailbox_message(
+        self,
+        user_id: str = Field(..., description="Parameter for user-id"),
+        message_id: str = Field(..., description="Parameter for message-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}"""
+        path = "/users/{user-id}/messages/{message-id}"
+        for k, v in {"user-id": user_id, "message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def send_shared_mailbox_mail(
+        self,
+        user_id: str = Field(..., description="Parameter for user-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """send_shared_mailbox_mail: POST /users/{user-id}/sendMail
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        path = "/users/{user-id}/sendMail"
+        for k, v in {"user-id": user_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_users(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_users: GET /users
+
+        TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
+        path = "/users"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_draft_email(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_draft_email: POST /me/messages"""
+        path = "/me/messages"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def delete_mail_message(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_mail_message: DELETE /me/messages/{message-id}"""
+        path = "/me/messages/{message-id}"
+        for k, v in {"message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def move_mail_message(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """move_mail_message: POST /me/messages/{message-id}/move"""
+        path = "/me/messages/{message-id}/move"
+        for k, v in {"message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_mail_message(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_mail_message: PATCH /me/messages/{message-id}"""
+        path = "/me/messages/{message-id}"
+        for k, v in {"message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def add_mail_attachment(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """add_mail_attachment: POST /me/messages/{message-id}/attachments"""
+        path = "/me/messages/{message-id}/attachments"
+        for k, v in {"message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_mail_attachments(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_mail_attachments: GET /me/messages/{message-id}/attachments"""
+        path = "/me/messages/{message-id}/attachments"
+        for k, v in {"message-id": message_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_mail_attachment(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        attachment_id: str = Field(..., description="Parameter for attachment-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}"""
+        path = "/me/messages/{message-id}/attachments/{attachment-id}"
+        for k, v in {"message-id": message_id, "attachment-id": attachment_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def delete_mail_attachment(
+        self,
+        message_id: str = Field(..., description="Parameter for message-id"),
+        attachment_id: str = Field(..., description="Parameter for attachment-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}"""
+        path = "/me/messages/{message-id}/attachments/{attachment-id}"
+        for k, v in {"message-id": message_id, "attachment-id": attachment_id}.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_calendar_events(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """list_calendar_events: GET /me/events"""
+        path = "/me/events"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        if timezone:
+            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_calendar_event(
+        self,
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """get_calendar_event: GET /me/events/{event-id}"""
+        path = "/me/events/{event-id}"
+        for k, v in {"event-id": event_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        if timezone:
+            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_calendar_event(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_calendar_event: POST /me/events
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        path = "/me/events"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_calendar_event(
+        self,
+        event_id: str = Field(..., description="Parameter for event-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_calendar_event: PATCH /me/events/{event-id}
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        path = "/me/events/{event-id}"
+        for k, v in {"event-id": event_id}.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def delete_calendar_event(
+        self,
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_calendar_event: DELETE /me/events/{event-id}"""
+        path = "/me/events/{event-id}"
+        for k, v in {"event-id": event_id}.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_specific_calendar_events(
+        self,
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """list_specific_calendar_events: GET /me/calendars/{calendar-id}/events"""
+        path = "/me/calendars/{calendar-id}/events"
+        for k, v in {"calendar-id": calendar_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        if timezone:
+            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_specific_calendar_event(
+        self,
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}"""
+        path = "/me/calendars/{calendar-id}/events/{event-id}"
+        for k, v in {"calendar-id": calendar_id, "event-id": event_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        if timezone:
+            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_specific_calendar_event(
+        self,
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_specific_calendar_event: POST /me/calendars/{calendar-id}/events
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        path = "/me/calendars/{calendar-id}/events"
+        for k, v in {"calendar-id": calendar_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_specific_calendar_event(
+        self,
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        event_id: str = Field(..., description="Parameter for event-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        path = "/me/calendars/{calendar-id}/events/{event-id}"
+        for k, v in {"calendar-id": calendar_id, "event-id": event_id}.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def delete_specific_calendar_event(
+        self,
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}"""
+        path = "/me/calendars/{calendar-id}/events/{event-id}"
+        for k, v in {"calendar-id": calendar_id, "event-id": event_id}.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_calendar_view(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """get_calendar_view: GET /me/calendarView"""
+        path = "/me/calendarView"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        if timezone:
+            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_calendars(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_calendars: GET /me/calendars"""
+        path = "/me/calendars"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def find_meeting_times(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """find_meeting_times: POST /me/findMeetingTimes"""
+        path = "/me/findMeetingTimes"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_drives(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_drives: GET /me/drives"""
+        path = "/me/drives"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_drive_root_item(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_drive_root_item: GET /drives/{drive-id}/root"""
+        path = "/drives/{drive-id}/root"
+        for k, v in {"drive-id": drive_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_root_folder(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_root_folder: GET /drives/{drive-id}/root"""
+        path = "/drives/{drive-id}/root"
+        for k, v in {"drive-id": drive_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_folder_files(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/children"
+        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def download_onedrive_file_content(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/content"
+        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def delete_onedrive_file(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}"""
+        path = "/drives/{drive-id}/items/{driveItem-id}"
+        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def upload_file_content(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/content"
+        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
+            path = path.replace("{k}", v)
+        method = "PUT"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def create_excel_chart(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        workbookWorksheet_id: str = Field(
+            ..., description="Parameter for workbookWorksheet-id"
+        ),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add"
+        for k, v in {
+            "drive-id": drive_id,
+            "driveItem-id": driveItem_id,
+            "workbookWorksheet-id": workbookWorksheet_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def format_excel_range(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        workbookWorksheet_id: str = Field(
+            ..., description="Parameter for workbookWorksheet-id"
+        ),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format"
+        for k, v in {
+            "drive-id": drive_id,
+            "driveItem-id": driveItem_id,
+            "workbookWorksheet-id": workbookWorksheet_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def sort_excel_range(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        workbookWorksheet_id: str = Field(
+            ..., description="Parameter for workbookWorksheet-id"
+        ),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort"
+        for k, v in {
+            "drive-id": drive_id,
+            "driveItem-id": driveItem_id,
+            "workbookWorksheet-id": workbookWorksheet_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def get_excel_range(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        workbookWorksheet_id: str = Field(
+            ..., description="Parameter for workbookWorksheet-id"
+        ),
+        address: str = Field(..., description="Parameter for address"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')"
+        for k, v in {
+            "drive-id": drive_id,
+            "driveItem-id": driveItem_id,
+            "workbookWorksheet-id": workbookWorksheet_id,
+            "address": address,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_excel_worksheets(
+        self,
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets"""
+        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets"
+        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_onenote_notebooks(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_onenote_notebooks: GET /me/onenote/notebooks"""
+        path = "/me/onenote/notebooks"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_onenote_notebook_sections(
+        self,
+        notebook_id: str = Field(..., description="Parameter for notebook-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections"""
+        path = "/me/onenote/notebooks/{notebook-id}/sections"
+        for k, v in {"notebook-id": notebook_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_onenote_section_pages(
+        self,
+        onenoteSection_id: str = Field(
+            ..., description="Parameter for onenoteSection-id"
+        ),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages"""
+        path = "/me/onenote/sections/{onenoteSection-id}/pages"
+        for k, v in {"onenoteSection-id": onenoteSection_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_onenote_page_content(
+        self,
+        onenotePage_id: str = Field(..., description="Parameter for onenotePage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content"""
+        path = "/me/onenote/pages/{onenotePage-id}/content"
+        for k, v in {"onenotePage-id": onenotePage_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_onenote_page(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_onenote_page: POST /me/onenote/pages"""
+        path = "/me/onenote/pages"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_todo_task_lists(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_todo_task_lists: GET /me/todo/lists"""
+        path = "/me/todo/lists"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_todo_tasks(
+        self,
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks"""
+        path = "/me/todo/lists/{todoTaskList-id}/tasks"
+        for k, v in {"todoTaskList-id": todoTaskList_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_todo_task(
+        self,
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        path = "/me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"
+        for k, v in {
+            "todoTaskList-id": todoTaskList_id,
+            "todoTask-id": todoTask_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_todo_task(
+        self,
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks"""
+        path = "/me/todo/lists/{todoTaskList-id}/tasks"
+        for k, v in {"todoTaskList-id": todoTaskList_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_todo_task(
+        self,
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        path = "/me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"
+        for k, v in {
+            "todoTaskList-id": todoTaskList_id,
+            "todoTask-id": todoTask_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def delete_todo_task(
+        self,
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        path = "/me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"
+        for k, v in {
+            "todoTaskList-id": todoTaskList_id,
+            "todoTask-id": todoTask_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_planner_tasks(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_planner_tasks: GET /me/planner/tasks"""
+        path = "/me/planner/tasks"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_planner_plan(
+        self,
+        plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_planner_plan: GET /planner/plans/{plannerPlan-id}"""
+        path = "/planner/plans/{plannerPlan-id}"
+        for k, v in {"plannerPlan-id": plannerPlan_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_plan_tasks(
+        self,
+        plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks"""
+        path = "/planner/plans/{plannerPlan-id}/tasks"
+        for k, v in {"plannerPlan-id": plannerPlan_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_planner_task(
+        self,
+        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_planner_task: GET /planner/tasks/{plannerTask-id}"""
+        path = "/planner/tasks/{plannerTask-id}"
+        for k, v in {"plannerTask-id": plannerTask_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_planner_task(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_planner_task: POST /planner/tasks"""
+        path = "/planner/tasks"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_planner_task(
+        self,
+        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_planner_task: PATCH /planner/tasks/{plannerTask-id}"""
+        path = "/planner/tasks/{plannerTask-id}"
+        for k, v in {"plannerTask-id": plannerTask_id}.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_planner_task_details(
+        self,
+        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details"""
+        path = "/planner/tasks/{plannerTask-id}/details"
+        for k, v in {"plannerTask-id": plannerTask_id}.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_outlook_contacts(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_outlook_contacts: GET /me/contacts"""
+        path = "/me/contacts"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_outlook_contact(
+        self,
+        contact_id: str = Field(..., description="Parameter for contact-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_outlook_contact: GET /me/contacts/{contact-id}"""
+        path = "/me/contacts/{contact-id}"
+        for k, v in {"contact-id": contact_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def create_outlook_contact(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_outlook_contact: POST /me/contacts"""
+        path = "/me/contacts"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def update_outlook_contact(
+        self,
+        contact_id: str = Field(..., description="Parameter for contact-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_outlook_contact: PATCH /me/contacts/{contact-id}"""
+        path = "/me/contacts/{contact-id}"
+        for k, v in {"contact-id": contact_id}.items():
+            path = path.replace("{k}", v)
+        method = "PATCH"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def delete_outlook_contact(
+        self,
+        contact_id: str = Field(..., description="Parameter for contact-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_outlook_contact: DELETE /me/contacts/{contact-id}"""
+        path = "/me/contacts/{contact-id}"
+        for k, v in {"contact-id": contact_id}.items():
+            path = path.replace("{k}", v)
+        method = "DELETE"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_current_user(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_current_user: GET /me"""
+        path = "/me"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_chats(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_chats: GET /me/chats"""
+        path = "/me/chats"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_chat(
+        self,
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_chat: GET /chats/{chat-id}"""
+        path = "/chats/{chat-id}"
+        for k, v in {"chat-id": chat_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_chat_messages(
+        self,
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_chat_messages: GET /chats/{chat-id}/messages"""
+        path = "/chats/{chat-id}/messages"
+        for k, v in {"chat-id": chat_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_chat_message(
+        self,
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}"""
+        path = "/chats/{chat-id}/messages/{chatMessage-id}"
+        for k, v in {"chat-id": chat_id, "chatMessage-id": chatMessage_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def send_chat_message(
+        self,
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """send_chat_message: POST /chats/{chat-id}/messages"""
+        path = "/chats/{chat-id}/messages"
+        for k, v in {"chat-id": chat_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_joined_teams(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_joined_teams: GET /me/joinedTeams"""
+        path = "/me/joinedTeams"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_team(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_team: GET /teams/{team-id}"""
+        path = "/teams/{team-id}"
+        for k, v in {"team-id": team_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_team_channels(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_team_channels: GET /teams/{team-id}/channels"""
+        path = "/teams/{team-id}/channels"
+        for k, v in {"team-id": team_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_team_channel(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_team_channel: GET /teams/{team-id}/channels/{channel-id}"""
+        path = "/teams/{team-id}/channels/{channel-id}"
+        for k, v in {"team-id": team_id, "channel-id": channel_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_channel_messages(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages"""
+        path = "/teams/{team-id}/channels/{channel-id}/messages"
+        for k, v in {"team-id": team_id, "channel-id": channel_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_channel_message(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"""
+        path = "/teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"
+        for k, v in {
+            "team-id": team_id,
+            "channel-id": channel_id,
+            "chatMessage-id": chatMessage_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def send_channel_message(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages"""
+        path = "/teams/{team-id}/channels/{channel-id}/messages"
+        for k, v in {"team-id": team_id, "channel-id": channel_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def list_team_members(
+        self,
+        team_id: str = Field(..., description="Parameter for team-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_team_members: GET /teams/{team-id}/members"""
+        path = "/teams/{team-id}/members"
+        for k, v in {"team-id": team_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_chat_message_replies(
+        self,
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies"""
+        path = "/chats/{chat-id}/messages/{chatMessage-id}/replies"
+        for k, v in {"chat-id": chat_id, "chatMessage-id": chatMessage_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def reply_to_chat_message(
+        self,
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies"""
+        path = "/chats/{chat-id}/messages/{chatMessage-id}/replies"
+        for k, v in {"chat-id": chat_id, "chatMessage-id": chatMessage_id}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
+
+    def search_sharepoint_sites(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """search_sharepoint_sites: GET /sites"""
+        path = "/sites"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_site(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_site: GET /sites/{site-id}"""
+        path = "/sites/{site-id}"
+        for k, v in {"site-id": site_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_sharepoint_site_drives(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_sharepoint_site_drives: GET /sites/{site-id}/drives"""
+        path = "/sites/{site-id}/drives"
+        for k, v in {"site-id": site_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_site_drive_by_id(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}"""
+        path = "/sites/{site-id}/drives/{drive-id}"
+        for k, v in {"site-id": site_id, "drive-id": drive_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_sharepoint_site_items(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_sharepoint_site_items: GET /sites/{site-id}/items"""
+        path = "/sites/{site-id}/items"
+        for k, v in {"site-id": site_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_site_item(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        baseItem_id: str = Field(..., description="Parameter for baseItem-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}"""
+        path = "/sites/{site-id}/items/{baseItem-id}"
+        for k, v in {"site-id": site_id, "baseItem-id": baseItem_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_sharepoint_site_lists(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_sharepoint_site_lists: GET /sites/{site-id}/lists"""
+        path = "/sites/{site-id}/lists"
+        for k, v in {"site-id": site_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_site_list(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        list_id: str = Field(..., description="Parameter for list-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}"""
+        path = "/sites/{site-id}/lists/{list-id}"
+        for k, v in {"site-id": site_id, "list-id": list_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def list_sharepoint_site_list_items(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        list_id: str = Field(..., description="Parameter for list-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items"""
+        path = "/sites/{site-id}/lists/{list-id}/items"
+        for k, v in {"site-id": site_id, "list-id": list_id}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_site_list_item(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        list_id: str = Field(..., description="Parameter for list-id"),
+        listItem_id: str = Field(..., description="Parameter for listItem-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}"""
+        path = "/sites/{site-id}/lists/{list-id}/items/{listItem-id}"
+        for k, v in {
+            "site-id": site_id,
+            "list-id": list_id,
+            "listItem-id": listItem_id,
+        }.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_site_by_path(
+        self,
+        site_id: str = Field(..., description="Parameter for site-id"),
+        path: str = Field(..., description="Parameter for path"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')"""
+        path = "/sites/{site-id}/getByPath(path='{path}')"
+        for k, v in {"site-id": site_id, "path": path}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def get_sharepoint_sites_delta(
+        self,
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sharepoint_sites_delta: GET /sites/delta()"""
+        path = "/sites/delta()"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "GET"
+        request_headers = {}
+        return self.request(
+            method=method, endpoint=path, params=params, headers=request_headers
+        )
+
+    def search_query(
+        self,
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """search_query: POST /search/query"""
+        path = "/search/query"
+        for k, v in {}.items():
+            path = path.replace("{k}", v)
+        method = "POST"
+        request_headers = {}
+        return self.request(
+            method=method,
+            endpoint=path,
+            params=params,
+            data=data,
+            headers=request_headers,
+        )
