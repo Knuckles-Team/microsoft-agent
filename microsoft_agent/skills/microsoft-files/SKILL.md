@@ -1,0 +1,214 @@
+---
+name: microsoft-files
+description: "Generated skill for files operations. Contains 45 tools."
+---
+
+### Overview
+This skill handles operations related to files.
+
+### Available Tools
+- `list_mail_messages`: list_mail_messages: GET /me/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_mail_folders`: list_mail_folders: GET /me/mailFolders
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_mail_folder_messages`: list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+  - **Parameters**:
+    - `mailFolder_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_shared_mailbox_messages`: list_shared_mailbox_messages: GET /users/{user-id}/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+  - **Parameters**:
+    - `user_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_shared_mailbox_folder_messages`: list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+  - **Parameters**:
+    - `user_id` (str)
+    - `mailFolder_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_users`: list_users: GET /users  TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_mail_attachments`: list_mail_attachments: GET /me/messages/{message-id}/attachments
+  - **Parameters**:
+    - `message_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_calendar_events`: list_calendar_events: GET /me/events
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+    - `timezone` (Optional[str])
+- `list_specific_calendar_events`: list_specific_calendar_events: GET /me/calendars/{calendar-id}/events
+  - **Parameters**:
+    - `calendar_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+    - `timezone` (Optional[str])
+- `list_calendars`: list_calendars: GET /me/calendars
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_drives`: list_drives: GET /me/drives
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `get_drive_root_item`: get_drive_root_item: GET /drives/{drive-id}/root
+  - **Parameters**:
+    - `drive_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `get_root_folder`: get_root_folder: GET /drives/{drive-id}/root
+  - **Parameters**:
+    - `drive_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_folder_files`: list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `download_onedrive_file_content`: download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `delete_onedrive_file`: delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `upload_file_content`: upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `data` (Optional[Dict[str, Any]])
+    - `params` (Optional[Dict[str, Any]])
+- `create_excel_chart`: create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `workbookWorksheet_id` (str)
+    - `data` (Optional[Dict[str, Any]])
+    - `params` (Optional[Dict[str, Any]])
+- `format_excel_range`: format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `workbookWorksheet_id` (str)
+    - `data` (Optional[Dict[str, Any]])
+    - `params` (Optional[Dict[str, Any]])
+- `sort_excel_range`: sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `workbookWorksheet_id` (str)
+    - `data` (Optional[Dict[str, Any]])
+    - `params` (Optional[Dict[str, Any]])
+- `get_excel_range`: get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `workbookWorksheet_id` (str)
+    - `address` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_excel_worksheets`: list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets
+  - **Parameters**:
+    - `drive_id` (str)
+    - `driveItem_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_onenote_notebooks`: list_onenote_notebooks: GET /me/onenote/notebooks
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_onenote_notebook_sections`: list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections
+  - **Parameters**:
+    - `notebook_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_onenote_section_pages`: list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages
+  - **Parameters**:
+    - `onenoteSection_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_todo_task_lists`: list_todo_task_lists: GET /me/todo/lists
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_todo_tasks`: list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks
+  - **Parameters**:
+    - `todoTaskList_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_planner_tasks`: list_planner_tasks: GET /me/planner/tasks
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_plan_tasks`: list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks
+  - **Parameters**:
+    - `plannerPlan_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_outlook_contacts`: list_outlook_contacts: GET /me/contacts
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_chats`: list_chats: GET /me/chats
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_chat_messages`: list_chat_messages: GET /chats/{chat-id}/messages
+  - **Parameters**:
+    - `chat_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_joined_teams`: list_joined_teams: GET /me/joinedTeams
+  - **Parameters**:
+    - `params` (Optional[Dict[str, Any]])
+- `list_team_channels`: list_team_channels: GET /teams/{team-id}/channels
+  - **Parameters**:
+    - `team_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_channel_messages`: list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages
+  - **Parameters**:
+    - `team_id` (str)
+    - `channel_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_team_members`: list_team_members: GET /teams/{team-id}/members
+  - **Parameters**:
+    - `team_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_chat_message_replies`: list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies
+  - **Parameters**:
+    - `chat_id` (str)
+    - `chatMessage_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_sharepoint_site_drives`: list_sharepoint_site_drives: GET /sites/{site-id}/drives
+  - **Parameters**:
+    - `site_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `get_sharepoint_site_drive_by_id`: get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}
+  - **Parameters**:
+    - `site_id` (str)
+    - `drive_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_sharepoint_site_items`: list_sharepoint_site_items: GET /sites/{site-id}/items
+  - **Parameters**:
+    - `site_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `get_sharepoint_site_item`: get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}
+  - **Parameters**:
+    - `site_id` (str)
+    - `baseItem_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_sharepoint_site_lists`: list_sharepoint_site_lists: GET /sites/{site-id}/lists
+  - **Parameters**:
+    - `site_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `get_sharepoint_site_list`: get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}
+  - **Parameters**:
+    - `site_id` (str)
+    - `list_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `list_sharepoint_site_list_items`: list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items
+  - **Parameters**:
+    - `site_id` (str)
+    - `list_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+- `get_sharepoint_site_list_item`: get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}
+  - **Parameters**:
+    - `site_id` (str)
+    - `list_id` (str)
+    - `listItem_id` (str)
+    - `params` (Optional[Dict[str, Any]])
+
+### Usage Instructions
+1. Review the tool available in this skill.
+2. Call the tool with the required parameters.
+
+### Error Handling
+- Ensure all required parameters are provided.
+- Check return values for error messages.
