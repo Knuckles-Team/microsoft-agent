@@ -98,7 +98,7 @@ def register_tools(mcp: FastMCP):
         "ChannelMessage.Read.All",
     ]
 
-    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
+    _ = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
 
     @mcp.tool(
         name="login",
@@ -109,65 +109,38 @@ def register_tools(mcp: FastMCP):
         force: bool = Field(
             False, description="Force a new login even if already logged in"
         )
-    ) -> str:
+    ) -> Any:
         """Authenticate with Microsoft using device code flow"""
-        if not force:
-            token = auth_manager.get_token()
-            if token:
-                account = auth_manager.get_current_account()
-                username = account.get("username", "Unknown") if account else "Unknown"
-                return f"Already logged in as {username}. Use force=True to login with a different account."
-
-        def print_code(msg):
-            print(f"\n{msg}\n")
-
-        try:
-            return auth_manager.acquire_token_by_device_code(print_code)
-        except Exception as e:
-            return f"Authentication failed: {str(e)}"
+        client = get_client()
+        return client.login(force=force)
 
     @mcp.tool(
         name="logout", description="Log out from Microsoft account", tags=["auth"]
     )
-    def logout() -> str:
+    def logout() -> Any:
         """Log out from Microsoft account"""
-        auth_manager.logout()
-        return "Logged out successfully"
+        client = get_client()
+        return client.logout()
 
     @mcp.tool(
         name="verify_login",
         description="Check current Microsoft authentication status",
         tags=["auth"],
     )
-    def verify_login() -> str:
+    def verify_login() -> Any:
         """Check current Microsoft authentication status"""
-        token = auth_manager.get_token()
-        if token:
-            account = auth_manager.get_current_account()
-            username = account.get("username", "Unknown") if account else "Unknown"
-            return f"Logged in as {username}"
-        return "Not logged in"
+        client = get_client()
+        return client.verify_login()
 
     @mcp.tool(
         name="list_accounts",
         description="List all available Microsoft accounts",
         tags=["auth"],
     )
-    def list_accounts() -> str:
+    def list_accounts() -> Any:
         """List all available Microsoft accounts"""
-        accounts = auth_manager.list_accounts()
-        if not accounts:
-            return "No accounts found"
-
-        result = []
-        current = auth_manager.get_current_account()
-        current_id = current.get("home_account_id") if current else None
-
-        for acc in accounts:
-            is_selected = "*" if acc.get("home_account_id") == current_id else " "
-            result.append(f"{is_selected} {acc.get('username')} ({acc.get('name')})")
-
-        return "\n".join(result)
+        client = get_client()
+        return client.list_accounts()
 
     @mcp.tool(
         name="search_tools",
@@ -177,1016 +150,658 @@ def register_tools(mcp: FastMCP):
     def search_tools(
         query: str = Field(..., description="Search query"),
         limit: int = Field(20, description="Max results"),
-    ) -> str:
+    ) -> Any:
         """Search available Microsoft Graph API tools"""
-        import inspect
-
-        results = []
-        query = query.lower()
-        functions = inspect.getmembers(sys.modules[__name__], inspect.isfunction)
-
-        for name, func in functions:
-            if (
-                "_" in name
-                and not name.startswith("_")
-                and name
-                not in [
-                    "health_check",
-                    "register_tools",
-                    "to_boolean",
-                    "to_integer",
-                    "get_logger",
-                    "login",
-                    "logout",
-                    "verify_login",
-                    "list_accounts",
-                    "search_tools",
-                ]
-            ):
-                doc = inspect.getdoc(func) or ""
-                if query in name.lower() or doc and query in doc.lower():
-                    results.append(
-                        f"{name}: {doc.splitlines()[0] if doc else 'No description'}"
-                    )
-                    if len(results) >= limit:
-                        break
-
-        if not results:
-            return "No tools found matching query"
-
-        return "\n".join(results)
+        client = get_client()
+        return client.search_tools(query=query, limit=limit)
 
     @mcp.tool(
         name="list_mail_messages",
-        description="""list_mail_messages: GET /me/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter""",
+        description="list_mail_messages: GET /me/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags=["mail", "files", "user"],
     )
     def list_mail_messages(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
-        """list_mail_messages: GET /me/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter"""
+        """list_mail_messages: GET /me/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
         client = get_client()
-        path = "/me/messages"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_mail_messages(params=params)
 
     @mcp.tool(
         name="list_mail_folders",
-        description="""list_mail_folders: GET /me/mailFolders""",
+        description="list_mail_folders: GET /me/mailFolders",
         tags=["mail", "files"],
     )
     def list_mail_folders(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_mail_folders: GET /me/mailFolders"""
         client = get_client()
-        path = "/me/mailFolders"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_mail_folders(params=params)
 
     @mcp.tool(
         name="list_mail_folder_messages",
-        description="""list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter""",
+        description="list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags=["mail", "files", "user"],
     )
     def list_mail_folder_messages(
         mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter"""
+        """list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
         client = get_client()
-        path = "/me/mailFolders/{mailFolder-id}/messages"
-        # Replace path parameters
-        for k, v in {"mailFolder-id": mailFolder_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_mail_folder_messages(
+            mailFolder_id=mailFolder_id, params=params
+        )
 
     @mcp.tool(
         name="get_mail_message",
-        description="""get_mail_message: GET /me/messages/{message-id}""",
+        description="get_mail_message: GET /me/messages/{message-id}",
         tags=["mail", "user"],
     )
     def get_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_mail_message: GET /me/messages/{message-id}"""
         client = get_client()
-        path = "/me/messages/{message-id}"
-        # Replace path parameters
-        for k, v in {"message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_mail_message(message_id=message_id, params=params)
 
     @mcp.tool(
         name="send_mail",
-        description="""send_mail: POST /me/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.""",
+        description="send_mail: POST /me/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags=["mail"],
     )
     def send_mail(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """send_mail: POST /me/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients."""
+        """send_mail: POST /me/sendMail
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
         client = get_client()
-        path = "/me/sendMail"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.send_mail(data=data, params=params)
 
     @mcp.tool(
         name="list_shared_mailbox_messages",
-        description="""list_shared_mailbox_messages: GET /users/{user-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter""",
+        description="list_shared_mailbox_messages: GET /users/{user-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags=["mail", "files", "user"],
     )
     def list_shared_mailbox_messages(
         user_id: str = Field(..., description="Parameter for user-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """list_shared_mailbox_messages: GET /users/{user-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter"""
+        """list_shared_mailbox_messages: GET /users/{user-id}/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
         client = get_client()
-        path = "/users/{user-id}/messages"
-        # Replace path parameters
-        for k, v in {"user-id": user_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_shared_mailbox_messages(user_id=user_id, params=params)
 
     @mcp.tool(
         name="list_shared_mailbox_folder_messages",
-        description="""list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter""",
+        description="list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags=["mail", "files", "user"],
     )
     def list_shared_mailbox_folder_messages(
         user_id: str = Field(..., description="Parameter for user-id"),
         mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter"""
+        """list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages
+
+        TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
         client = get_client()
-        path = "/users/{user-id}/mailFolders/{mailFolder-id}/messages"
-        # Replace path parameters
-        for k, v in {"user-id": user_id, "mailFolder-id": mailFolder_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_shared_mailbox_folder_messages(
+            user_id=user_id, mailFolder_id=mailFolder_id, params=params
+        )
 
     @mcp.tool(
         name="get_shared_mailbox_message",
-        description="""get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}""",
+        description="get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}",
         tags=["mail", "user"],
     )
     def get_shared_mailbox_message(
         user_id: str = Field(..., description="Parameter for user-id"),
         message_id: str = Field(..., description="Parameter for message-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}"""
         client = get_client()
-        path = "/users/{user-id}/messages/{message-id}"
-        # Replace path parameters
-        for k, v in {"user-id": user_id, "message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_shared_mailbox_message(
+            user_id=user_id, message_id=message_id, params=params
+        )
 
     @mcp.tool(
         name="send_shared_mailbox_mail",
-        description="""send_shared_mailbox_mail: POST /users/{user-id}/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.""",
+        description="send_shared_mailbox_mail: POST /users/{user-id}/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags=["mail"],
     )
     def send_shared_mailbox_mail(
         user_id: str = Field(..., description="Parameter for user-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """send_shared_mailbox_mail: POST /users/{user-id}/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients."""
+        """send_shared_mailbox_mail: POST /users/{user-id}/sendMail
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
         client = get_client()
-        path = "/users/{user-id}/sendMail"
-        # Replace path parameters
-        for k, v in {"user-id": user_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.send_shared_mailbox_mail(
+            user_id=user_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="list_users",
-        description="""list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter""",
+        description="list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags=["files", "user"],
     )
     def list_users(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
-        """list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter"""
+        """list_users: GET /users
+
+        TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
         client = get_client()
-        path = "/users"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_users(params=params)
 
     @mcp.tool(
         name="create_draft_email",
-        description="""create_draft_email: POST /me/messages""",
+        description="create_draft_email: POST /me/messages",
         tags=["mail"],
     )
     def create_draft_email(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """create_draft_email: POST /me/messages"""
         client = get_client()
-        path = "/me/messages"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_draft_email(data=data, params=params)
 
     @mcp.tool(
         name="delete_mail_message",
-        description="""delete_mail_message: DELETE /me/messages/{message-id}""",
+        description="delete_mail_message: DELETE /me/messages/{message-id}",
         tags=["mail", "user"],
     )
     def delete_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_mail_message: DELETE /me/messages/{message-id}"""
         client = get_client()
-        path = "/me/messages/{message-id}"
-        # Replace path parameters
-        for k, v in {"message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_mail_message(message_id=message_id, params=params)
 
     @mcp.tool(
         name="move_mail_message",
-        description="""move_mail_message: POST /me/messages/{message-id}/move""",
+        description="move_mail_message: POST /me/messages/{message-id}/move",
         tags=["mail", "user"],
     )
     def move_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """move_mail_message: POST /me/messages/{message-id}/move"""
         client = get_client()
-        path = "/me/messages/{message-id}/move"
-        # Replace path parameters
-        for k, v in {"message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.move_mail_message(message_id=message_id, data=data, params=params)
 
     @mcp.tool(
         name="update_mail_message",
-        description="""update_mail_message: PATCH /me/messages/{message-id}""",
+        description="update_mail_message: PATCH /me/messages/{message-id}",
         tags=["mail", "user"],
     )
     def update_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """update_mail_message: PATCH /me/messages/{message-id}"""
         client = get_client()
-        path = "/me/messages/{message-id}"
-        # Replace path parameters
-        for k, v in {"message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_mail_message(
+            message_id=message_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="add_mail_attachment",
-        description="""add_mail_attachment: POST /me/messages/{message-id}/attachments""",
+        description="add_mail_attachment: POST /me/messages/{message-id}/attachments",
         tags=["mail", "user"],
     )
     def add_mail_attachment(
         message_id: str = Field(..., description="Parameter for message-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """add_mail_attachment: POST /me/messages/{message-id}/attachments"""
         client = get_client()
-        path = "/me/messages/{message-id}/attachments"
-        # Replace path parameters
-        for k, v in {"message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.add_mail_attachment(
+            message_id=message_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="list_mail_attachments",
-        description="""list_mail_attachments: GET /me/messages/{message-id}/attachments""",
+        description="list_mail_attachments: GET /me/messages/{message-id}/attachments",
         tags=["mail", "files", "user"],
     )
     def list_mail_attachments(
         message_id: str = Field(..., description="Parameter for message-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_mail_attachments: GET /me/messages/{message-id}/attachments"""
         client = get_client()
-        path = "/me/messages/{message-id}/attachments"
-        # Replace path parameters
-        for k, v in {"message-id": message_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_mail_attachments(message_id=message_id, params=params)
 
     @mcp.tool(
         name="get_mail_attachment",
-        description="""get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}""",
+        description="get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}",
         tags=["mail", "user"],
     )
     def get_mail_attachment(
         message_id: str = Field(..., description="Parameter for message-id"),
         attachment_id: str = Field(..., description="Parameter for attachment-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}"""
         client = get_client()
-        path = "/me/messages/{message-id}/attachments/{attachment-id}"
-        # Replace path parameters
-        for k, v in {"message-id": message_id, "attachment-id": attachment_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_mail_attachment(
+            message_id=message_id, attachment_id=attachment_id, params=params
+        )
 
     @mcp.tool(
         name="delete_mail_attachment",
-        description="""delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}""",
+        description="delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}",
         tags=["mail", "user"],
     )
     def delete_mail_attachment(
         message_id: str = Field(..., description="Parameter for message-id"),
         attachment_id: str = Field(..., description="Parameter for attachment-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}"""
         client = get_client()
-        path = "/me/messages/{message-id}/attachments/{attachment-id}"
-        # Replace path parameters
-        for k, v in {"message-id": message_id, "attachment-id": attachment_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_mail_attachment(
+            message_id=message_id, attachment_id=attachment_id, params=params
+        )
 
     @mcp.tool(
         name="list_calendar_events",
-        description="""list_calendar_events: GET /me/events""",
+        description="list_calendar_events: GET /me/events",
         tags=["calendar", "files"],
     )
     def list_calendar_events(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
         timezone: Optional[str] = Field(None, description="IANA timezone"),
     ) -> Any:
         """list_calendar_events: GET /me/events"""
         client = get_client()
-        path = "/me/events"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        if timezone:
-            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_calendar_events(params=params, timezone=timezone)
 
     @mcp.tool(
         name="get_calendar_event",
-        description="""get_calendar_event: GET /me/events/{event-id}""",
+        description="get_calendar_event: GET /me/events/{event-id}",
         tags=["calendar"],
     )
     def get_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
         timezone: Optional[str] = Field(None, description="IANA timezone"),
     ) -> Any:
         """get_calendar_event: GET /me/events/{event-id}"""
         client = get_client()
-        path = "/me/events/{event-id}"
-        # Replace path parameters
-        for k, v in {"event-id": event_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        if timezone:
-            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_calendar_event(
+            event_id=event_id, params=params, timezone=timezone
+        )
 
     @mcp.tool(
         name="create_calendar_event",
-        description="""create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.""",
+        description="create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags=["calendar"],
     )
     def create_calendar_event(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients."""
+        """create_calendar_event: POST /me/events
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
         client = get_client()
-        path = "/me/events"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_calendar_event(data=data, params=params)
 
     @mcp.tool(
         name="update_calendar_event",
-        description="""update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.""",
+        description="update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags=["calendar"],
     )
     def update_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients."""
+        """update_calendar_event: PATCH /me/events/{event-id}
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
         client = get_client()
-        path = "/me/events/{event-id}"
-        # Replace path parameters
-        for k, v in {"event-id": event_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_calendar_event(event_id=event_id, data=data, params=params)
 
     @mcp.tool(
         name="delete_calendar_event",
-        description="""delete_calendar_event: DELETE /me/events/{event-id}""",
+        description="delete_calendar_event: DELETE /me/events/{event-id}",
         tags=["calendar"],
     )
     def delete_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_calendar_event: DELETE /me/events/{event-id}"""
         client = get_client()
-        path = "/me/events/{event-id}"
-        # Replace path parameters
-        for k, v in {"event-id": event_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_calendar_event(event_id=event_id, params=params)
 
     @mcp.tool(
         name="list_specific_calendar_events",
-        description="""list_specific_calendar_events: GET /me/calendars/{calendar-id}/events""",
+        description="list_specific_calendar_events: GET /me/calendars/{calendar-id}/events",
         tags=["calendar", "files"],
     )
     def list_specific_calendar_events(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
         timezone: Optional[str] = Field(None, description="IANA timezone"),
     ) -> Any:
         """list_specific_calendar_events: GET /me/calendars/{calendar-id}/events"""
         client = get_client()
-        path = "/me/calendars/{calendar-id}/events"
-        # Replace path parameters
-        for k, v in {"calendar-id": calendar_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        if timezone:
-            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_specific_calendar_events(
+            calendar_id=calendar_id, params=params, timezone=timezone
+        )
 
     @mcp.tool(
         name="get_specific_calendar_event",
-        description="""get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}""",
+        description="get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}",
         tags=["calendar"],
     )
     def get_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
         event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
         timezone: Optional[str] = Field(None, description="IANA timezone"),
     ) -> Any:
         """get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}"""
         client = get_client()
-        path = "/me/calendars/{calendar-id}/events/{event-id}"
-        # Replace path parameters
-        for k, v in {"calendar-id": calendar_id, "event-id": event_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        if timezone:
-            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_specific_calendar_event(
+            calendar_id=calendar_id, event_id=event_id, params=params, timezone=timezone
+        )
 
     @mcp.tool(
         name="create_specific_calendar_event",
-        description="""create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.""",
+        description="create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags=["calendar"],
     )
     def create_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients."""
+        """create_specific_calendar_event: POST /me/calendars/{calendar-id}/events
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
         client = get_client()
-        path = "/me/calendars/{calendar-id}/events"
-        # Replace path parameters
-        for k, v in {"calendar-id": calendar_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_specific_calendar_event(
+            calendar_id=calendar_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="update_specific_calendar_event",
-        description="""update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.""",
+        description="update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags=["calendar"],
     )
     def update_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
         event_id: str = Field(..., description="Parameter for event-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
-        """update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients."""
+        """update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
         client = get_client()
-        path = "/me/calendars/{calendar-id}/events/{event-id}"
-        # Replace path parameters
-        for k, v in {"calendar-id": calendar_id, "event-id": event_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_specific_calendar_event(
+            calendar_id=calendar_id, event_id=event_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="delete_specific_calendar_event",
-        description="""delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}""",
+        description="delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}",
         tags=["calendar"],
     )
     def delete_specific_calendar_event(
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
         event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}"""
         client = get_client()
-        path = "/me/calendars/{calendar-id}/events/{event-id}"
-        # Replace path parameters
-        for k, v in {"calendar-id": calendar_id, "event-id": event_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_specific_calendar_event(
+            calendar_id=calendar_id, event_id=event_id, params=params
+        )
 
     @mcp.tool(
         name="get_calendar_view",
-        description="""get_calendar_view: GET /me/calendarView""",
+        description="get_calendar_view: GET /me/calendarView",
         tags=["calendar"],
     )
     def get_calendar_view(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
         timezone: Optional[str] = Field(None, description="IANA timezone"),
     ) -> Any:
         """get_calendar_view: GET /me/calendarView"""
         client = get_client()
-        path = "/me/calendarView"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        if timezone:
-            request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_calendar_view(params=params, timezone=timezone)
 
     @mcp.tool(
         name="list_calendars",
-        description="""list_calendars: GET /me/calendars""",
+        description="list_calendars: GET /me/calendars",
         tags=["calendar", "files"],
     )
     def list_calendars(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_calendars: GET /me/calendars"""
         client = get_client()
-        path = "/me/calendars"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_calendars(params=params)
 
     @mcp.tool(
         name="find_meeting_times",
-        description="""find_meeting_times: POST /me/findMeetingTimes""",
+        description="find_meeting_times: POST /me/findMeetingTimes",
         tags=["calendar", "user"],
     )
     def find_meeting_times(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """find_meeting_times: POST /me/findMeetingTimes"""
         client = get_client()
-        path = "/me/findMeetingTimes"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.find_meeting_times(data=data, params=params)
 
     @mcp.tool(
-        name="list_drives",
-        description="""list_drives: GET /me/drives""",
-        tags=["files"],
+        name="list_drives", description="list_drives: GET /me/drives", tags=["files"]
     )
     def list_drives(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_drives: GET /me/drives"""
         client = get_client()
-        path = "/me/drives"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_drives(params=params)
 
     @mcp.tool(
         name="get_drive_root_item",
-        description="""get_drive_root_item: GET /drives/{drive-id}/root""",
+        description="get_drive_root_item: GET /drives/{drive-id}/root",
         tags=["files"],
     )
     def get_drive_root_item(
         drive_id: str = Field(..., description="Parameter for drive-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_drive_root_item: GET /drives/{drive-id}/root"""
         client = get_client()
-        path = "/drives/{drive-id}/root"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_drive_root_item(drive_id=drive_id, params=params)
 
     @mcp.tool(
         name="get_root_folder",
-        description="""get_root_folder: GET /drives/{drive-id}/root""",
+        description="get_root_folder: GET /drives/{drive-id}/root",
         tags=["mail", "files"],
     )
     def get_root_folder(
         drive_id: str = Field(..., description="Parameter for drive-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_root_folder: GET /drives/{drive-id}/root"""
         client = get_client()
-        path = "/drives/{drive-id}/root"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_root_folder(drive_id=drive_id, params=params)
 
     @mcp.tool(
         name="list_folder_files",
-        description="""list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children""",
+        description="list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children",
         tags=["mail", "files"],
     )
     def list_folder_files(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/children"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_folder_files(
+            drive_id=drive_id, driveItem_id=driveItem_id, params=params
+        )
 
     @mcp.tool(
         name="download_onedrive_file_content",
-        description="""download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content""",
+        description="download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content",
         tags=["files"],
     )
     def download_onedrive_file_content(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/content"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.download_onedrive_file_content(
+            drive_id=drive_id, driveItem_id=driveItem_id, params=params
+        )
 
     @mcp.tool(
         name="delete_onedrive_file",
-        description="""delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}""",
+        description="delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}",
         tags=["files"],
     )
     def delete_onedrive_file(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_onedrive_file(
+            drive_id=drive_id, driveItem_id=driveItem_id, params=params
+        )
 
     @mcp.tool(
         name="upload_file_content",
-        description="""upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content""",
+        description="upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content",
         tags=["files"],
     )
     def upload_file_content(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/content"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PUT"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.upload_file_content(
+            drive_id=drive_id, driveItem_id=driveItem_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="create_excel_chart",
-        description="""create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add""",
+        description="create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add",
         tags=["files"],
     )
     def create_excel_chart(
@@ -1195,33 +810,24 @@ def register_tools(mcp: FastMCP):
         workbookWorksheet_id: str = Field(
             ..., description="Parameter for workbookWorksheet-id"
         ),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add"
-        # Replace path parameters
-        for k, v in {
-            "drive-id": drive_id,
-            "driveItem-id": driveItem_id,
-            "workbookWorksheet-id": workbookWorksheet_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_excel_chart(
+            drive_id=drive_id,
+            driveItem_id=driveItem_id,
+            workbookWorksheet_id=workbookWorksheet_id,
+            data=data,
+            params=params,
+        )
 
     @mcp.tool(
         name="format_excel_range",
-        description="""format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format""",
+        description="format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format",
         tags=["files"],
     )
     def format_excel_range(
@@ -1230,33 +836,24 @@ def register_tools(mcp: FastMCP):
         workbookWorksheet_id: str = Field(
             ..., description="Parameter for workbookWorksheet-id"
         ),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format"
-        # Replace path parameters
-        for k, v in {
-            "drive-id": drive_id,
-            "driveItem-id": driveItem_id,
-            "workbookWorksheet-id": workbookWorksheet_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.format_excel_range(
+            drive_id=drive_id,
+            driveItem_id=driveItem_id,
+            workbookWorksheet_id=workbookWorksheet_id,
+            data=data,
+            params=params,
+        )
 
     @mcp.tool(
         name="sort_excel_range",
-        description="""sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort""",
+        description="sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort",
         tags=["files"],
     )
     def sort_excel_range(
@@ -1265,33 +862,24 @@ def register_tools(mcp: FastMCP):
         workbookWorksheet_id: str = Field(
             ..., description="Parameter for workbookWorksheet-id"
         ),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort"
-        # Replace path parameters
-        for k, v in {
-            "drive-id": drive_id,
-            "driveItem-id": driveItem_id,
-            "workbookWorksheet-id": workbookWorksheet_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.sort_excel_range(
+            drive_id=drive_id,
+            driveItem_id=driveItem_id,
+            workbookWorksheet_id=workbookWorksheet_id,
+            data=data,
+            params=params,
+        )
 
     @mcp.tool(
         name="get_excel_range",
-        description="""get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')""",
+        description="get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')",
         tags=["files"],
     )
     def get_excel_range(
@@ -1301,1358 +889,864 @@ def register_tools(mcp: FastMCP):
             ..., description="Parameter for workbookWorksheet-id"
         ),
         address: str = Field(..., description="Parameter for address"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')"
-        # Replace path parameters
-        for k, v in {
-            "drive-id": drive_id,
-            "driveItem-id": driveItem_id,
-            "workbookWorksheet-id": workbookWorksheet_id,
-            "address": address,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_excel_range(
+            drive_id=drive_id,
+            driveItem_id=driveItem_id,
+            workbookWorksheet_id=workbookWorksheet_id,
+            address=address,
+            params=params,
+        )
 
     @mcp.tool(
         name="list_excel_worksheets",
-        description="""list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets""",
+        description="list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets",
         tags=["files"],
     )
     def list_excel_worksheets(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets"""
         client = get_client()
-        path = "/drives/{drive-id}/items/{driveItem-id}/workbook/worksheets"
-        # Replace path parameters
-        for k, v in {"drive-id": drive_id, "driveItem-id": driveItem_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_excel_worksheets(
+            drive_id=drive_id, driveItem_id=driveItem_id, params=params
+        )
 
     @mcp.tool(
         name="list_onenote_notebooks",
-        description="""list_onenote_notebooks: GET /me/onenote/notebooks""",
+        description="list_onenote_notebooks: GET /me/onenote/notebooks",
         tags=["files", "notes"],
     )
     def list_onenote_notebooks(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_onenote_notebooks: GET /me/onenote/notebooks"""
         client = get_client()
-        path = "/me/onenote/notebooks"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_onenote_notebooks(params=params)
 
     @mcp.tool(
         name="list_onenote_notebook_sections",
-        description="""list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections""",
+        description="list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections",
         tags=["files", "notes"],
     )
     def list_onenote_notebook_sections(
         notebook_id: str = Field(..., description="Parameter for notebook-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections"""
         client = get_client()
-        path = "/me/onenote/notebooks/{notebook-id}/sections"
-        # Replace path parameters
-        for k, v in {"notebook-id": notebook_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_onenote_notebook_sections(
+            notebook_id=notebook_id, params=params
+        )
 
     @mcp.tool(
         name="list_onenote_section_pages",
-        description="""list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages""",
+        description="list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages",
         tags=["files", "notes"],
     )
     def list_onenote_section_pages(
         onenoteSection_id: str = Field(
             ..., description="Parameter for onenoteSection-id"
         ),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages"""
         client = get_client()
-        path = "/me/onenote/sections/{onenoteSection-id}/pages"
-        # Replace path parameters
-        for k, v in {"onenoteSection-id": onenoteSection_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_onenote_section_pages(
+            onenoteSection_id=onenoteSection_id, params=params
+        )
 
     @mcp.tool(
         name="get_onenote_page_content",
-        description="""get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content""",
+        description="get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content",
         tags=["notes"],
     )
     def get_onenote_page_content(
         onenotePage_id: str = Field(..., description="Parameter for onenotePage-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content"""
         client = get_client()
-        path = "/me/onenote/pages/{onenotePage-id}/content"
-        # Replace path parameters
-        for k, v in {"onenotePage-id": onenotePage_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_onenote_page_content(
+            onenotePage_id=onenotePage_id, params=params
+        )
 
     @mcp.tool(
         name="create_onenote_page",
-        description="""create_onenote_page: POST /me/onenote/pages""",
+        description="create_onenote_page: POST /me/onenote/pages",
         tags=["notes"],
     )
     def create_onenote_page(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """create_onenote_page: POST /me/onenote/pages"""
         client = get_client()
-        path = "/me/onenote/pages"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_onenote_page(data=data, params=params)
 
     @mcp.tool(
         name="list_todo_task_lists",
-        description="""list_todo_task_lists: GET /me/todo/lists""",
+        description="list_todo_task_lists: GET /me/todo/lists",
         tags=["files", "tasks"],
     )
     def list_todo_task_lists(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_todo_task_lists: GET /me/todo/lists"""
         client = get_client()
-        path = "/me/todo/lists"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_todo_task_lists(params=params)
 
     @mcp.tool(
         name="list_todo_tasks",
-        description="""list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks""",
+        description="list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks",
         tags=["files", "tasks"],
     )
     def list_todo_tasks(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks"""
         client = get_client()
-        path = "/me/todo/lists/{todoTaskList-id}/tasks"
-        # Replace path parameters
-        for k, v in {"todoTaskList-id": todoTaskList_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_todo_tasks(todoTaskList_id=todoTaskList_id, params=params)
 
     @mcp.tool(
         name="get_todo_task",
-        description="""get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}""",
+        description="get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
         tags=["tasks"],
     )
     def get_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
         client = get_client()
-        path = "/me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"
-        # Replace path parameters
-        for k, v in {
-            "todoTaskList-id": todoTaskList_id,
-            "todoTask-id": todoTask_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_todo_task(
+            todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
+        )
 
     @mcp.tool(
         name="create_todo_task",
-        description="""create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks""",
+        description="create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks",
         tags=["tasks"],
     )
     def create_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks"""
         client = get_client()
-        path = "/me/todo/lists/{todoTaskList-id}/tasks"
-        # Replace path parameters
-        for k, v in {"todoTaskList-id": todoTaskList_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_todo_task(
+            todoTaskList_id=todoTaskList_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="update_todo_task",
-        description="""update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}""",
+        description="update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
         tags=["tasks"],
     )
     def update_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
         client = get_client()
-        path = "/me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"
-        # Replace path parameters
-        for k, v in {
-            "todoTaskList-id": todoTaskList_id,
-            "todoTask-id": todoTask_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_todo_task(
+            todoTaskList_id=todoTaskList_id,
+            todoTask_id=todoTask_id,
+            data=data,
+            params=params,
+        )
 
     @mcp.tool(
         name="delete_todo_task",
-        description="""delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}""",
+        description="delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
         tags=["tasks"],
     )
     def delete_todo_task(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
         client = get_client()
-        path = "/me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"
-        # Replace path parameters
-        for k, v in {
-            "todoTaskList-id": todoTaskList_id,
-            "todoTask-id": todoTask_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_todo_task(
+            todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
+        )
 
     @mcp.tool(
         name="list_planner_tasks",
-        description="""list_planner_tasks: GET /me/planner/tasks""",
+        description="list_planner_tasks: GET /me/planner/tasks",
         tags=["files", "tasks"],
     )
     def list_planner_tasks(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_planner_tasks: GET /me/planner/tasks"""
         client = get_client()
-        path = "/me/planner/tasks"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_planner_tasks(params=params)
 
     @mcp.tool(
         name="get_planner_plan",
-        description="""get_planner_plan: GET /planner/plans/{plannerPlan-id}""",
+        description="get_planner_plan: GET /planner/plans/{plannerPlan-id}",
         tags=["tasks"],
     )
     def get_planner_plan(
         plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_planner_plan: GET /planner/plans/{plannerPlan-id}"""
         client = get_client()
-        path = "/planner/plans/{plannerPlan-id}"
-        # Replace path parameters
-        for k, v in {"plannerPlan-id": plannerPlan_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_planner_plan(plannerPlan_id=plannerPlan_id, params=params)
 
     @mcp.tool(
         name="list_plan_tasks",
-        description="""list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks""",
+        description="list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks",
         tags=["files", "tasks"],
     )
     def list_plan_tasks(
         plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks"""
         client = get_client()
-        path = "/planner/plans/{plannerPlan-id}/tasks"
-        # Replace path parameters
-        for k, v in {"plannerPlan-id": plannerPlan_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_plan_tasks(plannerPlan_id=plannerPlan_id, params=params)
 
     @mcp.tool(
         name="get_planner_task",
-        description="""get_planner_task: GET /planner/tasks/{plannerTask-id}""",
+        description="get_planner_task: GET /planner/tasks/{plannerTask-id}",
         tags=["tasks"],
     )
     def get_planner_task(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_planner_task: GET /planner/tasks/{plannerTask-id}"""
         client = get_client()
-        path = "/planner/tasks/{plannerTask-id}"
-        # Replace path parameters
-        for k, v in {"plannerTask-id": plannerTask_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_planner_task(plannerTask_id=plannerTask_id, params=params)
 
     @mcp.tool(
         name="create_planner_task",
-        description="""create_planner_task: POST /planner/tasks""",
+        description="create_planner_task: POST /planner/tasks",
         tags=["tasks"],
     )
     def create_planner_task(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """create_planner_task: POST /planner/tasks"""
         client = get_client()
-        path = "/planner/tasks"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_planner_task(data=data, params=params)
 
     @mcp.tool(
         name="update_planner_task",
-        description="""update_planner_task: PATCH /planner/tasks/{plannerTask-id}""",
+        description="update_planner_task: PATCH /planner/tasks/{plannerTask-id}",
         tags=["tasks"],
     )
     def update_planner_task(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """update_planner_task: PATCH /planner/tasks/{plannerTask-id}"""
         client = get_client()
-        path = "/planner/tasks/{plannerTask-id}"
-        # Replace path parameters
-        for k, v in {"plannerTask-id": plannerTask_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_planner_task(
+            plannerTask_id=plannerTask_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="update_planner_task_details",
-        description="""update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details""",
+        description="update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details",
         tags=["tasks"],
     )
     def update_planner_task_details(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details"""
         client = get_client()
-        path = "/planner/tasks/{plannerTask-id}/details"
-        # Replace path parameters
-        for k, v in {"plannerTask-id": plannerTask_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_planner_task_details(
+            plannerTask_id=plannerTask_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="list_outlook_contacts",
-        description="""list_outlook_contacts: GET /me/contacts""",
+        description="list_outlook_contacts: GET /me/contacts",
         tags=["files", "contacts"],
     )
     def list_outlook_contacts(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_outlook_contacts: GET /me/contacts"""
         client = get_client()
-        path = "/me/contacts"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_outlook_contacts(params=params)
 
     @mcp.tool(
         name="get_outlook_contact",
-        description="""get_outlook_contact: GET /me/contacts/{contact-id}""",
+        description="get_outlook_contact: GET /me/contacts/{contact-id}",
         tags=["contacts"],
     )
     def get_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_outlook_contact: GET /me/contacts/{contact-id}"""
         client = get_client()
-        path = "/me/contacts/{contact-id}"
-        # Replace path parameters
-        for k, v in {"contact-id": contact_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_outlook_contact(contact_id=contact_id, params=params)
 
     @mcp.tool(
         name="create_outlook_contact",
-        description="""create_outlook_contact: POST /me/contacts""",
+        description="create_outlook_contact: POST /me/contacts",
         tags=["contacts"],
     )
     def create_outlook_contact(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """create_outlook_contact: POST /me/contacts"""
         client = get_client()
-        path = "/me/contacts"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.create_outlook_contact(data=data, params=params)
 
     @mcp.tool(
         name="update_outlook_contact",
-        description="""update_outlook_contact: PATCH /me/contacts/{contact-id}""",
+        description="update_outlook_contact: PATCH /me/contacts/{contact-id}",
         tags=["contacts"],
     )
     def update_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """update_outlook_contact: PATCH /me/contacts/{contact-id}"""
         client = get_client()
-        path = "/me/contacts/{contact-id}"
-        # Replace path parameters
-        for k, v in {"contact-id": contact_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "PATCH"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.update_outlook_contact(
+            contact_id=contact_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="delete_outlook_contact",
-        description="""delete_outlook_contact: DELETE /me/contacts/{contact-id}""",
+        description="delete_outlook_contact: DELETE /me/contacts/{contact-id}",
         tags=["contacts"],
     )
     def delete_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """delete_outlook_contact: DELETE /me/contacts/{contact-id}"""
         client = get_client()
-        path = "/me/contacts/{contact-id}"
-        # Replace path parameters
-        for k, v in {"contact-id": contact_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "DELETE"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.delete_outlook_contact(contact_id=contact_id, params=params)
 
     @mcp.tool(
-        name="get_current_user",
-        description="""get_current_user: GET /me""",
-        tags=["user"],
+        name="get_current_user", description="get_current_user: GET /me", tags=["user"]
     )
     def get_current_user(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """get_current_user: GET /me"""
         client = get_client()
-        path = "/me"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_current_user(params=params)
 
     @mcp.tool(
         name="list_chats",
-        description="""list_chats: GET /me/chats""",
+        description="list_chats: GET /me/chats",
         tags=["files", "chat"],
     )
     def list_chats(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_chats: GET /me/chats"""
         client = get_client()
-        path = "/me/chats"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_chats(params=params)
 
     @mcp.tool(
-        name="get_chat", description="""get_chat: GET /chats/{chat-id}""", tags=["chat"]
+        name="get_chat", description="get_chat: GET /chats/{chat-id}", tags=["chat"]
     )
     def get_chat(
         chat_id: str = Field(..., description="Parameter for chat-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_chat: GET /chats/{chat-id}"""
         client = get_client()
-        path = "/chats/{chat-id}"
-        # Replace path parameters
-        for k, v in {"chat-id": chat_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_chat(chat_id=chat_id, params=params)
 
     @mcp.tool(
         name="list_chat_messages",
-        description="""list_chat_messages: GET /chats/{chat-id}/messages""",
+        description="list_chat_messages: GET /chats/{chat-id}/messages",
         tags=["mail", "files", "user", "chat"],
     )
     def list_chat_messages(
         chat_id: str = Field(..., description="Parameter for chat-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_chat_messages: GET /chats/{chat-id}/messages"""
         client = get_client()
-        path = "/chats/{chat-id}/messages"
-        # Replace path parameters
-        for k, v in {"chat-id": chat_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_chat_messages(chat_id=chat_id, params=params)
 
     @mcp.tool(
         name="get_chat_message",
-        description="""get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}""",
+        description="get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}",
         tags=["mail", "user", "chat"],
     )
     def get_chat_message(
         chat_id: str = Field(..., description="Parameter for chat-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}"""
         client = get_client()
-        path = "/chats/{chat-id}/messages/{chatMessage-id}"
-        # Replace path parameters
-        for k, v in {"chat-id": chat_id, "chatMessage-id": chatMessage_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_chat_message(
+            chat_id=chat_id, chatMessage_id=chatMessage_id, params=params
+        )
 
     @mcp.tool(
         name="send_chat_message",
-        description="""send_chat_message: POST /chats/{chat-id}/messages""",
+        description="send_chat_message: POST /chats/{chat-id}/messages",
         tags=["mail", "user", "chat"],
     )
     def send_chat_message(
         chat_id: str = Field(..., description="Parameter for chat-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """send_chat_message: POST /chats/{chat-id}/messages"""
         client = get_client()
-        path = "/chats/{chat-id}/messages"
-        # Replace path parameters
-        for k, v in {"chat-id": chat_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.send_chat_message(chat_id=chat_id, data=data, params=params)
 
     @mcp.tool(
         name="list_joined_teams",
-        description="""list_joined_teams: GET /me/joinedTeams""",
+        description="list_joined_teams: GET /me/joinedTeams",
         tags=["files", "teams"],
     )
     def list_joined_teams(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_joined_teams: GET /me/joinedTeams"""
         client = get_client()
-        path = "/me/joinedTeams"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_joined_teams(params=params)
 
     @mcp.tool(
-        name="get_team",
-        description="""get_team: GET /teams/{team-id}""",
-        tags=["teams"],
+        name="get_team", description="get_team: GET /teams/{team-id}", tags=["teams"]
     )
     def get_team(
         team_id: str = Field(..., description="Parameter for team-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_team: GET /teams/{team-id}"""
         client = get_client()
-        path = "/teams/{team-id}"
-        # Replace path parameters
-        for k, v in {"team-id": team_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_team(team_id=team_id, params=params)
 
     @mcp.tool(
         name="list_team_channels",
-        description="""list_team_channels: GET /teams/{team-id}/channels""",
+        description="list_team_channels: GET /teams/{team-id}/channels",
         tags=["files", "teams"],
     )
     def list_team_channels(
         team_id: str = Field(..., description="Parameter for team-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_team_channels: GET /teams/{team-id}/channels"""
         client = get_client()
-        path = "/teams/{team-id}/channels"
-        # Replace path parameters
-        for k, v in {"team-id": team_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_team_channels(team_id=team_id, params=params)
 
     @mcp.tool(
         name="get_team_channel",
-        description="""get_team_channel: GET /teams/{team-id}/channels/{channel-id}""",
+        description="get_team_channel: GET /teams/{team-id}/channels/{channel-id}",
         tags=["teams"],
     )
     def get_team_channel(
         team_id: str = Field(..., description="Parameter for team-id"),
         channel_id: str = Field(..., description="Parameter for channel-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_team_channel: GET /teams/{team-id}/channels/{channel-id}"""
         client = get_client()
-        path = "/teams/{team-id}/channels/{channel-id}"
-        # Replace path parameters
-        for k, v in {"team-id": team_id, "channel-id": channel_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_team_channel(
+            team_id=team_id, channel_id=channel_id, params=params
+        )
 
     @mcp.tool(
         name="list_channel_messages",
-        description="""list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages""",
+        description="list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages",
         tags=["mail", "files", "user", "teams"],
     )
     def list_channel_messages(
         team_id: str = Field(..., description="Parameter for team-id"),
         channel_id: str = Field(..., description="Parameter for channel-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages"""
         client = get_client()
-        path = "/teams/{team-id}/channels/{channel-id}/messages"
-        # Replace path parameters
-        for k, v in {"team-id": team_id, "channel-id": channel_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_channel_messages(
+            team_id=team_id, channel_id=channel_id, params=params
+        )
 
     @mcp.tool(
         name="get_channel_message",
-        description="""get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}""",
+        description="get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}",
         tags=["mail", "user", "teams"],
     )
     def get_channel_message(
         team_id: str = Field(..., description="Parameter for team-id"),
         channel_id: str = Field(..., description="Parameter for channel-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"""
         client = get_client()
-        path = "/teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"
-        # Replace path parameters
-        for k, v in {
-            "team-id": team_id,
-            "channel-id": channel_id,
-            "chatMessage-id": chatMessage_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_channel_message(
+            team_id=team_id,
+            channel_id=channel_id,
+            chatMessage_id=chatMessage_id,
+            params=params,
+        )
 
     @mcp.tool(
         name="send_channel_message",
-        description="""send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages""",
+        description="send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages",
         tags=["mail", "user", "teams"],
     )
     def send_channel_message(
         team_id: str = Field(..., description="Parameter for team-id"),
         channel_id: str = Field(..., description="Parameter for channel-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages"""
         client = get_client()
-        path = "/teams/{team-id}/channels/{channel-id}/messages"
-        # Replace path parameters
-        for k, v in {"team-id": team_id, "channel-id": channel_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.send_channel_message(
+            team_id=team_id, channel_id=channel_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="list_team_members",
-        description="""list_team_members: GET /teams/{team-id}/members""",
+        description="list_team_members: GET /teams/{team-id}/members",
         tags=["files", "user", "teams"],
     )
     def list_team_members(
         team_id: str = Field(..., description="Parameter for team-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_team_members: GET /teams/{team-id}/members"""
         client = get_client()
-        path = "/teams/{team-id}/members"
-        # Replace path parameters
-        for k, v in {"team-id": team_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_team_members(team_id=team_id, params=params)
 
     @mcp.tool(
         name="list_chat_message_replies",
-        description="""list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies""",
+        description="list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies",
         tags=["mail", "files", "user", "chat"],
     )
     def list_chat_message_replies(
         chat_id: str = Field(..., description="Parameter for chat-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies"""
         client = get_client()
-        path = "/chats/{chat-id}/messages/{chatMessage-id}/replies"
-        # Replace path parameters
-        for k, v in {"chat-id": chat_id, "chatMessage-id": chatMessage_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_chat_message_replies(
+            chat_id=chat_id, chatMessage_id=chatMessage_id, params=params
+        )
 
     @mcp.tool(
         name="reply_to_chat_message",
-        description="""reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies""",
+        description="reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies",
         tags=["mail", "user", "chat"],
     )
     def reply_to_chat_message(
         chat_id: str = Field(..., description="Parameter for chat-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies"""
         client = get_client()
-        path = "/chats/{chat-id}/messages/{chatMessage-id}/replies"
-        # Replace path parameters
-        for k, v in {"chat-id": chat_id, "chatMessage-id": chatMessage_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.reply_to_chat_message(
+            chat_id=chat_id, chatMessage_id=chatMessage_id, data=data, params=params
+        )
 
     @mcp.tool(
         name="search_sharepoint_sites",
-        description="""search_sharepoint_sites: GET /sites""",
+        description="search_sharepoint_sites: GET /sites",
         tags=["search", "sites"],
     )
     def search_sharepoint_sites(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """search_sharepoint_sites: GET /sites"""
         client = get_client()
-        path = "/sites"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.search_sharepoint_sites(params=params)
 
     @mcp.tool(
         name="get_sharepoint_site",
-        description="""get_sharepoint_site: GET /sites/{site-id}""",
+        description="get_sharepoint_site: GET /sites/{site-id}",
         tags=["sites"],
     )
     def get_sharepoint_site(
         site_id: str = Field(..., description="Parameter for site-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_sharepoint_site: GET /sites/{site-id}"""
         client = get_client()
-        path = "/sites/{site-id}"
-        # Replace path parameters
-        for k, v in {"site-id": site_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_site(site_id=site_id, params=params)
 
     @mcp.tool(
         name="list_sharepoint_site_drives",
-        description="""list_sharepoint_site_drives: GET /sites/{site-id}/drives""",
+        description="list_sharepoint_site_drives: GET /sites/{site-id}/drives",
         tags=["files", "sites"],
     )
     def list_sharepoint_site_drives(
         site_id: str = Field(..., description="Parameter for site-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_sharepoint_site_drives: GET /sites/{site-id}/drives"""
         client = get_client()
-        path = "/sites/{site-id}/drives"
-        # Replace path parameters
-        for k, v in {"site-id": site_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_sharepoint_site_drives(site_id=site_id, params=params)
 
     @mcp.tool(
         name="get_sharepoint_site_drive_by_id",
-        description="""get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}""",
+        description="get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}",
         tags=["files", "sites"],
     )
     def get_sharepoint_site_drive_by_id(
         site_id: str = Field(..., description="Parameter for site-id"),
         drive_id: str = Field(..., description="Parameter for drive-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}"""
         client = get_client()
-        path = "/sites/{site-id}/drives/{drive-id}"
-        # Replace path parameters
-        for k, v in {"site-id": site_id, "drive-id": drive_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_site_drive_by_id(
+            site_id=site_id, drive_id=drive_id, params=params
+        )
 
     @mcp.tool(
         name="list_sharepoint_site_items",
-        description="""list_sharepoint_site_items: GET /sites/{site-id}/items""",
+        description="list_sharepoint_site_items: GET /sites/{site-id}/items",
         tags=["files", "sites"],
     )
     def list_sharepoint_site_items(
         site_id: str = Field(..., description="Parameter for site-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_sharepoint_site_items: GET /sites/{site-id}/items"""
         client = get_client()
-        path = "/sites/{site-id}/items"
-        # Replace path parameters
-        for k, v in {"site-id": site_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_sharepoint_site_items(site_id=site_id, params=params)
 
     @mcp.tool(
         name="get_sharepoint_site_item",
-        description="""get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}""",
+        description="get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}",
         tags=["files", "sites"],
     )
     def get_sharepoint_site_item(
         site_id: str = Field(..., description="Parameter for site-id"),
         baseItem_id: str = Field(..., description="Parameter for baseItem-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}"""
         client = get_client()
-        path = "/sites/{site-id}/items/{baseItem-id}"
-        # Replace path parameters
-        for k, v in {"site-id": site_id, "baseItem-id": baseItem_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_site_item(
+            site_id=site_id, baseItem_id=baseItem_id, params=params
+        )
 
     @mcp.tool(
         name="list_sharepoint_site_lists",
-        description="""list_sharepoint_site_lists: GET /sites/{site-id}/lists""",
+        description="list_sharepoint_site_lists: GET /sites/{site-id}/lists",
         tags=["files", "sites"],
     )
     def list_sharepoint_site_lists(
         site_id: str = Field(..., description="Parameter for site-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_sharepoint_site_lists: GET /sites/{site-id}/lists"""
         client = get_client()
-        path = "/sites/{site-id}/lists"
-        # Replace path parameters
-        for k, v in {"site-id": site_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_sharepoint_site_lists(site_id=site_id, params=params)
 
     @mcp.tool(
         name="get_sharepoint_site_list",
-        description="""get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}""",
+        description="get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}",
         tags=["files", "sites"],
     )
     def get_sharepoint_site_list(
         site_id: str = Field(..., description="Parameter for site-id"),
         list_id: str = Field(..., description="Parameter for list-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}"""
         client = get_client()
-        path = "/sites/{site-id}/lists/{list-id}"
-        # Replace path parameters
-        for k, v in {"site-id": site_id, "list-id": list_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_site_list(
+            site_id=site_id, list_id=list_id, params=params
+        )
 
     @mcp.tool(
         name="list_sharepoint_site_list_items",
-        description="""list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items""",
+        description="list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items",
         tags=["files", "sites"],
     )
     def list_sharepoint_site_list_items(
         site_id: str = Field(..., description="Parameter for site-id"),
         list_id: str = Field(..., description="Parameter for list-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items"""
         client = get_client()
-        path = "/sites/{site-id}/lists/{list-id}/items"
-        # Replace path parameters
-        for k, v in {"site-id": site_id, "list-id": list_id}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.list_sharepoint_site_list_items(
+            site_id=site_id, list_id=list_id, params=params
+        )
 
     @mcp.tool(
         name="get_sharepoint_site_list_item",
-        description="""get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}""",
+        description="get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}",
         tags=["files", "sites"],
     )
     def get_sharepoint_site_list_item(
         site_id: str = Field(..., description="Parameter for site-id"),
         list_id: str = Field(..., description="Parameter for list-id"),
         listItem_id: str = Field(..., description="Parameter for listItem-id"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}"""
         client = get_client()
-        path = "/sites/{site-id}/lists/{list-id}/items/{listItem-id}"
-        # Replace path parameters
-        for k, v in {
-            "site-id": site_id,
-            "list-id": list_id,
-            "listItem-id": listItem_id,
-        }.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_site_list_item(
+            site_id=site_id, list_id=list_id, listItem_id=listItem_id, params=params
+        )
 
     @mcp.tool(
         name="get_sharepoint_site_by_path",
-        description="""get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')""",
+        description="get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')",
         tags=["sites"],
     )
     def get_sharepoint_site_by_path(
         site_id: str = Field(..., description="Parameter for site-id"),
         path: str = Field(..., description="Parameter for path"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')"""
         client = get_client()
-        path = "/sites/{site-id}/getByPath(path='{path}')"
-        # Replace path parameters
-        for k, v in {"site-id": site_id, "path": path}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_site_by_path(
+            site_id=site_id, path=path, params=params
+        )
 
     @mcp.tool(
         name="get_sharepoint_sites_delta",
-        description="""get_sharepoint_sites_delta: GET /sites/delta()""",
+        description="get_sharepoint_sites_delta: GET /sites/delta()",
         tags=["sites"],
     )
     def get_sharepoint_sites_delta(
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """get_sharepoint_sites_delta: GET /sites/delta()"""
         client = get_client()
-        path = "/sites/delta()"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "GET"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.get_sharepoint_sites_delta(params=params)
 
     @mcp.tool(
         name="search_query",
-        description="""search_query: POST /search/query""",
+        description="search_query: POST /search/query",
         tags=["search"],
     )
     def search_query(
-        data: Optional[Dict[str, Any]] = Field(None, description="Request body data"),
-        params: Optional[Dict[str, Any]] = Field(None, description="Query parameters"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
     ) -> Any:
         """search_query: POST /search/query"""
         client = get_client()
-        path = "/search/query"
-        # Replace path parameters
-        for k, v in {}.items():
-            path = path.replace("{k}", v)
-
-        method = "POST"
-        request_params = params or {}
-        request_headers = {}
-
-        kwargs = {"headers": request_headers}
-        if method in ["POST", "PUT", "PATCH"]:
-            kwargs["json"] = data
-
-        return client.graph_request(method, path, params=request_params, **kwargs)
+        return client.search_query(data=data, params=params)
 
 
 def microsoft_mcp() -> None:
