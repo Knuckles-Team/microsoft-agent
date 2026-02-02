@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "microsoft": {
+      "url": "${MCP_URL:-http://localhost:8005/mcp}"
+    }
+  }
+}
