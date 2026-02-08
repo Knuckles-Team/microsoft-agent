@@ -1,7 +1,7 @@
 ---
 services:
   microsoft-mcp:
-    image: docker.io/knucklessg1/microsoft:latest
+    image: docker.io/knucklessg1/microsoft-agent:latest
 #    build:
 #      context: . # Debug
 #      dockerfile: debug.Dockerfile
@@ -49,7 +49,7 @@ services:
       start_period: 10s
 
   microsoft-agent:
-    image: docker.io/knucklessg1/microsoft:latest
+    image: docker.io/knucklessg1/microsoft-agent:latest
     #    build:
     #      context: . # Debug
     #      dockerfile: debug.Dockerfile
