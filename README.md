@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.2.2*
+*Version: 0.2.3*
 
 ## Overview
 
