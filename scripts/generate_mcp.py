@@ -3,7 +3,6 @@ import os
 import re
 import sys
 
-# Categories mapping for tags
 CATEGORIES = {
     "mail": ["mail", "message", "attachment", "folder", "draft"],
     "calendar": ["calendar", "event", "meeting"],
@@ -44,21 +43,17 @@ def generate_tool(endpoint):
     path_pattern = endpoint["pathPattern"]
     method = endpoint["method"].upper()
 
-    # Description creation
     description = f"{tool_name}: {method} {path_pattern}"
 
     if "llmTip" in endpoint:
-        # Use simple replace to avoid quote issues, assuming no triple quotes in tip
         tip = endpoint["llmTip"].replace('"', "'")
         description += f"\\n\\nTIP: {tip}"
 
     tags = get_tags(tool_name)
     tags_str = f", tags={json.dumps(tags)}" if tags else ""
 
-    # Analyze path parameters
     path_params = re.findall(r"\{([a-zA-Z0-9_-]+)\}", path_pattern)
 
-    # Construct function definition
     func_args = []
     path_args = []
 
@@ -69,7 +64,6 @@ def generate_tool(endpoint):
         )
         path_args.append(f'"{param}": {py_param}')
 
-    # Add standard args
     if method in ["POST", "PUT", "PATCH"]:
         func_args.append(
             'data: Optional[Dict[str, Any]] = Field(None, description="Request body data")'
@@ -83,21 +77,12 @@ def generate_tool(endpoint):
             'timezone: Optional[str] = Field(None, description="IANA timezone")'
         )
 
-    # Logic for timezone header - using triple quotes to avoid single/double quote conflict
     timezone_logic = ""
     if "supportsTimezone" in endpoint:
-        # We want: if timezone: request_headers["Prefer"] = f'outlook.timezone="{timezone}"'
-        # We use a raw string for the f-string part in the generated code
         timezone_logic = "if timezone: request_headers['Prefer'] = f'outlook.timezone=\"{timezone}\"'"
 
     args_str = ", ".join(func_args)
     path_args_str = ", ".join(path_args)
-
-    # We use triple quotes for the function definition template
-    # We escape the opening triple quote of the tool decorators description in the f-string logic
-    # Basically we want generated code to look like:
-    # @mcp.tool(name="...", description="""...""")
-    # So we write description="\"\"\"...\"\"\""
 
     func_def = f'''
     @mcp.tool(name="{tool_name}", description="""{description}"""{tags_str})
@@ -133,8 +118,6 @@ def main():
     with open(endpoints_path, "r") as f:
         endpoints = json.load(f)
 
-    # Header with AuthManager integration
-    # Using explicit newlines in print to make it cleaner than triple quoted block
     print("#!/usr/bin/python")
     print("# coding: utf-8")
     print("")

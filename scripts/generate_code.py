@@ -4,7 +4,6 @@ import glob
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-# Configuration
 DOCS_DIR = os.path.abspath(
     "/home/genius/Workspace/microsoft-agent/microsoft-documentation"
 )
@@ -13,27 +12,22 @@ OUTPUT_DIR = os.path.abspath("/home/genius/Workspace/microsoft-agent/microsoft_a
 
 @dataclass
 class ApiEndpoint:
-    name: str  # e.g., get_user
-    resource: str  # e.g., user
-    method: str  # e.g., GET
-    url: str  # e.g., /users/{id | userPrincipalName}
+    name: str
+    resource: str
+    method: str
+    url: str
     description: str
-    parameters: List[str] = field(default_factory=list)  # sanitized param names
-    original_parameters: List[str] = field(
-        default_factory=list
-    )  # matching raw URL placeholders
+    parameters: List[str] = field(default_factory=list)
+    original_parameters: List[str] = field(default_factory=list)
     doc_file: str = ""
 
 
 def sanitize_name(name: str) -> str:
     """Sanitize string to be valid python identifier"""
-    # Replace - and | with _
     name = (
         name.replace("-", "_").replace("|", "_or_").replace(":", "_").replace(".", "_")
     )
-    # Remove any other non-alphanumeric chars (except _)
     name = re.sub(r"[^a-zA-Z0-9_]", "", name)
-    # Ensure it doesn't start with number
     if name[0].isdigit():
         name = "v_" + name
     return name
@@ -44,10 +38,7 @@ def derive_param_name(param_raw: str, url_segment: str) -> str:
     sanitized = sanitize_name(param_raw)
 
     if sanitized == "id":
-        # Check preceding segment
-        # e.g. /groups/{id} -> group_id
         if url_segment:
-            # Singularize if possible (simple heuristic)
             context = url_segment.rstrip("s")
             return f"{context}_id"
 
@@ -67,13 +58,12 @@ def parse_markdown(file_path: str) -> Optional[ApiEndpoint]:
 
     resource = parts[0]
     operation = "-".join(parts[1:])
-    name = f"{operation}_{resource}"  # e.g. get_user
+    name = f"{operation}_{resource}"
     name = sanitize_name(name)
 
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Extract HTTP Method and URL
     http_match = re.search(
         r"HTTP request.*?```(.*?)```", content, re.DOTALL | re.IGNORECASE
     )
@@ -103,7 +93,6 @@ def parse_markdown(file_path: str) -> Optional[ApiEndpoint]:
                 candidates.append(line)
 
         if candidates:
-            # Heuristic: pick the one with most parameters or longest
             complex_candidates = [c for c in candidates if "{" in c]
             if complex_candidates:
                 request_line = complex_candidates[0]
@@ -115,39 +104,29 @@ def parse_markdown(file_path: str) -> Optional[ApiEndpoint]:
             method = parts_req[0]
             url = parts_req[1]
 
-    # Clean URL
     if "?" in url:
         url = url.split("?")[0]
 
-    # Extract Description
     description = ""
     title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
     if title_match:
         description = title_match.group(1)
 
-    # Parameters inference from URL
-    # We need to preserve order and deduplicate names
     parameters = []
     original_parameters = []
 
-    # Split URL by segments to find context for params
-    # /groups/{id}/members/{id}
     segments = url.split("/")
 
     current_params = []
 
     for i, seg in enumerate(segments):
-        # Check if segment contains {param}
         match = re.search(r"\{(.*?)\}", seg)
         if match:
             raw_param = match.group(1)
-            # Look at previous segment for context
             prev_seg = segments[i - 1] if i > 0 else ""
 
-            # Derive name
             derived = derive_param_name(raw_param, prev_seg)
 
-            # Ensure uniqueness
             base_derived = derived
             counter = 2
             while derived in current_params:
@@ -227,31 +206,12 @@ def generate_api_code(endpoints: List[ApiEndpoint]) -> str:
         code.append(f"    def {ep.name}({', '.join(args)}) -> Any:")
         code.append(f'        """{ep.description}"""')
 
-        # Construct URL with replaced placeholders
         target_url = ep.url
-        # We need to replace {original} with {sanitized} in the string for f-string
-        # But wait, python f-string needs the variable name inside {}
-        # The URL has {id}, we have variable group_id.
-        # We need to construct a literal string where {id} is replaced by {group_id}
-
-        # We iterate parameters and replace occurrences in order?
-        # A bit risky if duplicates. We used segments to parse.
-        # Let's rebuild the URL from segments logic if possible, or just string replacement
-        # if we assume one-to-one mapping in order.
-
-        # Safer: Replace exact occurrences.
-        # But we have multiple {id}.
-        # Regex replacement one by one?
 
         replaced_url = target_url
         for i, original in enumerate(ep.original_parameters):
             sanitized = ep.parameters[i]
-            # specific replacement of first occurrence of {original}
-            # We must be careful not to replace already replaced ones or wrong ones.
-            # Best way: split by {, find the one matching, replace, join.
-            # actually we can just use the fact that we parsed them in order.
 
-            # Let's replace the first occurrence of f"{{{original}}}"
             replaced_url = replaced_url.replace(
                 f"{{{original}}}", f"{{{sanitized}}}", 1
             )
@@ -361,7 +321,6 @@ def generate_agent_code(endpoints: List[ApiEndpoint]) -> str:
     code.append("    model = create_model(provider, model_id, None, None)")
     code.append("    ")
     code.append("    child_agents = {}")
-    # code.append("    all_tools = mcp._tools") # Not needed if we use inspect
     code.append("    ")
     code.append("    # Define tools for each sub-agent dynamically")
     code.append("    import inspect")
@@ -425,8 +384,6 @@ def generate_agent_code(endpoints: List[ApiEndpoint]) -> str:
     code.append("    args = parser.parse_args()")
     code.append("    ")
     code.append("    print(f'Starting {AGENT_NAME}...')")
-    # For now we won't implement the full FastAPI server mounting here as it requires 'eunomia' and complex setup.
-    # But we provide the entry point that initializes the agent.
     code.append("    agent = create_agent(provider=args.provider, model_id=args.model)")
     code.append("    print('Agent created successfully.')")
     code.append(
@@ -452,19 +409,16 @@ def main():
 
     print(f"Successfully parsed {len(endpoints)} endpoints.")
 
-    # Generate API
     api_code = generate_api_code(endpoints)
     with open(os.path.join(OUTPUT_DIR, "microsoft_api.py"), "w") as f:
         f.write(api_code)
     print("Generated microsoft_api.py")
 
-    # Generate MCP
     mcp_code = generate_mcp_code(endpoints)
     with open(os.path.join(OUTPUT_DIR, "microsoft_mcp.py"), "w") as f:
         f.write(mcp_code)
     print("Generated microsoft_mcp.py")
 
-    # Generate Agent
     agent_code = generate_agent_code(endpoints)
     with open(os.path.join(OUTPUT_DIR, "microsoft_agent.py"), "w") as f:
         f.write(agent_code)

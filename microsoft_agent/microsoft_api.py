@@ -9,7 +9,6 @@ from urllib.parse import urljoin
 from pydantic import Field
 from microsoft_agent.auth import AuthManager
 
-# Initialize AuthManager
 CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
 AUTHORITY = "https://login.microsoftonline.com/common"
 SCOPES = [
@@ -77,8 +76,6 @@ class Api:
             return response.json()
         except Exception:
             return response.text
-
-    # --- Auto-generated Methods (183 endpoints) ---
 
     def getmemberobjects_directoryobject(
         self, directoryObject_id: str, data: Dict = None, params: Dict = None
