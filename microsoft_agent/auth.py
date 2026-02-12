@@ -16,7 +16,6 @@ FALLBACK_DIR = Path.home() / ".microsoft-agent"
 FALLBACK_PATH = FALLBACK_DIR / ".token_cache.json"
 SELECTED_ACCOUNT_PATH = FALLBACK_DIR / ".selected_account.json"
 
-# Ensure fallback directory exists
 FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -53,7 +52,6 @@ class AuthManager:
         if cache_data:
             self.token_cache.deserialize(cache_data)
 
-        # Load selected account
         self.load_selected_account()
 
     def save_token_cache(self):
@@ -147,27 +145,12 @@ class AuthManager:
         if "access_token" in result:
             self.access_token = result["access_token"]
 
-            # Auto-select new account
             if not self.selected_account_id:
-                # It's a bit tricky to match the result account to the cache account object immediately
-                # but usually acquire_token_by_device_flow adds it to cache.
-                # Let's refresh accounts
-                # accounts = self.msal_app.get_accounts()
-                # Try to assume the last added one or just the one matching the username if available?
-                # result does not always return the full account object structure found in cache.
-                # But result usually has 'id_token_claims' etc.
                 pass
-
-            # Update selected account if we can identify it,
-            # for now, if it's the first one, get_current_account will handle it.
-            # If we want to be precise, we can check result.get("home_account_id") (depends on msal version but usually present in result of acquire_token...)
-            # Actually acquire_token_by_device_flow returns a dict which might not have home_account_id directly at top level unless it's an ID token.
-            # But the cache is updated.
 
             self.save_token_cache()
 
-            # Try to find the account that was just added
-            if "home_account_id" in result:  # Sometimes it is directly here
+            if "home_account_id" in result:
                 self.selected_account_id = result["home_account_id"]
                 self.save_selected_account()
 
@@ -184,7 +167,6 @@ class AuthManager:
         self.selected_account_id = None
         self.access_token = None
 
-        # Clear persistence
         try:
             keyring.delete_password(SERVICE_NAME, TOKEN_CACHE_ACCOUNT)
             keyring.delete_password(SERVICE_NAME, SELECTED_ACCOUNT_KEY)
