@@ -30,7 +30,7 @@ CATEGORIES = {
 
 
 def get_tags(tool_name):
-    tags = []
+    tags = {}
     lower_name = tool_name.lower()
     for cat, keywords in CATEGORIES.items():
         if any(kw in lower_name for kw in keywords):
@@ -50,7 +50,7 @@ def generate_tool(endpoint):
         description += f"\\n\\nTIP: {tip}"
 
     tags = get_tags(tool_name)
-    tags_str = f", tags={json.dumps(tags)}" if tags else ""
+    tags_str = f", tags={set(tags)}" if tags else ""
 
     path_params = re.findall(r"\{([a-zA-Z0-9_-]+)\}", path_pattern)
 
@@ -148,7 +148,7 @@ def main():
     print("    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)")
     print("")
     print(
-        '    @mcp.tool(name="login", description="Authenticate with Microsoft using device code flow", tags=["auth"])'
+        '    @mcp.tool(name="login", description="Authenticate with Microsoft using device code flow", tags={"auth"})'
     )
     print(
         '    def login(force: bool = Field(False, description="Force a new login even if already logged in")) -> str:'
@@ -174,7 +174,7 @@ def main():
     print('            return f"Authentication failed: {str(e)}"')
     print("")
     print(
-        '    @mcp.tool(name="logout", description="Log out from Microsoft account", tags=["auth"])'
+        '    @mcp.tool(name="logout", description="Log out from Microsoft account", tags={"auth"})'
     )
     print("    def logout() -> str:")
     print('        """Log out from Microsoft account"""')
@@ -182,7 +182,7 @@ def main():
     print('        return "Logged out successfully"')
     print("")
     print(
-        '    @mcp.tool(name="verify_login", description="Check current Microsoft authentication status", tags=["auth"])'
+        '    @mcp.tool(name="verify_login", description="Check current Microsoft authentication status", tags={"auth"})'
     )
     print("    def verify_login() -> str:")
     print('        """Check current Microsoft authentication status"""')
@@ -196,7 +196,7 @@ def main():
     print('        return "Not logged in"')
     print("")
     print(
-        '    @mcp.tool(name="list_accounts", description="List all available Microsoft accounts", tags=["auth"])'
+        '    @mcp.tool(name="list_accounts", description="List all available Microsoft accounts", tags={"auth"})'
     )
     print("    def list_accounts() -> str:")
     print('        """List all available Microsoft accounts"""')
@@ -219,7 +219,7 @@ def main():
     print('        return "\\n".join(result)')
     print("")
     print(
-        '    @mcp.tool(name="search_tools", description="Search available Microsoft Graph API tools", tags=["meta"])'
+        '    @mcp.tool(name="search_tools", description="Search available Microsoft Graph API tools", tags={"meta"})'
     )
     print(
         '    def search_tools(query: str = Field(..., description="Search query"), limit: int = Field(20, description="Max results")) -> str:'

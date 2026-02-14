@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.2.7*
+*Version: 0.2.8*
 
 ## Overview
 
@@ -235,3 +235,4 @@ uv pip install microsoft-agent
 Documentation:
 
 [Microsoft API Docs](https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview?view=graph-rest-1.0)
+[Microsoft Graph SDK](https://github.com/microsoftgraph/msgraph-sdk-python)
