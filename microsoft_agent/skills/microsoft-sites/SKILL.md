@@ -1,70 +1,33 @@
 ---
 name: microsoft-sites
-description: "Generated skill for sites operations. Contains 12 tools."
+description: "Microsoft 365 Sites — SharePoint Sites, Lists, Drives & Items"
 ---
 
-### Overview
-This skill handles operations related to sites.
+# Microsoft 365 Sites
 
-### Available Tools
-- `search_sharepoint_sites`: search_sharepoint_sites: GET /sites
-  - **Parameters**:
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_site`: get_sharepoint_site: GET /sites/{site-id}
-  - **Parameters**:
-    - `site_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_sharepoint_site_drives`: list_sharepoint_site_drives: GET /sites/{site-id}/drives
-  - **Parameters**:
-    - `site_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_site_drive_by_id`: get_sharepoint_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}
-  - **Parameters**:
-    - `site_id` (str)
-    - `drive_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_sharepoint_site_items`: list_sharepoint_site_items: GET /sites/{site-id}/items
-  - **Parameters**:
-    - `site_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_site_item`: get_sharepoint_site_item: GET /sites/{site-id}/items/{baseItem-id}
-  - **Parameters**:
-    - `site_id` (str)
-    - `baseItem_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_sharepoint_site_lists`: list_sharepoint_site_lists: GET /sites/{site-id}/lists
-  - **Parameters**:
-    - `site_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_site_list`: get_sharepoint_site_list: GET /sites/{site-id}/lists/{list-id}
-  - **Parameters**:
-    - `site_id` (str)
-    - `list_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_sharepoint_site_list_items`: list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items
-  - **Parameters**:
-    - `site_id` (str)
-    - `list_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_site_list_item`: get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}
-  - **Parameters**:
-    - `site_id` (str)
-    - `list_id` (str)
-    - `listItem_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_site_by_path`: get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')
-  - **Parameters**:
-    - `site_id` (str)
-    - `path` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_sharepoint_sites_delta`: get_sharepoint_sites_delta: GET /sites/delta()
-  - **Parameters**:
-    - `params` (Optional[Dict[str, Any]])
+Manage SharePoint sites, site lists, site drives, site items, and site administration.
 
-### Usage Instructions
-1. Review the tool available in this skill.
-2. Call the tool with the required parameters.
+## Available Tools
 
-### Error Handling
-- Ensure all required parameters are provided.
-- Check return values for error messages.
+| Tool | Description |
+|------|-------------|
+| `get_admin_sharepoint` | Get SharePoint admin settings for the tenant |
+| `get_sharepoint_site_by_path` | get_sharepoint_site_by_path: GET /sites/{hostname}:/{server-relative-path} |
+| `get_sharepoint_site_list_item` | get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id} |
+| `get_sharepoint_sites_delta` | get_sharepoint_sites_delta: GET /sites/delta() |
+| `get_site` | get_site: GET /sites/{site-id} |
+| `get_site_drive_by_id` | get_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id} |
+| `get_site_item` | get_site_item: GET /sites/{site-id}/items/{baseItem-id} |
+| `get_site_list` | Get a specific SharePoint site list |
+| `list_sharepoint_site_list_items` | List items in a SharePoint site list |
+| `list_site_drives` | list_site_drives: GET /sites/{site-id}/drives |
+| `list_site_items` | list_site_items: GET /sites/{site-id}/items |
+| `list_site_lists` | List lists for a SharePoint site |
+| `list_sites` | list_sites: GET /sites |
+| `update_admin_sharepoint` | Update SharePoint admin settings for the tenant |
+
+## Required Permissions
+- `Sites.Read.All`
+
+## Error Handling
+All tools return `{"error": "<message>"}` on failure.

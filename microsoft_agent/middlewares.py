@@ -1,8 +1,7 @@
 import threading
-import os
 from fastmcp.server.middleware import MiddlewareContext, Middleware
 from fastmcp.utilities.logging import get_logger
-from microsoft_agent.microsoft_api import Api
+from microsoft_agent.microsoft_api import MicrosoftGraphApi
 
 local = threading.local()
 logger = get_logger(name="TokenMiddleware")
@@ -53,6 +52,8 @@ class JWTClaimsLoggingMiddleware(Middleware):
             )
 
 
-def get_client() -> Api:
-    token = os.environ.get("MICROSOFT_TOKEN")
-    return Api(token=token)
+from microsoft_agent.microsoft_api import auth_manager
+
+
+async def get_client() -> MicrosoftGraphApi:
+    return MicrosoftGraphApi(auth_manager=auth_manager)

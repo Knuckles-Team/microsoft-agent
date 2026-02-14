@@ -1,24 +1,20 @@
 ---
 name: microsoft-search
-description: "Generated skill for search operations. Contains 2 tools."
+description: "Microsoft 365 Search — Microsoft Graph Search Queries"
 ---
 
-### Overview
-This skill handles operations related to search.
+# Microsoft 365 Search
 
-### Available Tools
-- `search_sharepoint_sites`: search_sharepoint_sites: GET /sites
-  - **Parameters**:
-    - `params` (Optional[Dict[str, Any]])
-- `search_query`: search_query: POST /search/query
-  - **Parameters**:
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
+Execute Microsoft Graph search queries.
 
-### Usage Instructions
-1. Review the tool available in this skill.
-2. Call the tool with the required parameters.
+## Available Tools
 
-### Error Handling
-- Ensure all required parameters are provided.
-- Check return values for error messages.
+| Tool | Description |
+|------|-------------|
+| `search_query` | search_query: POST /search/query |
+
+## Required Permissions
+- `Files.Read.All, Sites.Read.All, Mail.Read`
+
+## Error Handling
+All tools return `{"error": "<message>"}` on failure.
