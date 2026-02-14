@@ -40,7 +40,7 @@ from pydantic import ValidationError
 from pydantic_ai.ui import SSE_CONTENT_TYPE
 from pydantic_ai.ui.ag_ui import AGUIAdapter
 
-__version__ = "0.2.7"
+__version__ = "0.2.8"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -119,6 +119,10 @@ EVENT_AGENT_PROMPT = (
 GROUP_AGENT_PROMPT = (
     "You are the Group Agent. You manage group resources using the available tools."
 )
+GROUPS_AGENT_PROMPT = "You are the Groups Agent. You manage Microsoft 365 groups, security groups, membership, ownership, conversations, and group drives using the available tools."
+ADMIN_AGENT_PROMPT = "You are the Admin Agent. You manage Microsoft 365 tenant administration including service health monitoring, service announcements, update messages, and SharePoint admin settings."
+ORGANIZATION_AGENT_PROMPT = "You are the Organization Agent. You manage organization profile, branding, and configuration using the available tools."
+DOMAINS_AGENT_PROMPT = "You are the Domains Agent. You manage tenant domains including adding, verifying, deleting domains, and viewing DNS configuration records."
 ITEMACTIVITYSTAT_AGENT_PROMPT = "You are the Itemactivitystat Agent. You manage itemactivitystat resources using the available tools."
 ITEMANALYTICS_AGENT_PROMPT = "You are the Itemanalytics Agent. You manage itemanalytics resources using the available tools."
 NOTEBOOK_AGENT_PROMPT = "You are the Notebook Agent. You manage notebook resources using the available tools."
@@ -254,6 +258,10 @@ def create_agent(
         "driveitem": (DRIVEITEM_AGENT_PROMPT, "Microsoft_Driveitem_Agent"),
         "event": (EVENT_AGENT_PROMPT, "Microsoft_Event_Agent"),
         "group": (GROUP_AGENT_PROMPT, "Microsoft_Group_Agent"),
+        "groups": (GROUPS_AGENT_PROMPT, "Microsoft_Groups_Agent"),
+        "admin": (ADMIN_AGENT_PROMPT, "Microsoft_Admin_Agent"),
+        "organization": (ORGANIZATION_AGENT_PROMPT, "Microsoft_Organization_Agent"),
+        "domains": (DOMAINS_AGENT_PROMPT, "Microsoft_Domains_Agent"),
         "itemactivitystat": (
             ITEMACTIVITYSTAT_AGENT_PROMPT,
             "Microsoft_Itemactivitystat_Agent",
@@ -455,6 +463,34 @@ def create_agent(
         """Assign a task related to group to the Group Agent."""
         return (
             await child_agents["group"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_groups_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to Microsoft 365 groups management (CRUD, membership, ownership, conversations, drives) to the Groups Agent."""
+        return (
+            await child_agents["groups"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_admin_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to tenant administration (service health, announcements, update messages, SharePoint admin) to the Admin Agent."""
+        return (
+            await child_agents["admin"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_organization_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to organization profile, branding, and configuration to the Organization Agent."""
+        return (
+            await child_agents["organization"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_domains_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to tenant domain management (add, verify, delete, DNS records) to the Domains Agent."""
+        return (
+            await child_agents["domains"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
@@ -733,7 +769,6 @@ def create_agent_server(
         mcp_config=mcp_config,
         skills_directory=skills_directory,
         ssl_verify=ssl_verify,
-        timeout=DEFAULT_TIMEOUT,
     )
 
     if skills_directory and os.path.exists(skills_directory):
