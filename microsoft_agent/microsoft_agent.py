@@ -40,7 +40,7 @@ from pydantic import ValidationError
 from pydantic_ai.ui import SSE_CONTENT_TYPE
 from pydantic_ai.ui.ag_ui import AGUIAdapter
 
-__version__ = "0.2.8"
+__version__ = "0.2.9"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -99,57 +99,45 @@ SUPERVISOR_SYSTEM_PROMPT = os.environ.get(
 )
 
 
-ACTIVITIESCONTAINER_AGENT_PROMPT = "You are the Activitiescontainer Agent. You manage activitiescontainer resources using the available tools."
-APPLICATION_AGENT_PROMPT = "You are the Application Agent. You manage application resources using the available tools."
-CALENDAR_AGENT_PROMPT = "You are the Calendar Agent. You manage calendar resources using the available tools."
-CHART_AGENT_PROMPT = (
-    "You are the Chart Agent. You manage chart resources using the available tools."
-)
-CHARTCOLLECTION_AGENT_PROMPT = "You are the Chartcollection Agent. You manage chartcollection resources using the available tools."
-CONVERSATIONTHREAD_AGENT_PROMPT = "You are the Conversationthread Agent. You manage conversationthread resources using the available tools."
-DIRECTORY_AGENT_PROMPT = "You are the Directory Agent. You manage directory resources using the available tools."
-DIRECTORYOBJECT_AGENT_PROMPT = "You are the Directoryobject Agent. You manage directoryobject resources using the available tools."
-DRIVE_AGENT_PROMPT = (
-    "You are the Drive Agent. You manage drive resources using the available tools."
-)
-DRIVEITEM_AGENT_PROMPT = "You are the Driveitem Agent. You manage driveitem resources using the available tools."
-EVENT_AGENT_PROMPT = (
-    "You are the Event Agent. You manage event resources using the available tools."
-)
-GROUP_AGENT_PROMPT = (
-    "You are the Group Agent. You manage group resources using the available tools."
-)
-GROUPS_AGENT_PROMPT = "You are the Groups Agent. You manage Microsoft 365 groups, security groups, membership, ownership, conversations, and group drives using the available tools."
-ADMIN_AGENT_PROMPT = "You are the Admin Agent. You manage Microsoft 365 tenant administration including service health monitoring, service announcements, update messages, and SharePoint admin settings."
-ORGANIZATION_AGENT_PROMPT = "You are the Organization Agent. You manage organization profile, branding, and configuration using the available tools."
+# =========================================================================
+# Agent Prompts
+# =========================================================================
+ADMIN_AGENT_PROMPT = "You are the Admin Agent. You manage Microsoft 365 tenant administration including service health monitoring, service announcements, update messages, SharePoint admin settings, and delegated admin relationships."
+AGREEMENTS_AGENT_PROMPT = "You are the Agreements Agent. You manage terms-of-use agreements using the available tools."
+APPLICATIONS_AGENT_PROMPT = "You are the Applications Agent. You manage app registrations, service principals, credentials, and enterprise apps using the available tools."
+AUDIT_AGENT_PROMPT = "You are the Audit Agent. You access directory audit logs, sign-in logs, and provisioning logs using the available tools."
+AUTH_AGENT_PROMPT = "You are the Auth Agent. You manage authentication operations including login, logout, session verification, and account listing."
+CALENDAR_AGENT_PROMPT = "You are the Calendar Agent. You manage calendar events, calendars, and scheduling using the available tools."
+CHAT_AGENT_PROMPT = "You are the Chat Agent. You manage chats, chat messages, replies, and group conversations using the available tools."
+COMMUNICATIONS_AGENT_PROMPT = "You are the Communications Agent. You manage online meetings (create, update, delete, list), call records, and user presence information using the available tools."
+CONNECTIONS_AGENT_PROMPT = "You are the Connections Agent. You manage Microsoft Search external connections using the available tools."
+CONTACTS_AGENT_PROMPT = "You are the Contacts Agent. You manage Outlook contacts (create, read, update, delete) using the available tools."
+DEVICES_AGENT_PROMPT = "You are the Devices Agent. You manage directory devices, Intune managed devices, compliance policies, device configurations, and device actions like wipe and retire using the available tools."
+DIRECTORY_AGENT_PROMPT = "You are the Directory Agent. You manage directory objects, roles, role templates, deleted items, role definitions, and role assignments using the available tools."
 DOMAINS_AGENT_PROMPT = "You are the Domains Agent. You manage tenant domains including adding, verifying, deleting domains, and viewing DNS configuration records."
-ITEMACTIVITYSTAT_AGENT_PROMPT = "You are the Itemactivitystat Agent. You manage itemactivitystat resources using the available tools."
-ITEMANALYTICS_AGENT_PROMPT = "You are the Itemanalytics Agent. You manage itemanalytics resources using the available tools."
-NOTEBOOK_AGENT_PROMPT = "You are the Notebook Agent. You manage notebook resources using the available tools."
-ONENOTESECTION_AGENT_PROMPT = "You are the Onenotesection Agent. You manage onenotesection resources using the available tools."
-OPENTYPEEXTENSION_AGENT_PROMPT = "You are the Opentypeextension Agent. You manage opentypeextension resources using the available tools."
-PERMISSION_AGENT_PROMPT = "You are the Permission Agent. You manage permission resources using the available tools."
-PLANNERGROUP_AGENT_PROMPT = "You are the Plannergroup Agent. You manage plannergroup resources using the available tools."
-PLANNERUSER_AGENT_PROMPT = "You are the Planneruser Agent. You manage planneruser resources using the available tools."
-REPORTROOT_AGENT_PROMPT = "You are the Reportroot Agent. You manage reportroot resources using the available tools."
-RESOURCES_BROWSER_AGENT_PROMPT = "You are the Resources_browser Agent. You manage resources_browser resources using the available tools."
-RESOURCES_CALENDAR_AGENT_PROMPT = "You are the Resources_calendar Agent. You manage resources_calendar resources using the available tools."
-RESOURCES_CALLRECORDS_AGENT_PROMPT = "You are the Resources_callrecords Agent. You manage resources_callrecords resources using the available tools."
-RESOURCES_CHANGE_AGENT_PROMPT = "You are the Resources_change Agent. You manage resources_change resources using the available tools."
-RESOURCES_GROUPS_AGENT_PROMPT = "You are the Resources_groups Agent. You manage resources_groups resources using the available tools."
-RESOURCES_ONENOTE_AGENT_PROMPT = "You are the Resources_onenote Agent. You manage resources_onenote resources using the available tools."
-RESOURCES_PLANNER_AGENT_PROMPT = "You are the Resources_planner Agent. You manage resources_planner resources using the available tools."
-SECTION_AGENT_PROMPT = (
-    "You are the Section Agent. You manage section resources using the available tools."
-)
-SERVICEPRINCIPAL_AGENT_PROMPT = "You are the Serviceprincipal Agent. You manage serviceprincipal resources using the available tools."
-SUBSCRIPTION_AGENT_PROMPT = "You are the Subscription Agent. You manage subscription resources using the available tools."
-SUBSCRIPTIONS_AGENT_PROMPT = "You are the Subscriptions Agent. You manage subscriptions resources using the available tools."
-USER_AGENT_PROMPT = (
-    "You are the User Agent. You manage user resources using the available tools."
-)
-USERDATASECURITYANDGOVERNANCE_AGENT_PROMPT = "You are the Userdatasecurityandgovernance Agent. You manage userdatasecurityandgovernance resources using the available tools."
-USERPROTECTIONSCOPECONTAINER_AGENT_PROMPT = "You are the Userprotectionscopecontainer Agent. You manage userprotectionscopecontainer resources using the available tools."
+EDUCATION_AGENT_PROMPT = "You are the Education Agent. You manage education classes, schools, users, and assignments using the available tools."
+EMPLOYEE_EXPERIENCE_AGENT_PROMPT = "You are the Employee Experience Agent. You manage learning providers and course activities using the available tools."
+FILES_AGENT_PROMPT = "You are the Files Agent. You manage OneDrive files, Excel workbooks, OneNote notebooks, and SharePoint file operations using the available tools."
+GROUPS_AGENT_PROMPT = "You are the Groups Agent. You manage Microsoft 365 groups, security groups, membership, ownership, conversations, and group drives using the available tools."
+IDENTITY_AGENT_PROMPT = "You are the Identity Agent. You manage identity operations including guest user invitations, conditional access policies, access reviews, entitlement access packages, and lifecycle workflows."
+MAIL_AGENT_PROMPT = "You are the Mail Agent. You manage email messages, folders, attachments, shared mailboxes, drafts, and mail operations using the available tools."
+META_AGENT_PROMPT = "You are the Meta Agent. You provide tool discovery and search capabilities using the available tools."
+NOTES_AGENT_PROMPT = "You are the Notes Agent. You manage OneNote notebooks, sections, and pages using the available tools."
+ORGANIZATION_AGENT_PROMPT = "You are the Organization Agent. You manage organization profile, branding, and configuration using the available tools."
+PLACES_AGENT_PROMPT = "You are the Places Agent. You manage rooms, room lists, and places using the available tools."
+POLICIES_AGENT_PROMPT = "You are the Policies Agent. You manage authorization policies, token policies, permission grant policies, and admin consent policies using the available tools."
+PRINT_AGENT_PROMPT = "You are the Print Agent. You manage printers, print jobs, and print shares using the available tools."
+PRIVACY_AGENT_PROMPT = "You are the Privacy Agent. You manage subject rights requests for GDPR/CCPA compliance using the available tools."
+REPORTS_AGENT_PROMPT = "You are the Reports Agent. You generate usage and activity reports for email, mailbox, Office 365, SharePoint, Teams, and OneDrive using the available tools."
+SEARCH_AGENT_PROMPT = "You are the Search Agent. You execute Microsoft Graph search queries using the available tools."
+SECURITY_AGENT_PROMPT = "You are the Security Agent. You manage security alerts, incidents, secure scores, threat intelligence, advanced hunting, risky users, risk detections, and sensitivity labels using the available tools."
+SITES_AGENT_PROMPT = "You are the Sites Agent. You manage SharePoint sites, site lists, site drives, site items, and site administration using the available tools."
+SOLUTIONS_AGENT_PROMPT = "You are the Solutions Agent. You manage booking businesses, appointments, and virtual events using the available tools."
+STORAGE_AGENT_PROMPT = "You are the Storage Agent. You manage file storage containers using the available tools."
+SUBSCRIPTIONS_AGENT_PROMPT = "You are the Subscriptions Agent. You manage webhook subscriptions (create, read, update, delete) using the available tools."
+TASKS_AGENT_PROMPT = "You are the Tasks Agent. You manage Planner tasks, To-Do task lists, and task operations using the available tools."
+TEAMS_AGENT_PROMPT = "You are the Teams Agent. You manage teams, channels, channel messages, and team membership using the available tools."
+USER_AGENT_PROMPT = "You are the User Agent. You manage user profiles, user mail operations, meetings, and group membership using the available tools."
 
 
 def create_agent(
@@ -233,97 +221,52 @@ def create_agent(
                     resource_tools[res] = []
                 resource_tools[res].append(func)
 
+    # =========================================================================
+    # Agent Definitions
+    # =========================================================================
     agent_defs = {
-        "activitiescontainer": (
-            ACTIVITIESCONTAINER_AGENT_PROMPT,
-            "Microsoft_Activitiescontainer_Agent",
-        ),
-        "application": (APPLICATION_AGENT_PROMPT, "Microsoft_Application_Agent"),
-        "calendar": (CALENDAR_AGENT_PROMPT, "Microsoft_Calendar_Agent"),
-        "chart": (CHART_AGENT_PROMPT, "Microsoft_Chart_Agent"),
-        "chartcollection": (
-            CHARTCOLLECTION_AGENT_PROMPT,
-            "Microsoft_Chartcollection_Agent",
-        ),
-        "conversationthread": (
-            CONVERSATIONTHREAD_AGENT_PROMPT,
-            "Microsoft_Conversationthread_Agent",
-        ),
-        "directory": (DIRECTORY_AGENT_PROMPT, "Microsoft_Directory_Agent"),
-        "directoryobject": (
-            DIRECTORYOBJECT_AGENT_PROMPT,
-            "Microsoft_Directoryobject_Agent",
-        ),
-        "drive": (DRIVE_AGENT_PROMPT, "Microsoft_Drive_Agent"),
-        "driveitem": (DRIVEITEM_AGENT_PROMPT, "Microsoft_Driveitem_Agent"),
-        "event": (EVENT_AGENT_PROMPT, "Microsoft_Event_Agent"),
-        "group": (GROUP_AGENT_PROMPT, "Microsoft_Group_Agent"),
-        "groups": (GROUPS_AGENT_PROMPT, "Microsoft_Groups_Agent"),
         "admin": (ADMIN_AGENT_PROMPT, "Microsoft_Admin_Agent"),
-        "organization": (ORGANIZATION_AGENT_PROMPT, "Microsoft_Organization_Agent"),
+        "agreements": (AGREEMENTS_AGENT_PROMPT, "Microsoft_Agreements_Agent"),
+        "applications": (APPLICATIONS_AGENT_PROMPT, "Microsoft_Applications_Agent"),
+        "audit": (AUDIT_AGENT_PROMPT, "Microsoft_Audit_Agent"),
+        "auth": (AUTH_AGENT_PROMPT, "Microsoft_Auth_Agent"),
+        "calendar": (CALENDAR_AGENT_PROMPT, "Microsoft_Calendar_Agent"),
+        "chat": (CHAT_AGENT_PROMPT, "Microsoft_Chat_Agent"),
+        "communications": (
+            COMMUNICATIONS_AGENT_PROMPT,
+            "Microsoft_Communications_Agent",
+        ),
+        "connections": (CONNECTIONS_AGENT_PROMPT, "Microsoft_Connections_Agent"),
+        "contacts": (CONTACTS_AGENT_PROMPT, "Microsoft_Contacts_Agent"),
+        "devices": (DEVICES_AGENT_PROMPT, "Microsoft_Devices_Agent"),
+        "directory": (DIRECTORY_AGENT_PROMPT, "Microsoft_Directory_Agent"),
         "domains": (DOMAINS_AGENT_PROMPT, "Microsoft_Domains_Agent"),
-        "itemactivitystat": (
-            ITEMACTIVITYSTAT_AGENT_PROMPT,
-            "Microsoft_Itemactivitystat_Agent",
+        "education": (EDUCATION_AGENT_PROMPT, "Microsoft_Education_Agent"),
+        "employee_experience": (
+            EMPLOYEE_EXPERIENCE_AGENT_PROMPT,
+            "Microsoft_Employee_Experience_Agent",
         ),
-        "itemanalytics": (ITEMANALYTICS_AGENT_PROMPT, "Microsoft_Itemanalytics_Agent"),
-        "notebook": (NOTEBOOK_AGENT_PROMPT, "Microsoft_Notebook_Agent"),
-        "onenotesection": (
-            ONENOTESECTION_AGENT_PROMPT,
-            "Microsoft_Onenotesection_Agent",
-        ),
-        "opentypeextension": (
-            OPENTYPEEXTENSION_AGENT_PROMPT,
-            "Microsoft_Opentypeextension_Agent",
-        ),
-        "permission": (PERMISSION_AGENT_PROMPT, "Microsoft_Permission_Agent"),
-        "plannergroup": (PLANNERGROUP_AGENT_PROMPT, "Microsoft_Plannergroup_Agent"),
-        "planneruser": (PLANNERUSER_AGENT_PROMPT, "Microsoft_Planneruser_Agent"),
-        "reportroot": (REPORTROOT_AGENT_PROMPT, "Microsoft_Reportroot_Agent"),
-        "resources_browser": (
-            RESOURCES_BROWSER_AGENT_PROMPT,
-            "Microsoft_Resources_Browser_Agent",
-        ),
-        "resources_calendar": (
-            RESOURCES_CALENDAR_AGENT_PROMPT,
-            "Microsoft_Resources_Calendar_Agent",
-        ),
-        "resources_callrecords": (
-            RESOURCES_CALLRECORDS_AGENT_PROMPT,
-            "Microsoft_Resources_Callrecords_Agent",
-        ),
-        "resources_change": (
-            RESOURCES_CHANGE_AGENT_PROMPT,
-            "Microsoft_Resources_Change_Agent",
-        ),
-        "resources_groups": (
-            RESOURCES_GROUPS_AGENT_PROMPT,
-            "Microsoft_Resources_Groups_Agent",
-        ),
-        "resources_onenote": (
-            RESOURCES_ONENOTE_AGENT_PROMPT,
-            "Microsoft_Resources_Onenote_Agent",
-        ),
-        "resources_planner": (
-            RESOURCES_PLANNER_AGENT_PROMPT,
-            "Microsoft_Resources_Planner_Agent",
-        ),
-        "section": (SECTION_AGENT_PROMPT, "Microsoft_Section_Agent"),
-        "serviceprincipal": (
-            SERVICEPRINCIPAL_AGENT_PROMPT,
-            "Microsoft_Serviceprincipal_Agent",
-        ),
-        "subscription": (SUBSCRIPTION_AGENT_PROMPT, "Microsoft_Subscription_Agent"),
+        "files": (FILES_AGENT_PROMPT, "Microsoft_Files_Agent"),
+        "groups": (GROUPS_AGENT_PROMPT, "Microsoft_Groups_Agent"),
+        "identity": (IDENTITY_AGENT_PROMPT, "Microsoft_Identity_Agent"),
+        "mail": (MAIL_AGENT_PROMPT, "Microsoft_Mail_Agent"),
+        "meta": (META_AGENT_PROMPT, "Microsoft_Meta_Agent"),
+        "notes": (NOTES_AGENT_PROMPT, "Microsoft_Notes_Agent"),
+        "organization": (ORGANIZATION_AGENT_PROMPT, "Microsoft_Organization_Agent"),
+        "places": (PLACES_AGENT_PROMPT, "Microsoft_Places_Agent"),
+        "policies": (POLICIES_AGENT_PROMPT, "Microsoft_Policies_Agent"),
+        "print": (PRINT_AGENT_PROMPT, "Microsoft_Print_Agent"),
+        "privacy": (PRIVACY_AGENT_PROMPT, "Microsoft_Privacy_Agent"),
+        "reports": (REPORTS_AGENT_PROMPT, "Microsoft_Reports_Agent"),
+        "search": (SEARCH_AGENT_PROMPT, "Microsoft_Search_Agent"),
+        "security": (SECURITY_AGENT_PROMPT, "Microsoft_Security_Agent"),
+        "sites": (SITES_AGENT_PROMPT, "Microsoft_Sites_Agent"),
+        "solutions": (SOLUTIONS_AGENT_PROMPT, "Microsoft_Solutions_Agent"),
+        "storage": (STORAGE_AGENT_PROMPT, "Microsoft_Storage_Agent"),
         "subscriptions": (SUBSCRIPTIONS_AGENT_PROMPT, "Microsoft_Subscriptions_Agent"),
+        "tasks": (TASKS_AGENT_PROMPT, "Microsoft_Tasks_Agent"),
+        "teams": (TEAMS_AGENT_PROMPT, "Microsoft_Teams_Agent"),
         "user": (USER_AGENT_PROMPT, "Microsoft_User_Agent"),
-        "userdatasecurityandgovernance": (
-            USERDATASECURITYANDGOVERNANCE_AGENT_PROMPT,
-            "Microsoft_Userdatasecurityandgovernance_Agent",
-        ),
-        "userprotectionscopecontainer": (
-            USERPROTECTIONSCOPECONTAINER_AGENT_PROMPT,
-            "Microsoft_Userprotectionscopecontainer_Agent",
-        ),
     }
 
     child_agents = {}
@@ -365,125 +308,96 @@ def create_agent(
         deps_type=Any,
     )
 
-    @supervisor.tool
-    async def assign_task_to_activitiescontainer_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to activitiescontainer to the Activitiescontainer Agent."""
-        return (
-            await child_agents["activitiescontainer"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_application_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to application to the Application Agent."""
-        return (
-            await child_agents["application"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_calendar_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to calendar to the Calendar Agent."""
-        return (
-            await child_agents["calendar"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_chart_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to chart to the Chart Agent."""
-        return (
-            await child_agents["chart"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_chartcollection_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to chartcollection to the Chartcollection Agent."""
-        return (
-            await child_agents["chartcollection"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_conversationthread_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to conversationthread to the Conversationthread Agent."""
-        return (
-            await child_agents["conversationthread"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_directory_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to directory to the Directory Agent."""
-        return (
-            await child_agents["directory"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_directoryobject_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to directoryobject to the Directoryobject Agent."""
-        return (
-            await child_agents["directoryobject"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_drive_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to drive to the Drive Agent."""
-        return (
-            await child_agents["drive"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_driveitem_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to driveitem to the Driveitem Agent."""
-        return (
-            await child_agents["driveitem"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_event_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to event to the Event Agent."""
-        return (
-            await child_agents["event"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_group_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to group to the Group Agent."""
-        return (
-            await child_agents["group"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_groups_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to Microsoft 365 groups management (CRUD, membership, ownership, conversations, drives) to the Groups Agent."""
-        return (
-            await child_agents["groups"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
+    # =========================================================================
+    # Supervisor routing tools
+    # =========================================================================
 
     @supervisor.tool
     async def assign_task_to_admin_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to tenant administration (service health, announcements, update messages, SharePoint admin) to the Admin Agent."""
+        """Assign a task related to tenant administration (service health, announcements, SharePoint admin, delegated admin) to the Admin Agent."""
         return (
             await child_agents["admin"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_organization_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to organization profile, branding, and configuration to the Organization Agent."""
+    async def assign_task_to_agreements_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to terms-of-use agreements to the Agreements Agent."""
         return (
-            await child_agents["organization"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["agreements"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_applications_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to app registrations, service principals, or enterprise apps to the Applications Agent."""
+        return (
+            await child_agents["applications"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_audit_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to directory audits, sign-in logs, or provisioning logs to the Audit Agent."""
+        return (
+            await child_agents["audit"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_auth_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to authentication (login, logout, session verification) to the Auth Agent."""
+        return (
+            await child_agents["auth"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_calendar_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to calendar events, calendars, or scheduling to the Calendar Agent."""
+        return (
+            await child_agents["calendar"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_chat_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to chats, chat messages, replies, or group conversations to the Chat Agent."""
+        return (
+            await child_agents["chat"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_communications_agent(
+        ctx: RunContext[Any], task: str
+    ) -> str:
+        """Assign a task related to online meetings, call records, or user presence to the Communications Agent."""
+        return (
+            await child_agents["communications"].run(
+                task, usage=ctx.usage, deps=ctx.deps
+            )
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_connections_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to Microsoft Search external connections to the Connections Agent."""
+        return (
+            await child_agents["connections"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_contacts_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to Outlook contacts management to the Contacts Agent."""
+        return (
+            await child_agents["contacts"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_devices_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to devices, managed devices, compliance policies, or device actions (wipe/retire) to the Devices Agent."""
+        return (
+            await child_agents["devices"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_directory_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to directory objects, roles, deleted items, role definitions, or role assignments to the Directory Agent."""
+        return (
+            await child_agents["directory"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
@@ -494,191 +408,147 @@ def create_agent(
         ).output
 
     @supervisor.tool
-    async def assign_task_to_itemactivitystat_agent(
+    async def assign_task_to_education_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to education classes, schools, users, or assignments to the Education Agent."""
+        return (
+            await child_agents["education"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_employee_experience_agent(
         ctx: RunContext[Any], task: str
     ) -> str:
-        """Assign a task related to itemactivitystat to the Itemactivitystat Agent."""
+        """Assign a task related to learning providers or course activities to the Employee Experience Agent."""
         return (
-            await child_agents["itemactivitystat"].run(
+            await child_agents["employee_experience"].run(
                 task, usage=ctx.usage, deps=ctx.deps
             )
         ).output
 
     @supervisor.tool
-    async def assign_task_to_itemanalytics_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to itemanalytics to the Itemanalytics Agent."""
+    async def assign_task_to_files_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to OneDrive files, Excel workbooks, OneNote, or SharePoint file operations to the Files Agent."""
         return (
-            await child_agents["itemanalytics"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["files"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_notebook_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to notebook to the Notebook Agent."""
+    async def assign_task_to_groups_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to Microsoft 365 groups management (CRUD, membership, ownership, conversations, drives) to the Groups Agent."""
         return (
-            await child_agents["notebook"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["groups"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_onenotesection_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to onenotesection to the Onenotesection Agent."""
+    async def assign_task_to_identity_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to identity operations (invitations, conditional access, access reviews, entitlements, lifecycle workflows) to the Identity Agent."""
         return (
-            await child_agents["onenotesection"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["identity"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_opentypeextension_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to opentypeextension to the Opentypeextension Agent."""
+    async def assign_task_to_mail_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to email messages, folders, attachments, shared mailboxes, or mail operations to the Mail Agent."""
         return (
-            await child_agents["opentypeextension"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["mail"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_permission_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to permission to the Permission Agent."""
+    async def assign_task_to_meta_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to tool discovery or search to the Meta Agent."""
         return (
-            await child_agents["permission"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["meta"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_plannergroup_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to plannergroup to the Plannergroup Agent."""
+    async def assign_task_to_notes_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to OneNote notebooks, sections, or pages to the Notes Agent."""
         return (
-            await child_agents["plannergroup"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["notes"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_planneruser_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to planneruser to the Planneruser Agent."""
+    async def assign_task_to_organization_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to organization profile, branding, and configuration to the Organization Agent."""
         return (
-            await child_agents["planneruser"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["organization"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_reportroot_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to reportroot to the Reportroot Agent."""
+    async def assign_task_to_places_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to rooms, room lists, or places management to the Places Agent."""
         return (
-            await child_agents["reportroot"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["places"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_browser_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_browser to the Resources_browser Agent."""
+    async def assign_task_to_policies_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to authorization, token, permission grant, or admin consent policies to the Policies Agent."""
         return (
-            await child_agents["resources_browser"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["policies"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_calendar_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_calendar to the Resources_calendar Agent."""
+    async def assign_task_to_print_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to printers, print jobs, or print shares to the Print Agent."""
         return (
-            await child_agents["resources_calendar"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["print"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_callrecords_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_callrecords to the Resources_callrecords Agent."""
+    async def assign_task_to_privacy_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to subject rights requests (GDPR/CCPA) to the Privacy Agent."""
         return (
-            await child_agents["resources_callrecords"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["privacy"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_change_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_change to the Resources_change Agent."""
+    async def assign_task_to_reports_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to usage and activity reports (email, mailbox, SharePoint, Teams, OneDrive) to the Reports Agent."""
         return (
-            await child_agents["resources_change"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["reports"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_groups_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_groups to the Resources_groups Agent."""
+    async def assign_task_to_search_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to Microsoft Graph search queries to the Search Agent."""
         return (
-            await child_agents["resources_groups"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["search"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_onenote_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_onenote to the Resources_onenote Agent."""
+    async def assign_task_to_security_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to security alerts, incidents, secure scores, threat intelligence, risky users, or sensitivity labels to the Security Agent."""
         return (
-            await child_agents["resources_onenote"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["security"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_resources_planner_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to resources_planner to the Resources_planner Agent."""
+    async def assign_task_to_sites_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to SharePoint sites, site lists, site drives, or site items to the Sites Agent."""
         return (
-            await child_agents["resources_planner"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
+            await child_agents["sites"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_section_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to section to the Section Agent."""
+    async def assign_task_to_solutions_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to bookings, appointments, or virtual events to the Solutions Agent."""
         return (
-            await child_agents["section"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["solutions"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
-    async def assign_task_to_serviceprincipal_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to serviceprincipal to the Serviceprincipal Agent."""
+    async def assign_task_to_storage_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to file storage containers to the Storage Agent."""
         return (
-            await child_agents["serviceprincipal"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_subscription_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to subscription to the Subscription Agent."""
-        return (
-            await child_agents["subscription"].run(task, usage=ctx.usage, deps=ctx.deps)
+            await child_agents["storage"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
 
     @supervisor.tool
     async def assign_task_to_subscriptions_agent(
         ctx: RunContext[Any], task: str
     ) -> str:
-        """Assign a task related to subscriptions to the Subscriptions Agent."""
+        """Assign a task related to webhook subscriptions to the Subscriptions Agent."""
         return (
             await child_agents["subscriptions"].run(
                 task, usage=ctx.usage, deps=ctx.deps
@@ -686,32 +556,24 @@ def create_agent(
         ).output
 
     @supervisor.tool
+    async def assign_task_to_tasks_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to Planner tasks, To-Do task lists, or task operations to the Tasks Agent."""
+        return (
+            await child_agents["tasks"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
+    async def assign_task_to_teams_agent(ctx: RunContext[Any], task: str) -> str:
+        """Assign a task related to teams, channels, channel messages, or team membership to the Teams Agent."""
+        return (
+            await child_agents["teams"].run(task, usage=ctx.usage, deps=ctx.deps)
+        ).output
+
+    @supervisor.tool
     async def assign_task_to_user_agent(ctx: RunContext[Any], task: str) -> str:
-        """Assign a task related to user to the User Agent."""
+        """Assign a task related to user profiles, mail operations, meetings, or group membership to the User Agent."""
         return (
             await child_agents["user"].run(task, usage=ctx.usage, deps=ctx.deps)
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_userdatasecurityandgovernance_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to userdatasecurityandgovernance to the Userdatasecurityandgovernance Agent."""
-        return (
-            await child_agents["userdatasecurityandgovernance"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
-        ).output
-
-    @supervisor.tool
-    async def assign_task_to_userprotectionscopecontainer_agent(
-        ctx: RunContext[Any], task: str
-    ) -> str:
-        """Assign a task related to userprotectionscopecontainer to the Userprotectionscopecontainer Agent."""
-        return (
-            await child_agents["userprotectionscopecontainer"].run(
-                task, usage=ctx.usage, deps=ctx.deps
-            )
         ).output
 
     return supervisor
