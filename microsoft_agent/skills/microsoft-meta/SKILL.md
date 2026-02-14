@@ -1,21 +1,20 @@
 ---
 name: microsoft-meta
-description: "Generated skill for meta operations. Contains 1 tools."
+description: "Microsoft 365 Meta — Tool Discovery & Search"
 ---
 
-### Overview
-This skill handles operations related to meta.
+# Microsoft 365 Meta
 
-### Available Tools
-- `search_tools`: Search available Microsoft Graph API tools
-  - **Parameters**:
-    - `query` (str)
-    - `limit` (int)
+Discover and search available MCP tools.
 
-### Usage Instructions
-1. Review the tool available in this skill.
-2. Call the tool with the required parameters.
+## Available Tools
 
-### Error Handling
-- Ensure all required parameters are provided.
-- Check return values for error messages.
+| Tool | Description |
+|------|-------------|
+| `search_tools` | Search available Microsoft Graph API tools |
+
+## Required Permissions
+- `None`
+
+## Error Handling
+All tools return `{"error": "<message>"}` on failure.

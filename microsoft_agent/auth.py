@@ -133,6 +133,18 @@ class AuthManager:
 
         return None
 
+    def get_token_details(self) -> Optional[Dict[str, Any]]:
+        """Get the full token response from MSAL."""
+        account = self.get_current_account()
+        if not account:
+            return None
+
+        result = self.msal_app.acquire_token_silent(self.scopes, account=account)
+        if result and "access_token" in result:
+            return result
+
+        return None
+
     def acquire_token_by_device_code(self, callback) -> str:
         """Initiate device code flow."""
         flow = self.msal_app.initiate_device_flow(scopes=self.scopes)

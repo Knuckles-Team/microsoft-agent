@@ -1,131 +1,49 @@
 ---
 name: microsoft-user
-description: "Generated skill for user operations. Contains 25 tools."
+description: "Microsoft 365 User — User Profile, Mail Operations, Meetings & Group Membership"
 ---
 
-### Overview
-This skill handles operations related to user.
+# Microsoft 365 User
 
-### Available Tools
-- `list_mail_messages`: list_mail_messages: GET /me/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
-  - **Parameters**:
-    - `params` (Optional[Dict[str, Any]])
-- `list_mail_folder_messages`: list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
-  - **Parameters**:
-    - `mailFolder_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_mail_message`: get_mail_message: GET /me/messages/{message-id}
-  - **Parameters**:
-    - `message_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_shared_mailbox_messages`: list_shared_mailbox_messages: GET /users/{user-id}/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
-  - **Parameters**:
-    - `user_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_shared_mailbox_folder_messages`: list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages  TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
-  - **Parameters**:
-    - `user_id` (str)
-    - `mailFolder_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_shared_mailbox_message`: get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}
-  - **Parameters**:
-    - `user_id` (str)
-    - `message_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_users`: list_users: GET /users  TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
-  - **Parameters**:
-    - `params` (Optional[Dict[str, Any]])
-- `delete_mail_message`: delete_mail_message: DELETE /me/messages/{message-id}
-  - **Parameters**:
-    - `message_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `move_mail_message`: move_mail_message: POST /me/messages/{message-id}/move
-  - **Parameters**:
-    - `message_id` (str)
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
-- `update_mail_message`: update_mail_message: PATCH /me/messages/{message-id}
-  - **Parameters**:
-    - `message_id` (str)
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
-- `add_mail_attachment`: add_mail_attachment: POST /me/messages/{message-id}/attachments
-  - **Parameters**:
-    - `message_id` (str)
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
-- `list_mail_attachments`: list_mail_attachments: GET /me/messages/{message-id}/attachments
-  - **Parameters**:
-    - `message_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_mail_attachment`: get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}
-  - **Parameters**:
-    - `message_id` (str)
-    - `attachment_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `delete_mail_attachment`: delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}
-  - **Parameters**:
-    - `message_id` (str)
-    - `attachment_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `find_meeting_times`: find_meeting_times: POST /me/findMeetingTimes
-  - **Parameters**:
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
-- `get_current_user`: get_current_user: GET /me
-  - **Parameters**:
-    - `params` (Optional[Dict[str, Any]])
-- `list_chat_messages`: list_chat_messages: GET /chats/{chat-id}/messages
-  - **Parameters**:
-    - `chat_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_chat_message`: get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}
-  - **Parameters**:
-    - `chat_id` (str)
-    - `chatMessage_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `send_chat_message`: send_chat_message: POST /chats/{chat-id}/messages
-  - **Parameters**:
-    - `chat_id` (str)
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
-- `list_channel_messages`: list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages
-  - **Parameters**:
-    - `team_id` (str)
-    - `channel_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `get_channel_message`: get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}
-  - **Parameters**:
-    - `team_id` (str)
-    - `channel_id` (str)
-    - `chatMessage_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `send_channel_message`: send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages
-  - **Parameters**:
-    - `team_id` (str)
-    - `channel_id` (str)
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
-- `list_team_members`: list_team_members: GET /teams/{team-id}/members
-  - **Parameters**:
-    - `team_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `list_chat_message_replies`: list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies
-  - **Parameters**:
-    - `chat_id` (str)
-    - `chatMessage_id` (str)
-    - `params` (Optional[Dict[str, Any]])
-- `reply_to_chat_message`: reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies
-  - **Parameters**:
-    - `chat_id` (str)
-    - `chatMessage_id` (str)
-    - `data` (Optional[Dict[str, Any]])
-    - `params` (Optional[Dict[str, Any]])
+Manage user profiles, mail operations, meetings, and group membership.
 
-### Usage Instructions
-1. Review the tool available in this skill.
-2. Call the tool with the required parameters.
+## Available Tools
 
-### Error Handling
-- Ensure all required parameters are provided.
-- Check return values for error messages.
+| Tool | Description |
+|------|-------------|
+| `add_group_member` | Add a member to a group |
+| `add_mail_attachment` | add_mail_attachment: POST /me/messages/{message-id}/attachments |
+| `delete_mail_attachment` | delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id} |
+| `delete_mail_message` | delete_mail_message: DELETE /me/messages/{message-id} |
+| `find_meeting_times` | find_meeting_times: POST /me/findMeetingTimes |
+| `get_channel_message` | get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id} |
+| `get_chat_message` | get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id} |
+| `get_current_user` | get_current_user: GET /me |
+| `get_mail_attachment` | get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id} |
+| `get_mail_message` | get_mail_message: GET /me/messages/{message-id} |
+| `get_me` | get_me: GET /me |
+| `get_shared_mailbox_message` | get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id} |
+| `list_channel_messages` | list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages |
+| `list_chat_message_replies` | list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies |
+| `list_chat_messages` | list_chat_messages: GET /chats/{chat-id}/messages |
+| `list_group_members` | Get a list of the group |
+| `list_group_owners` | Get owners of a group |
+| `list_mail_attachments` | list_mail_attachments: GET /me/messages/{message-id}/attachments |
+| `list_mail_folder_messages` | list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages |
+| `list_mail_messages` | list_mail_messages: GET /me/messages |
+| `list_shared_mailbox_folder_messages` | list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages |
+| `list_shared_mailbox_messages` | list_shared_mailbox_messages: GET /users/{user-id}/messages |
+| `list_team_members` | list_team_members: GET /teams/{team-id}/members |
+| `list_users` | list_users: GET /users |
+| `move_mail_message` | move_mail_message: POST /me/messages/{message-id}/move |
+| `remove_group_member` | Remove a member from a group |
+| `reply_to_chat_message` | reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies |
+| `send_channel_message` | send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages |
+| `send_chat_message` | send_chat_message: POST /chats/{chat-id}/messages |
+| `update_mail_message` | update_mail_message: PATCH /me/messages/{message-id} |
+
+## Required Permissions
+- `User.Read, Mail.ReadWrite, Chat.Read, Group.ReadWrite.All`
+
+## Error Handling
+All tools return `{"error": "<message>"}` on failure.

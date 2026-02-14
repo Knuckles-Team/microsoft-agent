@@ -1,23 +1,23 @@
 ---
 name: microsoft-auth
-description: "Generated skill for auth operations. Contains 4 tools."
+description: "Microsoft 365 Auth — Authentication & Session Management"
 ---
 
-### Overview
-This skill handles operations related to auth.
+# Microsoft 365 Auth
 
-### Available Tools
-- `login`: Authenticate with Microsoft using device code flow
-  - **Parameters**:
-    - `force` (bool)
-- `logout`: Log out from Microsoft account
-- `verify_login`: Check current Microsoft authentication status
-- `list_accounts`: List all available Microsoft accounts
+Manage authentication operations including login, logout, session verification, and account listing.
 
-### Usage Instructions
-1. Review the tool available in this skill.
-2. Call the tool with the required parameters.
+## Available Tools
 
-### Error Handling
-- Ensure all required parameters are provided.
-- Check return values for error messages.
+| Tool | Description |
+|------|-------------|
+| `list_accounts` | List all available Microsoft accounts |
+| `login` | Authenticate with Microsoft using device code flow |
+| `logout` | Log out from Microsoft account |
+| `verify_login` | Check current Microsoft authentication status |
+
+## Required Permissions
+- `User.Read`
+
+## Error Handling
+All tools return `{"error": "<message>"}` on failure.
