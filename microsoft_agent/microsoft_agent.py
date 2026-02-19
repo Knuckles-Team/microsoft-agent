@@ -40,7 +40,7 @@ from pydantic import ValidationError
 from pydantic_ai.ui import SSE_CONTENT_TYPE
 from pydantic_ai.ui.ag_ui import AGUIAdapter
 
-__version__ = "0.2.14"
+__version__ = "0.2.15"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -268,6 +268,20 @@ def create_agent(
         "user": (USER_AGENT_PROMPT, "Microsoft_User_Agent"),
     }
 
+    # 1. Identify Universal Skills
+    # Universal skills are those in the skills directory that do NOT start with the package prefix
+    package_prefix = "microsoft-"
+    skills_path = get_skills_path()
+    universal_skill_dirs = []
+
+    if os.path.exists(skills_path):
+        for item in os.listdir(skills_path):
+            item_path = os.path.join(skills_path, item)
+            if os.path.isdir(item_path):
+                if not item.startswith(package_prefix):
+                    universal_skill_dirs.append(item_path)
+                    logger.info(f"Identified universal skill: {item}")
+
     supervisor_skills = []
     child_agents = {}
     supervisor_skills_directories = [get_skills_path()]
@@ -301,6 +315,10 @@ def create_agent(
         if os.path.exists(default_skill_path):
             child_skills_directories.append(default_skill_path)
 
+        # Append Universal Skills to ALL child agents
+        if universal_skill_dirs:
+            child_skills_directories.extend(universal_skill_dirs)
+
         if child_skills_directories:
             ts = SkillsToolset(directories=child_skills_directories)
             tag_toolsets.append(ts)
@@ -323,6 +341,32 @@ def create_agent(
             agent.tool(t)
 
         child_agents[tag] = agent
+
+    # Create Custom Agent if custom_skills_directory is provided
+    if custom_skills_directory:
+        custom_agent_tag = "custom_agent"
+        custom_agent_name = "Custom_Agent"
+        custom_agent_prompt = (
+            "You are the Custom Agent.\n"
+            "Your goal is to handle custom tasks or general tasks not covered by other specialists.\n"
+            "You have access to valid custom skills and universal skills."
+        )
+
+        custom_agent_skills_dirs = list(universal_skill_dirs)
+        custom_agent_skills_dirs.append(custom_skills_directory)
+
+        custom_toolsets = []
+        custom_toolsets.append(SkillsToolset(directories=custom_agent_skills_dirs))
+
+        custom_agent = Agent(
+            name=custom_agent_name,
+            system_prompt=custom_agent_prompt,
+            model=model,
+            model_settings=settings,
+            toolsets=custom_toolsets,
+            tool_timeout=DEFAULT_TOOL_TIMEOUT,
+        )
+        child_agents[custom_agent_tag] = custom_agent
 
     if custom_skills_directory:
         supervisor_skills_directories.append(custom_skills_directory)
@@ -605,6 +649,17 @@ def create_agent(
         return (
             await child_agents["user"].run(task, usage=ctx.usage, deps=ctx.deps)
         ).output
+
+    if "custom_agent" in child_agents:
+
+        @supervisor.tool
+        async def assign_task_to_custom_agent(ctx: RunContext[Any], task: str) -> str:
+            """Assign a task to the Custom Agent."""
+            return (
+                await child_agents["custom_agent"]
+                .run(task, usage=ctx.usage, deps=ctx.deps)
+                .output
+            )
 
     return supervisor
 
