@@ -1,6 +1,7 @@
 ---
 name: microsoft-communications
 description: "Microsoft 365 Communications — Online Meetings, Call Records & Presence"
+tags: [communications]
 ---
 
 # Microsoft 365 Communications

@@ -1,6 +1,7 @@
 ---
 name: microsoft-security
 description: "Microsoft 365 Security — Alerts, Incidents, Threat Intelligence & Identity Protection"
+tags: [security]
 ---
 
 # Microsoft 365 Security

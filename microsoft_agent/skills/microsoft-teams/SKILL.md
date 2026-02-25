@@ -1,6 +1,7 @@
 ---
 name: microsoft-teams
 description: "Microsoft 365 Teams — Teams, Channels, Messages & Membership"
+tags: [teams]
 ---
 
 # Microsoft 365 Teams

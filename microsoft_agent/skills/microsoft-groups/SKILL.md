@@ -1,6 +1,7 @@
 ---
 name: microsoft-groups
 description: "Microsoft 365 Groups — Groups, Membership, Ownership & Group Conversations"
+tags: [groups]
 ---
 
 # Microsoft 365 Groups

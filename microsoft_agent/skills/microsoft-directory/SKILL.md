@@ -1,6 +1,7 @@
 ---
 name: microsoft-directory
 description: "Microsoft 365 Directory — Directory Objects, Roles, Role Definitions & Role Assignments"
+tags: [directory]
 ---
 
 # Microsoft 365 Directory

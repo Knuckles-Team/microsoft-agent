@@ -1,6 +1,7 @@
 ---
 name: microsoft-auth
 description: "Microsoft 365 Auth — Authentication & Session Management"
+tags: [auth]
 ---
 
 # Microsoft 365 Auth

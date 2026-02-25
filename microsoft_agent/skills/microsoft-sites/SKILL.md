@@ -1,6 +1,7 @@
 ---
 name: microsoft-sites
 description: "Microsoft 365 Sites — SharePoint Sites, Lists, Drives & Items"
+tags: [sites]
 ---
 
 # Microsoft 365 Sites

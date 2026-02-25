@@ -1,6 +1,7 @@
 ---
 name: microsoft-subscriptions
 description: "Microsoft 365 Subscriptions — Webhook Subscriptions for Change Notifications"
+tags: [subscriptions]
 ---
 
 # Microsoft 365 Subscriptions

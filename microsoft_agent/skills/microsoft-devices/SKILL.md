@@ -1,6 +1,7 @@
 ---
 name: microsoft-devices
 description: "Microsoft 365 Devices — Directory Devices, Intune Managed Devices & Compliance"
+tags: [devices]
 ---
 
 # Microsoft 365 Devices

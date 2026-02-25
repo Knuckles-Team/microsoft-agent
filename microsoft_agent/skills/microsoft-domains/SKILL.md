@@ -1,6 +1,7 @@
 ---
 name: microsoft-domains
 description: "Microsoft 365 Domains — Tenant Domain Management & DNS Configuration"
+tags: [domains]
 ---
 
 # Microsoft 365 Domains

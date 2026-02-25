@@ -1,6 +1,7 @@
 ---
 name: microsoft-admin
 description: "Microsoft 365 Admin — Service Health, Messages, SharePoint Admin & Delegated Admin Relationships"
+tags: [admin]
 ---
 
 # Microsoft 365 Admin

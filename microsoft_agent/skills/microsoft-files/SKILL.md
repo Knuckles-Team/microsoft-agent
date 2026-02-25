@@ -1,6 +1,7 @@
 ---
 name: microsoft-files
 description: "Microsoft 365 Files — OneDrive, Excel, OneNote & SharePoint Files"
+tags: [files]
 ---
 
 # Microsoft 365 Files

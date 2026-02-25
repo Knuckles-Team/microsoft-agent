@@ -1,6 +1,7 @@
 ---
 name: microsoft-places
 description: "Microsoft 365 Places — Rooms & Room Lists"
+tags: [places]
 ---
 
 # Microsoft 365 Places

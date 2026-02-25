@@ -1,6 +1,7 @@
 ---
 name: microsoft-mail
 description: "Microsoft 365 Mail — Email Messages, Folders, Attachments, Drafts & Shared Mailboxes"
+tags: [mail]
 ---
 
 # Microsoft 365 Mail

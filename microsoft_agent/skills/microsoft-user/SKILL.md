@@ -1,6 +1,7 @@
 ---
 name: microsoft-user
 description: "Microsoft 365 User — User Profile, Mail Operations, Meetings & Group Membership"
+tags: [user]
 ---
 
 # Microsoft 365 User

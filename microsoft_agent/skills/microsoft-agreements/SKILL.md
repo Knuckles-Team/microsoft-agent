@@ -1,6 +1,7 @@
 ---
 name: microsoft-agreements
 description: "Microsoft 365 Agreements — Terms-of-Use Agreements Management"
+tags: [agreements]
 ---
 
 # Microsoft 365 Agreements

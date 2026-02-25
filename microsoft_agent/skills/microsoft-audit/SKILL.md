@@ -1,6 +1,7 @@
 ---
 name: microsoft-audit
 description: "Microsoft 365 Audit — Directory Audits, Sign-In Logs & Provisioning Logs"
+tags: [audit]
 ---
 
 # Microsoft 365 Audit

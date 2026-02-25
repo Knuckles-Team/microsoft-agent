@@ -1,6 +1,7 @@
 ---
 name: microsoft-policies
 description: "Microsoft 365 Policies — Authorization, Token & Permission Grant Policies"
+tags: [policies]
 ---
 
 # Microsoft 365 Policies

@@ -1,6 +1,7 @@
 ---
 name: microsoft-print
 description: "Microsoft 365 Print — Printers, Print Jobs & Print Shares"
+tags: [print]
 ---
 
 # Microsoft 365 Print

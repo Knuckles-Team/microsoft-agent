@@ -1,6 +1,7 @@
 ---
 name: microsoft-privacy
 description: "Microsoft 365 Privacy — Subject Rights Requests (GDPR/CCPA)"
+tags: [privacy]
 ---
 
 # Microsoft 365 Privacy

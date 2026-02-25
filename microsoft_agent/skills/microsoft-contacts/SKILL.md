@@ -1,6 +1,7 @@
 ---
 name: microsoft-contacts
 description: "Microsoft 365 Contacts — Outlook Contact Management"
+tags: [contacts]
 ---
 
 # Microsoft 365 Contacts

@@ -1,6 +1,7 @@
 ---
 name: microsoft-reports
 description: "Microsoft 365 Reports — Usage & Activity Reports"
+tags: [reports]
 ---
 
 # Microsoft 365 Reports

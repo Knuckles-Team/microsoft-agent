@@ -1,6 +1,7 @@
 ---
 name: microsoft-applications
 description: "Microsoft 365 Applications — App Registrations, Service Principals & Enterprise Apps"
+tags: [applications]
 ---
 
 # Microsoft 365 Applications
