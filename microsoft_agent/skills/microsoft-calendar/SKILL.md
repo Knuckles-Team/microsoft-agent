@@ -1,6 +1,7 @@
 ---
 name: microsoft-calendar
 description: "Microsoft 365 Calendar — Calendar Events, Calendars & Scheduling"
+tags: [calendar]
 ---
 
 # Microsoft 365 Calendar

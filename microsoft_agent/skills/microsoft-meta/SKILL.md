@@ -1,6 +1,7 @@
 ---
 name: microsoft-meta
 description: "Microsoft 365 Meta — Tool Discovery & Search"
+tags: [meta]
 ---
 
 # Microsoft 365 Meta

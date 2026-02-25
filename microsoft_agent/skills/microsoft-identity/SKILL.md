@@ -1,6 +1,7 @@
 ---
 name: microsoft-identity
 description: "Microsoft 365 Identity — Invitations, Conditional Access, Access Reviews & Lifecycle Workflows"
+tags: [identity]
 ---
 
 # Microsoft 365 Identity

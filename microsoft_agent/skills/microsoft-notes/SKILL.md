@@ -1,6 +1,7 @@
 ---
 name: microsoft-notes
 description: "Microsoft 365 Notes — OneNote Notebooks, Sections & Pages"
+tags: [notes]
 ---
 
 # Microsoft 365 Notes

@@ -1,6 +1,7 @@
 ---
 name: microsoft-solutions
 description: "Microsoft 365 Solutions — Booking Businesses, Appointments & Virtual Events"
+tags: [solutions]
 ---
 
 # Microsoft 365 Solutions

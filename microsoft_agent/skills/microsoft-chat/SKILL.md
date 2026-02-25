@@ -1,6 +1,7 @@
 ---
 name: microsoft-chat
 description: "Microsoft 365 Chat — Chats, Messages, Replies & Group Conversations"
+tags: [chat]
 ---
 
 # Microsoft 365 Chat

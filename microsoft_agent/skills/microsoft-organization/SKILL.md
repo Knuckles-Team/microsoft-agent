@@ -1,6 +1,7 @@
 ---
 name: microsoft-organization
 description: "Microsoft 365 Organization — Organization Profile, Branding & Configuration"
+tags: [organization]
 ---
 
 # Microsoft 365 Organization

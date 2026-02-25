@@ -1,6 +1,7 @@
 ---
 name: microsoft-connections
 description: "Microsoft 365 Connections — Microsoft Search External Connections"
+tags: [connections]
 ---
 
 # Microsoft 365 Connections

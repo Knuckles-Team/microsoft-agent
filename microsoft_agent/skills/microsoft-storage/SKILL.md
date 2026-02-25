@@ -1,6 +1,7 @@
 ---
 name: microsoft-storage
 description: "Microsoft 365 Storage — File Storage Containers"
+tags: [storage]
 ---
 
 # Microsoft 365 Storage

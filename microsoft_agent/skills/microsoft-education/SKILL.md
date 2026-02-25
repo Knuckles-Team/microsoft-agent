@@ -1,6 +1,7 @@
 ---
 name: microsoft-education
 description: "Microsoft 365 Education — Education Classes, Schools, Users & Assignments"
+tags: [education]
 ---
 
 # Microsoft 365 Education

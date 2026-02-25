@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import atexit
@@ -213,3 +214,30 @@ class AuthManager:
                 self.save_token_cache()
                 return True
         return False
+
+
+async def get_client():
+    from microsoft_agent.microsoft_api import MicrosoftGraphApi
+    from agent_utilities.middlewares import local
+
+    # These should ideally be in a central config, but for now we'll use env or defaults
+    CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
+    AUTHORITY = "https://login.microsoftonline.com/common"
+    SCOPES = [
+        "User.Read",
+        "Mail.ReadWrite",
+        "Calendars.ReadWrite",
+        "Files.ReadWrite",
+    ]  # Minimal scopes
+
+    auth = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
+    token = auth.get_token()
+
+    if not token:
+        token = getattr(local, "user_token", None)
+        # Note: MicrosoftGraphApi SDK implementation might need a proper token adapter for local.user_token
+
+    if not token:
+        raise ValueError("Microsoft token is not provided. Please login.")
+
+    return MicrosoftGraphApi(auth)

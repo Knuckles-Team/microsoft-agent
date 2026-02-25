@@ -1,6 +1,7 @@
 ---
 name: microsoft-tasks
 description: "Microsoft 365 Tasks — Planner Tasks & To-Do Task Lists"
+tags: [tasks]
 ---
 
 # Microsoft 365 Tasks

@@ -1,6 +1,7 @@
 ---
 name: microsoft-search
 description: "Microsoft 365 Search — Microsoft Graph Search Queries"
+tags: [search]
 ---
 
 # Microsoft 365 Search

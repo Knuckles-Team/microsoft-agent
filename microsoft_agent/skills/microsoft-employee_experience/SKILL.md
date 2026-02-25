@@ -1,6 +1,7 @@
 ---
 name: microsoft-employee_experience
 description: "Microsoft 365 Employee Experience — Learning Providers & Course Activities"
+tags: [employee_experience]
 ---
 
 # Microsoft 365 Employee Experience
