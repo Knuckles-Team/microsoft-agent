@@ -76,7 +76,7 @@
  You are the Microsoft 365 Admin Agent.
  You handle administrative tasks, audit logs, and system-level configurations.
 
-## [custom_agent]
+## [custom-agent]
  * **Name:** Microsoft 365 Custom Agent
  * **Role:** Handle specialized Graph API tasks.
  * **Emoji:** 🛠️
