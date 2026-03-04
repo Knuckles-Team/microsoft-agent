@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # coding: utf-8
 
+from dotenv import load_dotenv, find_dotenv
+from agent_utilities.base_utilities import to_boolean
 import os
 import sys
 import logging
@@ -31,7 +33,7 @@ from microsoft_agent.auth import get_client
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-__version__ = "0.2.26"
+__version__ = "0.2.27"
 print(f"Microsoft MCP v{__version__}")
 
 logger = get_logger(name="TokenMiddleware")
@@ -57,13 +59,14 @@ def register_prompts(mcp: FastMCP):
         return "Please show my calendar events for today."
 
 
-def register_tools(mcp: FastMCP):
-    @mcp.custom_route("/health", methods=["GET"])
+def register_misc_tools(mcp: FastMCP):
     async def health_check(request: Request) -> JSONResponse:
         return JSONResponse({"status": "OK"})
 
     CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
+
     AUTHORITY = "https://login.microsoftonline.com/common"
+
     SCOPES = [
         "User.Read",
         "Mail.ReadWrite",
@@ -120,6 +123,8 @@ def register_tools(mcp: FastMCP):
 
     _ = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
 
+
+def register_auth_tools(mcp: FastMCP):
     @mcp.tool(
         name="login",
         description="Authenticate with Microsoft using device code flow",
@@ -162,6 +167,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return client.list_accounts()
 
+
+def register_meta_tools(mcp: FastMCP):
     @mcp.tool(
         name="search_tools",
         description="Search available Microsoft Graph API tools",
@@ -175,6 +182,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return client.search_tools(query=query, limit=limit)
 
+
+def register_mail_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_mail_messages",
         description="list_mail_messages: GET /me/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
@@ -334,21 +343,6 @@ def register_tools(mcp: FastMCP):
         )
 
     @mcp.tool(
-        name="list_users",
-        description="list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
-        tags={"files", "user"},
-    )
-    async def list_users(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
-    ) -> Any:
-        """list_users: GET /users
-
-        TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
-        """
-        client = get_client()
-        return await client.list_users(params=params)
-
-    @mcp.tool(
         name="create_draft_email",
         description="create_draft_email: POST /me/messages",
         tags={"mail"},
@@ -484,261 +478,6 @@ def register_tools(mcp: FastMCP):
         )
 
     @mcp.tool(
-        name="list_calendar_events",
-        description="list_calendar_events: GET /me/events",
-        tags={"calendar", "files"},
-    )
-    async def list_calendar_events(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-        timezone: Optional[str] = Field(None, description="IANA timezone"),
-    ) -> Any:
-        """list_calendar_events: GET /me/events"""
-        client = await get_client()
-        return await client.list_calendar_events(params=params, timezone=timezone)
-
-    @mcp.tool(
-        name="get_calendar_event",
-        description="get_calendar_event: GET /me/events/{event-id}",
-        tags={"calendar"},
-    )
-    async def get_calendar_event(
-        event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-        timezone: Optional[str] = Field(None, description="IANA timezone"),
-    ) -> Any:
-        """get_calendar_event: GET /me/events/{event-id}"""
-        client = await get_client()
-        return await client.get_calendar_event(
-            event_id=event_id, params=params, timezone=timezone
-        )
-
-    @mcp.tool(
-        name="create_calendar_event",
-        description="create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags={"calendar"},
-    )
-    async def create_calendar_event(
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_calendar_event: POST /me/events
-
-        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
-        """
-        client = await get_client()
-        return await client.create_calendar_event(data=data, params=params)
-
-    @mcp.tool(
-        name="update_calendar_event",
-        description="update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags={"calendar"},
-    )
-    async def update_calendar_event(
-        event_id: str = Field(..., description="Parameter for event-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_calendar_event: PATCH /me/events/{event-id}
-
-        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
-        """
-        client = await get_client()
-        return await client.update_calendar_event(
-            event_id=event_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="delete_calendar_event",
-        description="delete_calendar_event: DELETE /me/events/{event-id}",
-        tags={"calendar"},
-    )
-    async def delete_calendar_event(
-        event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """delete_calendar_event: DELETE /me/events/{event-id}"""
-        client = await get_client()
-        return await client.delete_calendar_event(event_id=event_id, params=params)
-
-    @mcp.tool(
-        name="list_specific_calendar_events",
-        description="list_specific_calendar_events: GET /me/calendars/{calendar-id}/events",
-        tags={"calendar", "files"},
-    )
-    async def list_specific_calendar_events(
-        calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-        timezone: Optional[str] = Field(None, description="IANA timezone"),
-    ) -> Any:
-        """list_specific_calendar_events: GET /me/calendars/{calendar-id}/events"""
-        client = await get_client()
-        # Note: We might need a specific method in MicrosoftGraphApi for this,
-        # or list_calendar_events could take optional calendar_id.
-        # For now I will assume list_specific_calendar_events exists or I will add it.
-        return await client.list_specific_calendar_events(
-            calendar_id=calendar_id, params=params, timezone=timezone
-        )
-
-    @mcp.tool(
-        name="get_specific_calendar_event",
-        description="get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}",
-        tags={"calendar"},
-    )
-    async def get_specific_calendar_event(
-        calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-        timezone: Optional[str] = Field(None, description="IANA timezone"),
-    ) -> Any:
-        """get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}"""
-        client = await get_client()
-        return await client.get_specific_calendar_event(
-            calendar_id=calendar_id, event_id=event_id, params=params, timezone=timezone
-        )
-
-    @mcp.tool(
-        name="create_specific_calendar_event",
-        description="create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags={"calendar"},
-    )
-    async def create_specific_calendar_event(
-        calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_specific_calendar_event: POST /me/calendars/{calendar-id}/events
-
-        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
-        """
-        client = await get_client()
-        return await client.create_specific_calendar_event(
-            calendar_id=calendar_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="update_specific_calendar_event",
-        description="update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
-        tags={"calendar"},
-    )
-    async def update_specific_calendar_event(
-        calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        event_id: str = Field(..., description="Parameter for event-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}
-
-        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
-        """
-        client = await get_client()
-        return await client.update_specific_calendar_event(
-            calendar_id=calendar_id, event_id=event_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="delete_specific_calendar_event",
-        description="delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}",
-        tags={"calendar"},
-    )
-    async def delete_specific_calendar_event(
-        calendar_id: str = Field(..., description="Parameter for calendar-id"),
-        event_id: str = Field(..., description="Parameter for event-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}"""
-        client = await get_client()
-        return await client.delete_specific_calendar_event(
-            calendar_id=calendar_id, event_id=event_id, params=params
-        )
-
-    @mcp.tool(
-        name="get_calendar_view",
-        description="get_calendar_view: GET /me/calendarView",
-        tags={"calendar"},
-    )
-    async def get_calendar_view(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-        timezone: Optional[str] = Field(None, description="IANA timezone"),
-    ) -> Any:
-        """get_calendar_view: GET /me/calendarView"""
-        client = await get_client()
-        return await client.get_calendar_view(params=params, timezone=timezone)
-
-    @mcp.tool(
-        name="list_calendars",
-        description="list_calendars: GET /me/calendars",
-        tags={"calendar", "files"},
-    )
-    async def list_calendars(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
-    ) -> Any:
-        """list_calendars: GET /me/calendars"""
-        client = await get_client()
-        return await client.list_calendars(params=params)
-
-    @mcp.tool(
-        name="find_meeting_times",
-        description="find_meeting_times: POST /me/findMeetingTimes",
-        tags={"calendar", "user"},
-    )
-    async def find_meeting_times(
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """find_meeting_times: POST /me/findMeetingTimes"""
-        client = await get_client()
-        return await client.find_meeting_times(data=data, params=params)
-
-    @mcp.tool(
-        name="list_drives", description="list_drives: GET /me/drives", tags={"files"}
-    )
-    async def list_drives(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
-    ) -> Any:
-        """list_drives: GET /me/drives"""
-        client = await get_client()
-        return await client.list_drives(params=params)
-
-    @mcp.tool(
-        name="get_drive_root_item",
-        description="get_drive_root_item: GET /drives/{drive-id}/root",
-        tags={"files"},
-    )
-    async def get_drive_root_item(
-        drive_id: str = Field(..., description="Parameter for drive-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_drive_root_item: GET /drives/{drive-id}/root"""
-        client = await get_client()
-        return await client.get_drive_root_item(drive_id=drive_id, params=params)
-
-    @mcp.tool(
         name="get_root_folder",
         description="get_root_folder: GET /drives/{drive-id}/root",
         tags={"mail", "files"},
@@ -770,6 +509,193 @@ def register_tools(mcp: FastMCP):
         return await client.list_folder_files(
             drive_id=drive_id, driveItem_id=driveItem_id, params=params
         )
+
+    @mcp.tool(
+        name="list_chat_messages",
+        description="list_chat_messages: GET /chats/{chat-id}/messages",
+        tags={"mail", "files", "user", "chat"},
+    )
+    async def list_chat_messages(
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_chat_messages: GET /chats/{chat-id}/messages"""
+        client = await get_client()
+        return await client.list_chat_messages(chat_id=chat_id, params=params)
+
+    @mcp.tool(
+        name="get_chat_message",
+        description="get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}",
+        tags={"mail", "user", "chat"},
+    )
+    async def get_chat_message(
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}"""
+        client = await get_client()
+        return await client.get_chat_message(
+            chat_id=chat_id, chatMessage_id=chatMessage_id, params=params
+        )
+
+    @mcp.tool(
+        name="send_chat_message",
+        description="send_chat_message: POST /chats/{chat-id}/messages",
+        tags={"mail", "user", "chat"},
+    )
+    async def send_chat_message(
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """send_chat_message: POST /chats/{chat-id}/messages"""
+        client = await get_client()
+        return await client.send_chat_message(chat_id=chat_id, data=data, params=params)
+
+    @mcp.tool(
+        name="list_channel_messages",
+        description="list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages",
+        tags={"mail", "files", "user", "teams"},
+    )
+    async def list_channel_messages(
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages"""
+        client = await get_client()
+        return await client.list_channel_messages(
+            team_id=team_id, channel_id=channel_id, params=params
+        )
+
+    @mcp.tool(
+        name="get_channel_message",
+        description="get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}",
+        tags={"mail", "user", "teams"},
+    )
+    async def get_channel_message(
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"""
+        client = await get_client()
+        return await client.get_channel_message(
+            team_id=team_id,
+            channel_id=channel_id,
+            chatMessage_id=chatMessage_id,
+            params=params,
+        )
+
+    @mcp.tool(
+        name="send_channel_message",
+        description="send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages",
+        tags={"mail", "user", "teams"},
+    )
+    async def send_channel_message(
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages"""
+        client = await get_client()
+        return await client.send_channel_message(
+            team_id=team_id, channel_id=channel_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="list_chat_message_replies",
+        description="list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies",
+        tags={"mail", "files", "user", "chat"},
+    )
+    async def list_chat_message_replies(
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies"""
+        client = await get_client()
+        return await client.list_chat_message_replies(
+            chat_id=chat_id, chatMessage_id=chatMessage_id, params=params
+        )
+
+    @mcp.tool(
+        name="reply_to_chat_message",
+        description="reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies",
+        tags={"mail", "user", "chat"},
+    )
+    async def reply_to_chat_message(
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies"""
+        client = await get_client()
+        return await client.reply_to_chat_message(
+            chat_id=chat_id, chatMessage_id=chatMessage_id, data=data, params=params
+        )
+
+
+def register_files_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="list_users",
+        description="list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
+        tags={"files", "user"},
+    )
+    async def list_users(
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+    ) -> Any:
+        """list_users: GET /users
+
+        TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
+        """
+        client = get_client()
+        return await client.list_users(params=params)
+
+    @mcp.tool(
+        name="list_drives", description="list_drives: GET /me/drives", tags={"files"}
+    )
+    async def list_drives(
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+    ) -> Any:
+        """list_drives: GET /me/drives"""
+        client = await get_client()
+        return await client.list_drives(params=params)
+
+    @mcp.tool(
+        name="get_drive_root_item",
+        description="get_drive_root_item: GET /drives/{drive-id}/root",
+        tags={"files"},
+    )
+    async def get_drive_root_item(
+        drive_id: str = Field(..., description="Parameter for drive-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_drive_root_item: GET /drives/{drive-id}/root"""
+        client = await get_client()
+        return await client.get_drive_root_item(drive_id=drive_id, params=params)
 
     @mcp.tool(
         name="download_onedrive_file_content",
@@ -1035,38 +961,6 @@ def register_tools(mcp: FastMCP):
         )
 
     @mcp.tool(
-        name="get_onenote_page_content",
-        description="get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content",
-        tags={"notes"},
-    )
-    async def get_onenote_page_content(
-        onenotePage_id: str = Field(..., description="Parameter for onenotePage-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content"""
-        client = await get_client()
-        return await client.get_onenote_page_content(
-            onenotePage_id=onenotePage_id, params=params
-        )
-
-    @mcp.tool(
-        name="create_onenote_page",
-        description="create_onenote_page: POST /me/onenote/pages",
-        tags={"notes"},
-    )
-    async def create_onenote_page(
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_onenote_page: POST /me/onenote/pages"""
-        client = await get_client()
-        return await client.create_onenote_page(data=data, params=params)
-
-    @mcp.tool(
         name="list_todo_task_lists",
         description="list_todo_task_lists: GET /me/todo/lists",
         tags={"files", "tasks"},
@@ -1096,82 +990,6 @@ def register_tools(mcp: FastMCP):
         )
 
     @mcp.tool(
-        name="get_todo_task",
-        description="get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
-        tags={"tasks"},
-    )
-    async def get_todo_task(
-        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
-        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
-        client = await get_client()
-        return await client.get_todo_task(
-            todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
-        )
-
-    @mcp.tool(
-        name="create_todo_task",
-        description="create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks",
-        tags={"tasks"},
-    )
-    async def create_todo_task(
-        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks"""
-        client = await get_client()
-        return await client.create_todo_task(
-            todoTaskList_id=todoTaskList_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="update_todo_task",
-        description="update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
-        tags={"tasks"},
-    )
-    async def update_todo_task(
-        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
-        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
-        client = await get_client()
-        return await client.update_todo_task(
-            todoTaskList_id=todoTaskList_id,
-            todoTask_id=todoTask_id,
-            data=data,
-            params=params,
-        )
-
-    @mcp.tool(
-        name="delete_todo_task",
-        description="delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
-        tags={"tasks"},
-    )
-    async def delete_todo_task(
-        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
-        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
-        client = await get_client()
-        return await client.delete_todo_task(
-            todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
-        )
-
-    @mcp.tool(
         name="list_planner_tasks",
         description="list_planner_tasks: GET /me/planner/tasks",
         tags={"files", "tasks"},
@@ -1182,23 +1000,6 @@ def register_tools(mcp: FastMCP):
         """list_planner_tasks: GET /me/planner/tasks"""
         client = await get_client()
         return await client.list_planner_tasks(params=params)
-
-    @mcp.tool(
-        name="get_planner_plan",
-        description="get_planner_plan: GET /planner/plans/{plannerPlan-id}",
-        tags={"tasks"},
-    )
-    async def get_planner_plan(
-        plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_planner_plan: GET /planner/plans/{plannerPlan-id}"""
-        client = await get_client()
-        return await client.get_planner_plan(
-            plannerPlan_id=plannerPlan_id, params=params
-        )
 
     @mcp.tool(
         name="list_plan_tasks",
@@ -1218,74 +1019,6 @@ def register_tools(mcp: FastMCP):
         )
 
     @mcp.tool(
-        name="get_planner_task",
-        description="get_planner_task: GET /planner/tasks/{plannerTask-id}",
-        tags={"tasks"},
-    )
-    async def get_planner_task(
-        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_planner_task: GET /planner/tasks/{plannerTask-id}"""
-        client = await get_client()
-        return await client.get_planner_task(
-            plannerTask_id=plannerTask_id, params=params
-        )
-
-    @mcp.tool(
-        name="create_planner_task",
-        description="create_planner_task: POST /planner/tasks",
-        tags={"tasks"},
-    )
-    async def create_planner_task(
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_planner_task: POST /planner/tasks"""
-        client = await get_client()
-        return await client.create_planner_task(data=data, params=params)
-
-    @mcp.tool(
-        name="update_planner_task",
-        description="update_planner_task: PATCH /planner/tasks/{plannerTask-id}",
-        tags={"tasks"},
-    )
-    async def update_planner_task(
-        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_planner_task: PATCH /planner/tasks/{plannerTask-id}"""
-        client = await get_client()
-        return await client.update_planner_task(
-            plannerTask_id=plannerTask_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="update_planner_task_details",
-        description="update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details",
-        tags={"tasks"},
-    )
-    async def update_planner_task_details(
-        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details"""
-        client = await get_client()
-        return await client.update_planner_task_details(
-            plannerTask_id=plannerTask_id, data=data, params=params
-        )
-
-    @mcp.tool(
         name="list_outlook_contacts",
         description="list_outlook_contacts: GET /me/contacts",
         tags={"files", "contacts"},
@@ -1298,91 +1031,6 @@ def register_tools(mcp: FastMCP):
         return await client.list_outlook_contacts(params=params)
 
     @mcp.tool(
-        name="get_outlook_contact",
-        description="get_outlook_contact: GET /me/contacts/{contact-id}",
-        tags={"contacts"},
-    )
-    async def get_outlook_contact(
-        contact_id: str = Field(..., description="Parameter for contact-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_outlook_contact: GET /me/contacts/{contact-id}"""
-        client = await get_client()
-        return await client.get_outlook_contact(contact_id=contact_id, params=params)
-
-    @mcp.tool(
-        name="create_outlook_contact",
-        description="create_outlook_contact: POST /me/contacts",
-        tags={"contacts"},
-    )
-    async def create_outlook_contact(
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_outlook_contact: POST /me/contacts"""
-        client = await get_client()
-        return await client.create_outlook_contact(data=data, params=params)
-
-    @mcp.tool(
-        name="update_outlook_contact",
-        description="update_outlook_contact: PATCH /me/contacts/{contact-id}",
-        tags={"contacts"},
-    )
-    async def update_outlook_contact(
-        contact_id: str = Field(..., description="Parameter for contact-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_outlook_contact: PATCH /me/contacts/{contact-id}"""
-        client = await get_client()
-        return await client.update_outlook_contact(
-            contact_id=contact_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="delete_outlook_contact",
-        description="delete_outlook_contact: DELETE /me/contacts/{contact-id}",
-        tags={"contacts"},
-    )
-    async def delete_outlook_contact(
-        contact_id: str = Field(..., description="Parameter for contact-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """delete_outlook_contact: DELETE /me/contacts/{contact-id}"""
-        client = await get_client()
-        return await client.delete_outlook_contact(contact_id=contact_id, params=params)
-
-    @mcp.tool(
-        name="get_current_user", description="get_current_user: GET /me", tags={"user"}
-    )
-    async def get_current_user(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
-    ) -> Any:
-        """get_current_user: GET /me"""
-        client = await get_client()
-        return await client.get_current_user(params=params)
-
-    @mcp.tool(
-        name="get_me",
-        description="get_me: GET /me",
-        tags={"user"},
-    )
-    async def get_me(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
-    ) -> Any:
-        """get_me: GET /me"""
-        client = await get_client()
-        return await client.get_me(params=params)
-
-    @mcp.tool(
         name="list_chats",
         description="list_chats: GET /me/chats",
         tags={"files", "chat"},
@@ -1393,52 +1041,6 @@ def register_tools(mcp: FastMCP):
         """list_chats: GET /me/chats"""
         client = await get_client()
         return await client.list_chats(params=params)
-
-    @mcp.tool(
-        name="get_chat", description="get_chat: GET /chats/{chat-id}", tags={"chat"}
-    )
-    async def get_chat(
-        chat_id: str = Field(..., description="Parameter for chat-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_chat: GET /chats/{chat-id}"""
-        client = await get_client()
-        return await client.get_chat(chat_id=chat_id, params=params)
-
-    @mcp.tool(
-        name="list_chat_messages",
-        description="list_chat_messages: GET /chats/{chat-id}/messages",
-        tags={"mail", "files", "user", "chat"},
-    )
-    async def list_chat_messages(
-        chat_id: str = Field(..., description="Parameter for chat-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_chat_messages: GET /chats/{chat-id}/messages"""
-        client = await get_client()
-        return await client.list_chat_messages(chat_id=chat_id, params=params)
-
-    @mcp.tool(
-        name="get_chat_message",
-        description="get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}",
-        tags={"mail", "user", "chat"},
-    )
-    async def get_chat_message(
-        chat_id: str = Field(..., description="Parameter for chat-id"),
-        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}"""
-        client = await get_client()
-        return await client.get_chat_message(
-            chat_id=chat_id, chatMessage_id=chatMessage_id, params=params
-        )
 
     @mcp.tool(
         name="get_excel_worksheet",
@@ -1463,22 +1065,6 @@ def register_tools(mcp: FastMCP):
         )
 
     @mcp.tool(
-        name="send_chat_message",
-        description="send_chat_message: POST /chats/{chat-id}/messages",
-        tags={"mail", "user", "chat"},
-    )
-    async def send_chat_message(
-        chat_id: str = Field(..., description="Parameter for chat-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """send_chat_message: POST /chats/{chat-id}/messages"""
-        client = await get_client()
-        return await client.send_chat_message(chat_id=chat_id, data=data, params=params)
-
-    @mcp.tool(
         name="list_joined_teams",
         description="list_joined_teams: GET /me/joinedTeams",
         tags={"files", "teams"},
@@ -1489,19 +1075,6 @@ def register_tools(mcp: FastMCP):
         """list_joined_teams: GET /me/joinedTeams"""
         client = await get_client()
         return await client.list_joined_teams(params=params)
-
-    @mcp.tool(
-        name="get_team", description="get_team: GET /teams/{team-id}", tags={"teams"}
-    )
-    async def get_team(
-        team_id: str = Field(..., description="Parameter for team-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_team: GET /teams/{team-id}"""
-        client = await get_client()
-        return await client.get_team(team_id=team_id, params=params)
 
     @mcp.tool(
         name="list_team_channels",
@@ -1519,83 +1092,6 @@ def register_tools(mcp: FastMCP):
         return await client.list_team_channels(team_id=team_id, params=params)
 
     @mcp.tool(
-        name="get_team_channel",
-        description="get_team_channel: GET /teams/{team-id}/channels/{channel-id}",
-        tags={"teams"},
-    )
-    async def get_team_channel(
-        team_id: str = Field(..., description="Parameter for team-id"),
-        channel_id: str = Field(..., description="Parameter for channel-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_team_channel: GET /teams/{team-id}/channels/{channel-id}"""
-        client = await get_client()
-        return await client.get_team_channel(
-            team_id=team_id, channel_id=channel_id, params=params
-        )
-
-    @mcp.tool(
-        name="list_channel_messages",
-        description="list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages",
-        tags={"mail", "files", "user", "teams"},
-    )
-    async def list_channel_messages(
-        team_id: str = Field(..., description="Parameter for team-id"),
-        channel_id: str = Field(..., description="Parameter for channel-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages"""
-        client = await get_client()
-        return await client.list_channel_messages(
-            team_id=team_id, channel_id=channel_id, params=params
-        )
-
-    @mcp.tool(
-        name="get_channel_message",
-        description="get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}",
-        tags={"mail", "user", "teams"},
-    )
-    async def get_channel_message(
-        team_id: str = Field(..., description="Parameter for team-id"),
-        channel_id: str = Field(..., description="Parameter for channel-id"),
-        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"""
-        client = await get_client()
-        return await client.get_channel_message(
-            team_id=team_id,
-            channel_id=channel_id,
-            chatMessage_id=chatMessage_id,
-            params=params,
-        )
-
-    @mcp.tool(
-        name="send_channel_message",
-        description="send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages",
-        tags={"mail", "user", "teams"},
-    )
-    async def send_channel_message(
-        team_id: str = Field(..., description="Parameter for team-id"),
-        channel_id: str = Field(..., description="Parameter for channel-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages"""
-        client = await get_client()
-        return await client.send_channel_message(
-            team_id=team_id, channel_id=channel_id, data=data, params=params
-        )
-
-    @mcp.tool(
         name="list_team_members",
         description="list_team_members: GET /teams/{team-id}/members",
         tags={"files", "user", "teams"},
@@ -1609,70 +1105,6 @@ def register_tools(mcp: FastMCP):
         """list_team_members: GET /teams/{team-id}/members"""
         client = await get_client()
         return await client.list_team_members(team_id=team_id, params=params)
-
-    @mcp.tool(
-        name="list_chat_message_replies",
-        description="list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies",
-        tags={"mail", "files", "user", "chat"},
-    )
-    async def list_chat_message_replies(
-        chat_id: str = Field(..., description="Parameter for chat-id"),
-        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies"""
-        client = await get_client()
-        return await client.list_chat_message_replies(
-            chat_id=chat_id, chatMessage_id=chatMessage_id, params=params
-        )
-
-    @mcp.tool(
-        name="reply_to_chat_message",
-        description="reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies",
-        tags={"mail", "user", "chat"},
-    )
-    async def reply_to_chat_message(
-        chat_id: str = Field(..., description="Parameter for chat-id"),
-        chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies"""
-        client = await get_client()
-        return await client.reply_to_chat_message(
-            chat_id=chat_id, chatMessage_id=chatMessage_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="list_sites",
-        description="list_sites: GET /sites",
-        tags={"sites"},
-    )
-    async def list_sites(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
-    ) -> Any:
-        """list_sites: GET /sites"""
-        client = await get_client()
-        return await client.list_sites(params=params)
-
-    @mcp.tool(
-        name="get_site",
-        description="get_site: GET /sites/{site-id}",
-        tags={"sites"},
-    )
-    async def get_site(
-        site_id: str = Field(..., description="Parameter for site-id"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_site: GET /sites/{site-id}"""
-        client = await get_client()
-        return await client.get_site(site_id=site_id, params=params)
 
     @mcp.tool(
         name="list_site_drives",
@@ -1829,6 +1261,601 @@ def register_tools(mcp: FastMCP):
             drive_id=drive_id, item_id=item_id, table_id=table_id, params=params
         )
 
+
+def register_calendar_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="list_calendar_events",
+        description="list_calendar_events: GET /me/events",
+        tags={"calendar", "files"},
+    )
+    async def list_calendar_events(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """list_calendar_events: GET /me/events"""
+        client = await get_client()
+        return await client.list_calendar_events(params=params, timezone=timezone)
+
+    @mcp.tool(
+        name="get_calendar_event",
+        description="get_calendar_event: GET /me/events/{event-id}",
+        tags={"calendar"},
+    )
+    async def get_calendar_event(
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """get_calendar_event: GET /me/events/{event-id}"""
+        client = await get_client()
+        return await client.get_calendar_event(
+            event_id=event_id, params=params, timezone=timezone
+        )
+
+    @mcp.tool(
+        name="create_calendar_event",
+        description="create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        tags={"calendar"},
+    )
+    async def create_calendar_event(
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_calendar_event: POST /me/events
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        client = await get_client()
+        return await client.create_calendar_event(data=data, params=params)
+
+    @mcp.tool(
+        name="update_calendar_event",
+        description="update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        tags={"calendar"},
+    )
+    async def update_calendar_event(
+        event_id: str = Field(..., description="Parameter for event-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_calendar_event: PATCH /me/events/{event-id}
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        client = await get_client()
+        return await client.update_calendar_event(
+            event_id=event_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="delete_calendar_event",
+        description="delete_calendar_event: DELETE /me/events/{event-id}",
+        tags={"calendar"},
+    )
+    async def delete_calendar_event(
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_calendar_event: DELETE /me/events/{event-id}"""
+        client = await get_client()
+        return await client.delete_calendar_event(event_id=event_id, params=params)
+
+    @mcp.tool(
+        name="list_specific_calendar_events",
+        description="list_specific_calendar_events: GET /me/calendars/{calendar-id}/events",
+        tags={"calendar", "files"},
+    )
+    async def list_specific_calendar_events(
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """list_specific_calendar_events: GET /me/calendars/{calendar-id}/events"""
+        client = await get_client()
+        # Note: We might need a specific method in MicrosoftGraphApi for this,
+        # or list_calendar_events could take optional calendar_id.
+        # For now I will assume list_specific_calendar_events exists or I will add it.
+        return await client.list_specific_calendar_events(
+            calendar_id=calendar_id, params=params, timezone=timezone
+        )
+
+    @mcp.tool(
+        name="get_specific_calendar_event",
+        description="get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}",
+        tags={"calendar"},
+    )
+    async def get_specific_calendar_event(
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}"""
+        client = await get_client()
+        return await client.get_specific_calendar_event(
+            calendar_id=calendar_id, event_id=event_id, params=params, timezone=timezone
+        )
+
+    @mcp.tool(
+        name="create_specific_calendar_event",
+        description="create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        tags={"calendar"},
+    )
+    async def create_specific_calendar_event(
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_specific_calendar_event: POST /me/calendars/{calendar-id}/events
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        client = await get_client()
+        return await client.create_specific_calendar_event(
+            calendar_id=calendar_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="update_specific_calendar_event",
+        description="update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        tags={"calendar"},
+    )
+    async def update_specific_calendar_event(
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        event_id: str = Field(..., description="Parameter for event-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}
+
+        TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.
+        """
+        client = await get_client()
+        return await client.update_specific_calendar_event(
+            calendar_id=calendar_id, event_id=event_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="delete_specific_calendar_event",
+        description="delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}",
+        tags={"calendar"},
+    )
+    async def delete_specific_calendar_event(
+        calendar_id: str = Field(..., description="Parameter for calendar-id"),
+        event_id: str = Field(..., description="Parameter for event-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}"""
+        client = await get_client()
+        return await client.delete_specific_calendar_event(
+            calendar_id=calendar_id, event_id=event_id, params=params
+        )
+
+    @mcp.tool(
+        name="get_calendar_view",
+        description="get_calendar_view: GET /me/calendarView",
+        tags={"calendar"},
+    )
+    async def get_calendar_view(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+        timezone: Optional[str] = Field(None, description="IANA timezone"),
+    ) -> Any:
+        """get_calendar_view: GET /me/calendarView"""
+        client = await get_client()
+        return await client.get_calendar_view(params=params, timezone=timezone)
+
+    @mcp.tool(
+        name="list_calendars",
+        description="list_calendars: GET /me/calendars",
+        tags={"calendar", "files"},
+    )
+    async def list_calendars(
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+    ) -> Any:
+        """list_calendars: GET /me/calendars"""
+        client = await get_client()
+        return await client.list_calendars(params=params)
+
+    @mcp.tool(
+        name="find_meeting_times",
+        description="find_meeting_times: POST /me/findMeetingTimes",
+        tags={"calendar", "user"},
+    )
+    async def find_meeting_times(
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """find_meeting_times: POST /me/findMeetingTimes"""
+        client = await get_client()
+        return await client.find_meeting_times(data=data, params=params)
+
+
+def register_notes_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_onenote_page_content",
+        description="get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content",
+        tags={"notes"},
+    )
+    async def get_onenote_page_content(
+        onenotePage_id: str = Field(..., description="Parameter for onenotePage-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content"""
+        client = await get_client()
+        return await client.get_onenote_page_content(
+            onenotePage_id=onenotePage_id, params=params
+        )
+
+    @mcp.tool(
+        name="create_onenote_page",
+        description="create_onenote_page: POST /me/onenote/pages",
+        tags={"notes"},
+    )
+    async def create_onenote_page(
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_onenote_page: POST /me/onenote/pages"""
+        client = await get_client()
+        return await client.create_onenote_page(data=data, params=params)
+
+
+def register_tasks_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_todo_task",
+        description="get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
+        tags={"tasks"},
+    )
+    async def get_todo_task(
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        client = await get_client()
+        return await client.get_todo_task(
+            todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
+        )
+
+    @mcp.tool(
+        name="create_todo_task",
+        description="create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks",
+        tags={"tasks"},
+    )
+    async def create_todo_task(
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks"""
+        client = await get_client()
+        return await client.create_todo_task(
+            todoTaskList_id=todoTaskList_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="update_todo_task",
+        description="update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
+        tags={"tasks"},
+    )
+    async def update_todo_task(
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        client = await get_client()
+        return await client.update_todo_task(
+            todoTaskList_id=todoTaskList_id,
+            todoTask_id=todoTask_id,
+            data=data,
+            params=params,
+        )
+
+    @mcp.tool(
+        name="delete_todo_task",
+        description="delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}",
+        tags={"tasks"},
+    )
+    async def delete_todo_task(
+        todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
+        todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        client = await get_client()
+        return await client.delete_todo_task(
+            todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
+        )
+
+    @mcp.tool(
+        name="get_planner_plan",
+        description="get_planner_plan: GET /planner/plans/{plannerPlan-id}",
+        tags={"tasks"},
+    )
+    async def get_planner_plan(
+        plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_planner_plan: GET /planner/plans/{plannerPlan-id}"""
+        client = await get_client()
+        return await client.get_planner_plan(
+            plannerPlan_id=plannerPlan_id, params=params
+        )
+
+    @mcp.tool(
+        name="get_planner_task",
+        description="get_planner_task: GET /planner/tasks/{plannerTask-id}",
+        tags={"tasks"},
+    )
+    async def get_planner_task(
+        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_planner_task: GET /planner/tasks/{plannerTask-id}"""
+        client = await get_client()
+        return await client.get_planner_task(
+            plannerTask_id=plannerTask_id, params=params
+        )
+
+    @mcp.tool(
+        name="create_planner_task",
+        description="create_planner_task: POST /planner/tasks",
+        tags={"tasks"},
+    )
+    async def create_planner_task(
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_planner_task: POST /planner/tasks"""
+        client = await get_client()
+        return await client.create_planner_task(data=data, params=params)
+
+    @mcp.tool(
+        name="update_planner_task",
+        description="update_planner_task: PATCH /planner/tasks/{plannerTask-id}",
+        tags={"tasks"},
+    )
+    async def update_planner_task(
+        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_planner_task: PATCH /planner/tasks/{plannerTask-id}"""
+        client = await get_client()
+        return await client.update_planner_task(
+            plannerTask_id=plannerTask_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="update_planner_task_details",
+        description="update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details",
+        tags={"tasks"},
+    )
+    async def update_planner_task_details(
+        plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details"""
+        client = await get_client()
+        return await client.update_planner_task_details(
+            plannerTask_id=plannerTask_id, data=data, params=params
+        )
+
+
+def register_contacts_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_outlook_contact",
+        description="get_outlook_contact: GET /me/contacts/{contact-id}",
+        tags={"contacts"},
+    )
+    async def get_outlook_contact(
+        contact_id: str = Field(..., description="Parameter for contact-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_outlook_contact: GET /me/contacts/{contact-id}"""
+        client = await get_client()
+        return await client.get_outlook_contact(contact_id=contact_id, params=params)
+
+    @mcp.tool(
+        name="create_outlook_contact",
+        description="create_outlook_contact: POST /me/contacts",
+        tags={"contacts"},
+    )
+    async def create_outlook_contact(
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_outlook_contact: POST /me/contacts"""
+        client = await get_client()
+        return await client.create_outlook_contact(data=data, params=params)
+
+    @mcp.tool(
+        name="update_outlook_contact",
+        description="update_outlook_contact: PATCH /me/contacts/{contact-id}",
+        tags={"contacts"},
+    )
+    async def update_outlook_contact(
+        contact_id: str = Field(..., description="Parameter for contact-id"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_outlook_contact: PATCH /me/contacts/{contact-id}"""
+        client = await get_client()
+        return await client.update_outlook_contact(
+            contact_id=contact_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="delete_outlook_contact",
+        description="delete_outlook_contact: DELETE /me/contacts/{contact-id}",
+        tags={"contacts"},
+    )
+    async def delete_outlook_contact(
+        contact_id: str = Field(..., description="Parameter for contact-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_outlook_contact: DELETE /me/contacts/{contact-id}"""
+        client = await get_client()
+        return await client.delete_outlook_contact(contact_id=contact_id, params=params)
+
+
+def register_user_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_current_user", description="get_current_user: GET /me", tags={"user"}
+    )
+    async def get_current_user(
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+    ) -> Any:
+        """get_current_user: GET /me"""
+        client = await get_client()
+        return await client.get_current_user(params=params)
+
+    @mcp.tool(
+        name="get_me",
+        description="get_me: GET /me",
+        tags={"user"},
+    )
+    async def get_me(
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+    ) -> Any:
+        """get_me: GET /me"""
+        client = await get_client()
+        return await client.get_me(params=params)
+
+
+def register_chat_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_chat", description="get_chat: GET /chats/{chat-id}", tags={"chat"}
+    )
+    async def get_chat(
+        chat_id: str = Field(..., description="Parameter for chat-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_chat: GET /chats/{chat-id}"""
+        client = await get_client()
+        return await client.get_chat(chat_id=chat_id, params=params)
+
+
+def register_teams_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_team", description="get_team: GET /teams/{team-id}", tags={"teams"}
+    )
+    async def get_team(
+        team_id: str = Field(..., description="Parameter for team-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_team: GET /teams/{team-id}"""
+        client = await get_client()
+        return await client.get_team(team_id=team_id, params=params)
+
+    @mcp.tool(
+        name="get_team_channel",
+        description="get_team_channel: GET /teams/{team-id}/channels/{channel-id}",
+        tags={"teams"},
+    )
+    async def get_team_channel(
+        team_id: str = Field(..., description="Parameter for team-id"),
+        channel_id: str = Field(..., description="Parameter for channel-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_team_channel: GET /teams/{team-id}/channels/{channel-id}"""
+        client = await get_client()
+        return await client.get_team_channel(
+            team_id=team_id, channel_id=channel_id, params=params
+        )
+
+
+def register_sites_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="list_sites",
+        description="list_sites: GET /sites",
+        tags={"sites"},
+    )
+    async def list_sites(
+        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+    ) -> Any:
+        """list_sites: GET /sites"""
+        client = await get_client()
+        return await client.list_sites(params=params)
+
+    @mcp.tool(
+        name="get_site",
+        description="get_site: GET /sites/{site-id}",
+        tags={"sites"},
+    )
+    async def get_site(
+        site_id: str = Field(..., description="Parameter for site-id"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_site: GET /sites/{site-id}"""
+        client = await get_client()
+        return await client.get_site(site_id=site_id, params=params)
+
     @mcp.tool(
         name="get_sharepoint_site_by_path",
         description="get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')",
@@ -1859,6 +1886,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.get_sharepoint_sites_delta(params=params)
 
+
+def register_search_tools(mcp: FastMCP):
     @mcp.tool(
         name="search_query",
         description="search_query: POST /search/query",
@@ -1874,10 +1903,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.search_query(data=data, params=params)
 
-    # =================================================================
-    # Groups
-    # =================================================================
 
+def register_groups_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_groups",
         description="list_groups: GET /groups\n\nList all Microsoft 365 groups and security groups in the organization. Supports $filter, $search, $select, $top, $orderby, $count query parameters. Requires ConsistencyLevel: eventual header for advanced queries.",
@@ -2051,10 +2078,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.list_group_drives(group_id=group_id, params=params)
 
-    # =================================================================
-    # Admin / Tenant Management
-    # =================================================================
 
+def register_admin_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_service_health",
         description="list_service_health: GET /admin/serviceAnnouncement/healthOverviews\n\nGet the service health status for all services in the tenant.",
@@ -2167,10 +2192,39 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.update_admin_sharepoint(data=data, params=params)
 
-    # =================================================================
-    # Organization
-    # =================================================================
+    @mcp.tool(
+        name="list_delegated_admin_relationships",
+        description="list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships\n\nList delegated admin relationships.",
+        tags={"admin"},
+    )
+    async def list_delegated_admin_relationships(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships"""
+        client = await get_client()
+        return await client.list_delegated_admin_relationships(params=params)
 
+    @mcp.tool(
+        name="get_delegated_admin_relationship",
+        description="get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}\n\nGet a specific delegated admin relationship.",
+        tags={"admin"},
+    )
+    async def get_delegated_admin_relationship(
+        rel_id: str = Field(..., description="Delegated admin relationship ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}"""
+        client = await get_client()
+        return await client.get_delegated_admin_relationship(
+            rel_id=rel_id, params=params
+        )
+
+
+def register_organization_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_organization",
         description="list_organization: GET /organization\n\nGet the properties and relationships of the currently authenticated organization.",
@@ -2245,10 +2299,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.update_org_branding(org_id=org_id, data=data, params=params)
 
-    # =================================================================
-    # Domains
-    # =================================================================
 
+def register_domains_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_domains",
         description="list_domains: GET /domains\n\nList domains associated with the tenant.",
@@ -2340,10 +2392,8 @@ def register_tools(mcp: FastMCP):
             domain_id=domain_id, params=params
         )
 
-    # =================================================================
-    # Subscriptions (Change Notifications / Webhooks)
-    # =================================================================
 
+def register_subscriptions_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_subscriptions",
         description="list_subscriptions: GET /subscriptions\n\nList active webhook subscriptions for change notifications.",
@@ -2423,10 +2473,8 @@ def register_tools(mcp: FastMCP):
             subscription_id=subscription_id, params=params
         )
 
-    # =========================================================================
-    # Communications / Online Meetings
-    # =========================================================================
 
+def register_communications_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_online_meetings",
         description="list_online_meetings: GET /me/onlineMeetings\n\nList online meetings for the current user. Returns meeting details including subject, join URL, start/end time, and participants.",
@@ -2576,10 +2624,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.get_my_presence(params=params)
 
-    # =========================================================================
-    # Invitations
-    # =========================================================================
 
+def register_identity_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_invitation",
         description="create_invitation: POST /invitations\n\nCreate an invitation for an external / guest user. Provide invitedUserEmailAddress and inviteRedirectUrl. Optionally set invitedUserDisplayName and sendInvitationMessage.",
@@ -2595,10 +2641,148 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.create_invitation(data=data, params=params)
 
-    # =========================================================================
-    # Security
-    # =========================================================================
+    @mcp.tool(
+        name="list_conditional_access_policies",
+        description="list_conditional_access_policies: GET /identity/conditionalAccess/policies\n\nList conditional access policies.",
+        tags={"identity"},
+    )
+    async def list_conditional_access_policies(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_conditional_access_policies: GET /identity/conditionalAccess/policies"""
+        client = await get_client()
+        return await client.list_conditional_access_policies(params=params)
 
+    @mcp.tool(
+        name="get_conditional_access_policy",
+        description="get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}\n\nGet a specific conditional access policy.",
+        tags={"identity"},
+    )
+    async def get_conditional_access_policy(
+        policy_id: str = Field(..., description="Conditional access policy ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}"""
+        client = await get_client()
+        return await client.get_conditional_access_policy(
+            policy_id=policy_id, params=params
+        )
+
+    @mcp.tool(
+        name="create_conditional_access_policy",
+        description="create_conditional_access_policy: POST /identity/conditionalAccess/policies\n\nCreate a conditional access policy.",
+        tags={"identity"},
+    )
+    async def create_conditional_access_policy(
+        data: Optional[Dict[(str, Any)]] = Field(
+            None, description="Request body with displayName, state, conditions, etc."
+        ),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """create_conditional_access_policy: POST /identity/conditionalAccess/policies"""
+        client = await get_client()
+        return await client.create_conditional_access_policy(data=data, params=params)
+
+    @mcp.tool(
+        name="update_conditional_access_policy",
+        description="update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}\n\nUpdate a conditional access policy.",
+        tags={"identity"},
+    )
+    async def update_conditional_access_policy(
+        policy_id: str = Field(..., description="Conditional access policy ID"),
+        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}"""
+        client = await get_client()
+        return await client.update_conditional_access_policy(
+            policy_id=policy_id, data=data, params=params
+        )
+
+    @mcp.tool(
+        name="delete_conditional_access_policy",
+        description="delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}\n\nDelete a conditional access policy.",
+        tags={"identity"},
+    )
+    async def delete_conditional_access_policy(
+        policy_id: str = Field(..., description="Conditional access policy ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}"""
+        client = await get_client()
+        return await client.delete_conditional_access_policy(
+            policy_id=policy_id, params=params
+        )
+
+    @mcp.tool(
+        name="list_access_reviews",
+        description="list_access_reviews: GET /identityGovernance/accessReviewDefinitions\n\nList access review schedule definitions.",
+        tags={"identity"},
+    )
+    async def list_access_reviews(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_access_reviews: GET /identityGovernance/accessReviewDefinitions"""
+        client = await get_client()
+        return await client.list_access_reviews(params=params)
+
+    @mcp.tool(
+        name="get_access_review",
+        description="get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}\n\nGet a specific access review definition.",
+        tags={"identity"},
+    )
+    async def get_access_review(
+        review_id: str = Field(..., description="Access review schedule definition ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}"""
+        client = await get_client()
+        return await client.get_access_review(review_id=review_id, params=params)
+
+    @mcp.tool(
+        name="list_entitlement_access_packages",
+        description="list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages\n\nList entitlement management access packages.",
+        tags={"identity"},
+    )
+    async def list_entitlement_access_packages(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages"""
+        client = await get_client()
+        return await client.list_entitlement_access_packages(params=params)
+
+    @mcp.tool(
+        name="list_lifecycle_workflows",
+        description="list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows\n\nList lifecycle management workflows.",
+        tags={"identity"},
+    )
+    async def list_lifecycle_workflows(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows"""
+        client = await get_client()
+        return await client.list_lifecycle_workflows(params=params)
+
+
+def register_security_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_security_alerts",
         description="list_security_alerts: GET /security/alerts_v2\n\nList security alerts. Returns alert details including severity, status, and detected threats.",
@@ -2755,10 +2939,110 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.run_hunting_query(data=data, params=params)
 
-    # =========================================================================
-    # Audit Logs
-    # =========================================================================
+    @mcp.tool(
+        name="list_risk_detections",
+        description="list_risk_detections: GET /identityProtection/riskDetections\n\nList risk detections (sign-in anomalies, leaked credentials, etc.).",
+        tags={"security"},
+    )
+    async def list_risk_detections(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_risk_detections: GET /identityProtection/riskDetections"""
+        client = await get_client()
+        return await client.list_risk_detections(params=params)
 
+    @mcp.tool(
+        name="get_risk_detection",
+        description="get_risk_detection: GET /identityProtection/riskDetections/{id}\n\nGet a specific risk detection.",
+        tags={"security"},
+    )
+    async def get_risk_detection(
+        risk_id: str = Field(..., description="Risk detection ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_risk_detection: GET /identityProtection/riskDetections/{id}"""
+        client = await get_client()
+        return await client.get_risk_detection(risk_id=risk_id, params=params)
+
+    @mcp.tool(
+        name="list_risky_users",
+        description="list_risky_users: GET /identityProtection/riskyUsers\n\nList users flagged as risky.",
+        tags={"security"},
+    )
+    async def list_risky_users(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_risky_users: GET /identityProtection/riskyUsers"""
+        client = await get_client()
+        return await client.list_risky_users(params=params)
+
+    @mcp.tool(
+        name="get_risky_user",
+        description="get_risky_user: GET /identityProtection/riskyUsers/{id}\n\nGet a specific risky user.",
+        tags={"security"},
+    )
+    async def get_risky_user(
+        user_id: str = Field(..., description="Risky user ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_risky_user: GET /identityProtection/riskyUsers/{id}"""
+        client = await get_client()
+        return await client.get_risky_user(user_id=user_id, params=params)
+
+    @mcp.tool(
+        name="dismiss_risky_user",
+        description="dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss\n\nDismiss a risky user (mark as safe).",
+        tags={"security"},
+    )
+    async def dismiss_risky_user(
+        user_id: str = Field(..., description="User ID to dismiss"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss"""
+        client = await get_client()
+        return await client.dismiss_risky_user(user_id=user_id, params=params)
+
+    @mcp.tool(
+        name="list_sensitivity_labels",
+        description="list_sensitivity_labels: GET /informationProtection/policy/labels\n\nList sensitivity labels.",
+        tags={"security"},
+    )
+    async def list_sensitivity_labels(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_sensitivity_labels: GET /informationProtection/policy/labels"""
+        client = await get_client()
+        return await client.list_sensitivity_labels(params=params)
+
+    @mcp.tool(
+        name="get_sensitivity_label",
+        description="get_sensitivity_label: GET /informationProtection/policy/labels/{id}\n\nGet a specific sensitivity label.",
+        tags={"security"},
+    )
+    async def get_sensitivity_label(
+        label_id: str = Field(..., description="Sensitivity label ID"),
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_sensitivity_label: GET /informationProtection/policy/labels/{id}"""
+        client = await get_client()
+        return await client.get_sensitivity_label(label_id=label_id, params=params)
+
+
+def register_audit_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_directory_audits",
         description="list_directory_audits: GET /auditLogs/directoryAudits\n\nList directory audit log entries. Shows changes to directory objects (users, groups, apps).",
@@ -2831,10 +3115,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.list_provisioning_logs(params=params)
 
-    # =========================================================================
-    # Reports
-    # =========================================================================
 
+def register_reports_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_email_activity_report",
         description="get_email_activity_report: GET /reports/getEmailActivityUserDetail\n\nGet email activity user detail report. Period: D7, D30, D90, D180.",
@@ -2925,10 +3207,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.get_onedrive_usage_report(period=period, params=params)
 
-    # =========================================================================
-    # Applications
-    # =========================================================================
 
+def register_applications_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_applications",
         description="list_applications: GET /applications\n\nList app registrations in the tenant.",
@@ -3046,10 +3326,6 @@ def register_tools(mcp: FastMCP):
             app_id=app_id, data=data, params=params
         )
 
-    # =========================================================================
-    # Service Principals
-    # =========================================================================
-
     @mcp.tool(
         name="list_service_principals",
         description="list_service_principals: GET /servicePrincipals\n\nList service principals (enterprise apps).",
@@ -3129,235 +3405,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.delete_service_principal(sp_id=sp_id, params=params)
 
-    # =========================================================================
-    # Identity (Conditional Access)
-    # =========================================================================
 
-    @mcp.tool(
-        name="list_conditional_access_policies",
-        description="list_conditional_access_policies: GET /identity/conditionalAccess/policies\n\nList conditional access policies.",
-        tags={"identity"},
-    )
-    async def list_conditional_access_policies(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_conditional_access_policies: GET /identity/conditionalAccess/policies"""
-        client = await get_client()
-        return await client.list_conditional_access_policies(params=params)
-
-    @mcp.tool(
-        name="get_conditional_access_policy",
-        description="get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}\n\nGet a specific conditional access policy.",
-        tags={"identity"},
-    )
-    async def get_conditional_access_policy(
-        policy_id: str = Field(..., description="Conditional access policy ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}"""
-        client = await get_client()
-        return await client.get_conditional_access_policy(
-            policy_id=policy_id, params=params
-        )
-
-    @mcp.tool(
-        name="create_conditional_access_policy",
-        description="create_conditional_access_policy: POST /identity/conditionalAccess/policies\n\nCreate a conditional access policy.",
-        tags={"identity"},
-    )
-    async def create_conditional_access_policy(
-        data: Optional[Dict[(str, Any)]] = Field(
-            None, description="Request body with displayName, state, conditions, etc."
-        ),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """create_conditional_access_policy: POST /identity/conditionalAccess/policies"""
-        client = await get_client()
-        return await client.create_conditional_access_policy(data=data, params=params)
-
-    @mcp.tool(
-        name="update_conditional_access_policy",
-        description="update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}\n\nUpdate a conditional access policy.",
-        tags={"identity"},
-    )
-    async def update_conditional_access_policy(
-        policy_id: str = Field(..., description="Conditional access policy ID"),
-        data: Optional[Dict[(str, Any)]] = Field(None, description="Request body data"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}"""
-        client = await get_client()
-        return await client.update_conditional_access_policy(
-            policy_id=policy_id, data=data, params=params
-        )
-
-    @mcp.tool(
-        name="delete_conditional_access_policy",
-        description="delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}\n\nDelete a conditional access policy.",
-        tags={"identity"},
-    )
-    async def delete_conditional_access_policy(
-        policy_id: str = Field(..., description="Conditional access policy ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}"""
-        client = await get_client()
-        return await client.delete_conditional_access_policy(
-            policy_id=policy_id, params=params
-        )
-
-    # =========================================================================
-    # Identity Governance
-    # =========================================================================
-
-    @mcp.tool(
-        name="list_access_reviews",
-        description="list_access_reviews: GET /identityGovernance/accessReviewDefinitions\n\nList access review schedule definitions.",
-        tags={"identity"},
-    )
-    async def list_access_reviews(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_access_reviews: GET /identityGovernance/accessReviewDefinitions"""
-        client = await get_client()
-        return await client.list_access_reviews(params=params)
-
-    @mcp.tool(
-        name="get_access_review",
-        description="get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}\n\nGet a specific access review definition.",
-        tags={"identity"},
-    )
-    async def get_access_review(
-        review_id: str = Field(..., description="Access review schedule definition ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}"""
-        client = await get_client()
-        return await client.get_access_review(review_id=review_id, params=params)
-
-    @mcp.tool(
-        name="list_entitlement_access_packages",
-        description="list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages\n\nList entitlement management access packages.",
-        tags={"identity"},
-    )
-    async def list_entitlement_access_packages(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages"""
-        client = await get_client()
-        return await client.list_entitlement_access_packages(params=params)
-
-    @mcp.tool(
-        name="list_lifecycle_workflows",
-        description="list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows\n\nList lifecycle management workflows.",
-        tags={"identity"},
-    )
-    async def list_lifecycle_workflows(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows"""
-        client = await get_client()
-        return await client.list_lifecycle_workflows(params=params)
-
-    # =========================================================================
-    # Identity Protection
-    # =========================================================================
-
-    @mcp.tool(
-        name="list_risk_detections",
-        description="list_risk_detections: GET /identityProtection/riskDetections\n\nList risk detections (sign-in anomalies, leaked credentials, etc.).",
-        tags={"security"},
-    )
-    async def list_risk_detections(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_risk_detections: GET /identityProtection/riskDetections"""
-        client = await get_client()
-        return await client.list_risk_detections(params=params)
-
-    @mcp.tool(
-        name="get_risk_detection",
-        description="get_risk_detection: GET /identityProtection/riskDetections/{id}\n\nGet a specific risk detection.",
-        tags={"security"},
-    )
-    async def get_risk_detection(
-        risk_id: str = Field(..., description="Risk detection ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_risk_detection: GET /identityProtection/riskDetections/{id}"""
-        client = await get_client()
-        return await client.get_risk_detection(risk_id=risk_id, params=params)
-
-    @mcp.tool(
-        name="list_risky_users",
-        description="list_risky_users: GET /identityProtection/riskyUsers\n\nList users flagged as risky.",
-        tags={"security"},
-    )
-    async def list_risky_users(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_risky_users: GET /identityProtection/riskyUsers"""
-        client = await get_client()
-        return await client.list_risky_users(params=params)
-
-    @mcp.tool(
-        name="get_risky_user",
-        description="get_risky_user: GET /identityProtection/riskyUsers/{id}\n\nGet a specific risky user.",
-        tags={"security"},
-    )
-    async def get_risky_user(
-        user_id: str = Field(..., description="Risky user ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_risky_user: GET /identityProtection/riskyUsers/{id}"""
-        client = await get_client()
-        return await client.get_risky_user(user_id=user_id, params=params)
-
-    @mcp.tool(
-        name="dismiss_risky_user",
-        description="dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss\n\nDismiss a risky user (mark as safe).",
-        tags={"security"},
-    )
-    async def dismiss_risky_user(
-        user_id: str = Field(..., description="User ID to dismiss"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss"""
-        client = await get_client()
-        return await client.dismiss_risky_user(user_id=user_id, params=params)
-
-    # =========================================================================
-    # Directory
-    # =========================================================================
-
+def register_directory_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_directory_objects",
         description="list_directory_objects: GET /directoryObjects\n\nList directory objects.",
@@ -3459,84 +3508,6 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.restore_deleted_item(object_id=object_id, params=params)
 
-    # =========================================================================
-    # Policies
-    # =========================================================================
-
-    @mcp.tool(
-        name="get_authorization_policy",
-        description="get_authorization_policy: GET /policies/authorizationPolicy\n\nGet the tenant authorization policy.",
-        tags={"policies"},
-    )
-    async def get_authorization_policy(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_authorization_policy: GET /policies/authorizationPolicy"""
-        client = await get_client()
-        return await client.get_authorization_policy(params=params)
-
-    @mcp.tool(
-        name="list_token_lifetime_policies",
-        description="list_token_lifetime_policies: GET /policies/tokenLifetimePolicies\n\nList token lifetime policies.",
-        tags={"policies"},
-    )
-    async def list_token_lifetime_policies(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_token_lifetime_policies: GET /policies/tokenLifetimePolicies"""
-        client = await get_client()
-        return await client.list_token_lifetime_policies(params=params)
-
-    @mcp.tool(
-        name="list_token_issuance_policies",
-        description="list_token_issuance_policies: GET /policies/tokenIssuancePolicies\n\nList token issuance policies.",
-        tags={"policies"},
-    )
-    async def list_token_issuance_policies(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_token_issuance_policies: GET /policies/tokenIssuancePolicies"""
-        client = await get_client()
-        return await client.list_token_issuance_policies(params=params)
-
-    @mcp.tool(
-        name="list_permission_grant_policies",
-        description="list_permission_grant_policies: GET /policies/permissionGrantPolicies\n\nList permission grant policies.",
-        tags={"policies"},
-    )
-    async def list_permission_grant_policies(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_permission_grant_policies: GET /policies/permissionGrantPolicies"""
-        client = await get_client()
-        return await client.list_permission_grant_policies(params=params)
-
-    @mcp.tool(
-        name="get_admin_consent_policy",
-        description="get_admin_consent_policy: GET /policies/adminConsentRequestPolicy\n\nGet the admin consent request policy.",
-        tags={"policies"},
-    )
-    async def get_admin_consent_policy(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_admin_consent_policy: GET /policies/adminConsentRequestPolicy"""
-        client = await get_client()
-        return await client.get_admin_consent_policy(params=params)
-
-    # =========================================================================
-    # Role Management
-    # =========================================================================
-
     @mcp.tool(
         name="list_role_definitions",
         description="list_role_definitions: GET /roleManagement/directory/roleDefinitions\n\nList RBAC directory role definitions.",
@@ -3615,10 +3586,80 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.create_role_assignment(data=data, params=params)
 
-    # =========================================================================
-    # Devices
-    # =========================================================================
 
+def register_policies_tools(mcp: FastMCP):
+    @mcp.tool(
+        name="get_authorization_policy",
+        description="get_authorization_policy: GET /policies/authorizationPolicy\n\nGet the tenant authorization policy.",
+        tags={"policies"},
+    )
+    async def get_authorization_policy(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_authorization_policy: GET /policies/authorizationPolicy"""
+        client = await get_client()
+        return await client.get_authorization_policy(params=params)
+
+    @mcp.tool(
+        name="list_token_lifetime_policies",
+        description="list_token_lifetime_policies: GET /policies/tokenLifetimePolicies\n\nList token lifetime policies.",
+        tags={"policies"},
+    )
+    async def list_token_lifetime_policies(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_token_lifetime_policies: GET /policies/tokenLifetimePolicies"""
+        client = await get_client()
+        return await client.list_token_lifetime_policies(params=params)
+
+    @mcp.tool(
+        name="list_token_issuance_policies",
+        description="list_token_issuance_policies: GET /policies/tokenIssuancePolicies\n\nList token issuance policies.",
+        tags={"policies"},
+    )
+    async def list_token_issuance_policies(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_token_issuance_policies: GET /policies/tokenIssuancePolicies"""
+        client = await get_client()
+        return await client.list_token_issuance_policies(params=params)
+
+    @mcp.tool(
+        name="list_permission_grant_policies",
+        description="list_permission_grant_policies: GET /policies/permissionGrantPolicies\n\nList permission grant policies.",
+        tags={"policies"},
+    )
+    async def list_permission_grant_policies(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """list_permission_grant_policies: GET /policies/permissionGrantPolicies"""
+        client = await get_client()
+        return await client.list_permission_grant_policies(params=params)
+
+    @mcp.tool(
+        name="get_admin_consent_policy",
+        description="get_admin_consent_policy: GET /policies/adminConsentRequestPolicy\n\nGet the admin consent request policy.",
+        tags={"policies"},
+    )
+    async def get_admin_consent_policy(
+        params: Optional[Dict[(str, Any)]] = Field(
+            None, description="Query parameters"
+        ),
+    ) -> Any:
+        """get_admin_consent_policy: GET /policies/adminConsentRequestPolicy"""
+        client = await get_client()
+        return await client.get_admin_consent_policy(params=params)
+
+
+def register_devices_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_devices",
         description="list_devices: GET /devices\n\nList devices registered in the directory.",
@@ -3662,10 +3703,6 @@ def register_tools(mcp: FastMCP):
         """delete_device: DELETE /devices/{id}"""
         client = await get_client()
         return await client.delete_device(device_id=device_id, params=params)
-
-    # =========================================================================
-    # Device Management
-    # =========================================================================
 
     @mcp.tool(
         name="list_managed_devices",
@@ -3754,10 +3791,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.retire_managed_device(device_id=device_id, params=params)
 
-    # =========================================================================
-    # Education
-    # =========================================================================
 
+def register_education_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_education_classes",
         description="list_education_classes: GET /education/classes\n\nList education classes.",
@@ -3845,10 +3880,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.list_education_assignments(class_id=class_id, params=params)
 
-    # =========================================================================
-    # Agreements
-    # =========================================================================
 
+def register_agreements_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_agreements",
         description="list_agreements: GET /agreements\n\nList terms-of-use agreements.",
@@ -3910,10 +3943,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.delete_agreement(agreement_id=agreement_id, params=params)
 
-    # =========================================================================
-    # Places
-    # =========================================================================
 
+def register_places_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_rooms",
         description="list_rooms: GET /places/microsoft.graph.room\n\nList conference rooms.",
@@ -3975,10 +4006,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.update_place(place_id=place_id, data=data, params=params)
 
-    # =========================================================================
-    # Print
-    # =========================================================================
 
+def register_print_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_printers",
         description="list_printers: GET /print/printers\n\nList printers registered in the tenant.",
@@ -4055,10 +4084,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.list_print_shares(params=params)
 
-    # =========================================================================
-    # Privacy
-    # =========================================================================
 
+def register_privacy_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_subject_rights_requests",
         description="list_subject_rights_requests: GET /privacy/subjectRightsRequests\n\nList subject rights requests (GDPR/CCPA).",
@@ -4107,10 +4134,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.create_subject_rights_request(data=data, params=params)
 
-    # =========================================================================
-    # Solutions (Bookings & Virtual Events)
-    # =========================================================================
 
+def register_solutions_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_booking_businesses",
         description="list_booking_businesses: GET /solutions/bookingBusinesses\n\nList booking businesses.",
@@ -4191,10 +4216,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.list_virtual_events(params=params)
 
-    # =========================================================================
-    # Storage
-    # =========================================================================
 
+def register_storage_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_file_storage_containers",
         description="list_file_storage_containers: GET /storage/fileStorage/containers\n\nList file storage containers.",
@@ -4243,10 +4266,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.create_file_storage_container(data=data, params=params)
 
-    # =========================================================================
-    # Employee Experience
-    # =========================================================================
 
+def register_employee_experience_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_learning_providers",
         description="list_learning_providers: GET /employeeExperience/learningProviders\n\nList learning providers.",
@@ -4292,10 +4313,8 @@ def register_tools(mcp: FastMCP):
         client = await get_client()
         return await client.list_learning_course_activities(params=params)
 
-    # =========================================================================
-    # External Connectors
-    # =========================================================================
 
+def register_connections_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_external_connections",
         description="list_external_connections: GET /external/connections\n\nList Microsoft Search external connections.",
@@ -4361,74 +4380,6 @@ def register_tools(mcp: FastMCP):
             connection_id=connection_id, params=params
         )
 
-    # =========================================================================
-    # Information Protection
-    # =========================================================================
-
-    @mcp.tool(
-        name="list_sensitivity_labels",
-        description="list_sensitivity_labels: GET /informationProtection/policy/labels\n\nList sensitivity labels.",
-        tags={"security"},
-    )
-    async def list_sensitivity_labels(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_sensitivity_labels: GET /informationProtection/policy/labels"""
-        client = await get_client()
-        return await client.list_sensitivity_labels(params=params)
-
-    @mcp.tool(
-        name="get_sensitivity_label",
-        description="get_sensitivity_label: GET /informationProtection/policy/labels/{id}\n\nGet a specific sensitivity label.",
-        tags={"security"},
-    )
-    async def get_sensitivity_label(
-        label_id: str = Field(..., description="Sensitivity label ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_sensitivity_label: GET /informationProtection/policy/labels/{id}"""
-        client = await get_client()
-        return await client.get_sensitivity_label(label_id=label_id, params=params)
-
-    # =========================================================================
-    # Tenant Relationships
-    # =========================================================================
-
-    @mcp.tool(
-        name="list_delegated_admin_relationships",
-        description="list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships\n\nList delegated admin relationships.",
-        tags={"admin"},
-    )
-    async def list_delegated_admin_relationships(
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships"""
-        client = await get_client()
-        return await client.list_delegated_admin_relationships(params=params)
-
-    @mcp.tool(
-        name="get_delegated_admin_relationship",
-        description="get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}\n\nGet a specific delegated admin relationship.",
-        tags={"admin"},
-    )
-    async def get_delegated_admin_relationship(
-        rel_id: str = Field(..., description="Delegated admin relationship ID"),
-        params: Optional[Dict[(str, Any)]] = Field(
-            None, description="Query parameters"
-        ),
-    ) -> Any:
-        """get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}"""
-        client = await get_client()
-        return await client.get_delegated_admin_relationship(
-            rel_id=rel_id, params=params
-        )
-
 
 def mcp_server() -> None:
     """Run the Microsoft MCP server with specified transport and connection parameters.
@@ -4437,6 +4388,7 @@ def mcp_server() -> None:
     It supports stdio or TCP transport modes and exits on invalid arguments or help requests.
 
     """
+    load_dotenv(find_dotenv())
     parser = create_mcp_parser()
 
     args = parser.parse_args()
@@ -4739,7 +4691,119 @@ def mcp_server() -> None:
             sys.exit(1)
 
     mcp = FastMCP("Microsoft", auth=auth)
-    register_tools(mcp)
+    DEFAULT_MISCTOOL = to_boolean(os.getenv("MISCTOOL", "True"))
+    if DEFAULT_MISCTOOL:
+        register_misc_tools(mcp)
+    DEFAULT_AUTHTOOL = to_boolean(os.getenv("AUTHTOOL", "True"))
+    if DEFAULT_AUTHTOOL:
+        register_auth_tools(mcp)
+    DEFAULT_METATOOL = to_boolean(os.getenv("METATOOL", "True"))
+    if DEFAULT_METATOOL:
+        register_meta_tools(mcp)
+    DEFAULT_MAILTOOL = to_boolean(os.getenv("MAILTOOL", "True"))
+    if DEFAULT_MAILTOOL:
+        register_mail_tools(mcp)
+    DEFAULT_FILESTOOL = to_boolean(os.getenv("FILESTOOL", "True"))
+    if DEFAULT_FILESTOOL:
+        register_files_tools(mcp)
+    DEFAULT_CALENDARTOOL = to_boolean(os.getenv("CALENDARTOOL", "True"))
+    if DEFAULT_CALENDARTOOL:
+        register_calendar_tools(mcp)
+    DEFAULT_NOTESTOOL = to_boolean(os.getenv("NOTESTOOL", "True"))
+    if DEFAULT_NOTESTOOL:
+        register_notes_tools(mcp)
+    DEFAULT_TASKSTOOL = to_boolean(os.getenv("TASKSTOOL", "True"))
+    if DEFAULT_TASKSTOOL:
+        register_tasks_tools(mcp)
+    DEFAULT_CONTACTSTOOL = to_boolean(os.getenv("CONTACTSTOOL", "True"))
+    if DEFAULT_CONTACTSTOOL:
+        register_contacts_tools(mcp)
+    DEFAULT_USERTOOL = to_boolean(os.getenv("USERTOOL", "True"))
+    if DEFAULT_USERTOOL:
+        register_user_tools(mcp)
+    DEFAULT_CHATTOOL = to_boolean(os.getenv("CHATTOOL", "True"))
+    if DEFAULT_CHATTOOL:
+        register_chat_tools(mcp)
+    DEFAULT_TEAMSTOOL = to_boolean(os.getenv("TEAMSTOOL", "True"))
+    if DEFAULT_TEAMSTOOL:
+        register_teams_tools(mcp)
+    DEFAULT_SITESTOOL = to_boolean(os.getenv("SITESTOOL", "True"))
+    if DEFAULT_SITESTOOL:
+        register_sites_tools(mcp)
+    DEFAULT_SEARCHTOOL = to_boolean(os.getenv("SEARCHTOOL", "True"))
+    if DEFAULT_SEARCHTOOL:
+        register_search_tools(mcp)
+    DEFAULT_GROUPSTOOL = to_boolean(os.getenv("GROUPSTOOL", "True"))
+    if DEFAULT_GROUPSTOOL:
+        register_groups_tools(mcp)
+    DEFAULT_ADMINTOOL = to_boolean(os.getenv("ADMINTOOL", "True"))
+    if DEFAULT_ADMINTOOL:
+        register_admin_tools(mcp)
+    DEFAULT_ORGANIZATIONTOOL = to_boolean(os.getenv("ORGANIZATIONTOOL", "True"))
+    if DEFAULT_ORGANIZATIONTOOL:
+        register_organization_tools(mcp)
+    DEFAULT_DOMAINSTOOL = to_boolean(os.getenv("DOMAINSTOOL", "True"))
+    if DEFAULT_DOMAINSTOOL:
+        register_domains_tools(mcp)
+    DEFAULT_SUBSCRIPTIONSTOOL = to_boolean(os.getenv("SUBSCRIPTIONSTOOL", "True"))
+    if DEFAULT_SUBSCRIPTIONSTOOL:
+        register_subscriptions_tools(mcp)
+    DEFAULT_COMMUNICATIONSTOOL = to_boolean(os.getenv("COMMUNICATIONSTOOL", "True"))
+    if DEFAULT_COMMUNICATIONSTOOL:
+        register_communications_tools(mcp)
+    DEFAULT_IDENTITYTOOL = to_boolean(os.getenv("IDENTITYTOOL", "True"))
+    if DEFAULT_IDENTITYTOOL:
+        register_identity_tools(mcp)
+    DEFAULT_SECURITYTOOL = to_boolean(os.getenv("SECURITYTOOL", "True"))
+    if DEFAULT_SECURITYTOOL:
+        register_security_tools(mcp)
+    DEFAULT_AUDITTOOL = to_boolean(os.getenv("AUDITTOOL", "True"))
+    if DEFAULT_AUDITTOOL:
+        register_audit_tools(mcp)
+    DEFAULT_REPORTSTOOL = to_boolean(os.getenv("REPORTSTOOL", "True"))
+    if DEFAULT_REPORTSTOOL:
+        register_reports_tools(mcp)
+    DEFAULT_APPLICATIONSTOOL = to_boolean(os.getenv("APPLICATIONSTOOL", "True"))
+    if DEFAULT_APPLICATIONSTOOL:
+        register_applications_tools(mcp)
+    DEFAULT_DIRECTORYTOOL = to_boolean(os.getenv("DIRECTORYTOOL", "True"))
+    if DEFAULT_DIRECTORYTOOL:
+        register_directory_tools(mcp)
+    DEFAULT_POLICIESTOOL = to_boolean(os.getenv("POLICIESTOOL", "True"))
+    if DEFAULT_POLICIESTOOL:
+        register_policies_tools(mcp)
+    DEFAULT_DEVICESTOOL = to_boolean(os.getenv("DEVICESTOOL", "True"))
+    if DEFAULT_DEVICESTOOL:
+        register_devices_tools(mcp)
+    DEFAULT_EDUCATIONTOOL = to_boolean(os.getenv("EDUCATIONTOOL", "True"))
+    if DEFAULT_EDUCATIONTOOL:
+        register_education_tools(mcp)
+    DEFAULT_AGREEMENTSTOOL = to_boolean(os.getenv("AGREEMENTSTOOL", "True"))
+    if DEFAULT_AGREEMENTSTOOL:
+        register_agreements_tools(mcp)
+    DEFAULT_PLACESTOOL = to_boolean(os.getenv("PLACESTOOL", "True"))
+    if DEFAULT_PLACESTOOL:
+        register_places_tools(mcp)
+    DEFAULT_PRINTTOOL = to_boolean(os.getenv("PRINTTOOL", "True"))
+    if DEFAULT_PRINTTOOL:
+        register_print_tools(mcp)
+    DEFAULT_PRIVACYTOOL = to_boolean(os.getenv("PRIVACYTOOL", "True"))
+    if DEFAULT_PRIVACYTOOL:
+        register_privacy_tools(mcp)
+    DEFAULT_SOLUTIONSTOOL = to_boolean(os.getenv("SOLUTIONSTOOL", "True"))
+    if DEFAULT_SOLUTIONSTOOL:
+        register_solutions_tools(mcp)
+    DEFAULT_STORAGETOOL = to_boolean(os.getenv("STORAGETOOL", "True"))
+    if DEFAULT_STORAGETOOL:
+        register_storage_tools(mcp)
+    DEFAULT_EMPLOYEE_EXPERIENCETOOL = to_boolean(
+        os.getenv("EMPLOYEE_EXPERIENCETOOL", "True")
+    )
+    if DEFAULT_EMPLOYEE_EXPERIENCETOOL:
+        register_employee_experience_tools(mcp)
+    DEFAULT_CONNECTIONSTOOL = to_boolean(os.getenv("CONNECTIONSTOOL", "True"))
+    if DEFAULT_CONNECTIONSTOOL:
+        register_connections_tools(mcp)
     register_prompts(mcp)
 
     for mw in middlewares:
