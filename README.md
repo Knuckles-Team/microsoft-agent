@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.2.33*
+*Version: 0.2.34*
 
 ## Overview
 
@@ -172,7 +172,7 @@ flowchart TB
 | `--host`          | Host to bind the server to                                     | `0.0.0.0`                      |
 | `--port`          | Port to bind the server to                                     | `9000`                         |
 | `--provider`      | LLM Provider (openai, anthropic, google, huggingface)          | `openai`                       |
-| `--model-id`      | LLM Model ID                                                   | `qwen/qwen3-coder-next`           |
+| `--model-id`      | LLM Model ID                                                   | `qwen/qwen3.5-35b-a3b`           |
 | `--mcp-url`       | MCP Server URL                                                 | `http://microsoft-agent:8000/mcp` |
 
 ### Examples
