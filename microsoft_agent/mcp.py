@@ -20,7 +20,7 @@ from microsoft_agent.auth import get_client
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-__version__ = "0.2.36"
+__version__ = "0.2.37"
 print(f"Microsoft MCP v{__version__}")
 
 logger = get_logger(name="TokenMiddleware")
