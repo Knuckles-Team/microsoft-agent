@@ -7,6 +7,7 @@ import msal
 import keyring
 from keyring.errors import KeyringError
 from pathlib import Path
+from agent_utilities.exceptions import AuthError, UnauthorizedError
 
 logger = logging.getLogger(__name__)
 
@@ -240,4 +241,11 @@ async def get_client():
     if not token:
         raise ValueError("Microsoft token is not provided. Please login.")
 
-    return MicrosoftGraphApi(auth)
+    try:
+        return MicrosoftGraphApi(auth)
+    except (AuthError, UnauthorizedError) as e:
+        raise RuntimeError(
+            f"AUTHENTICATION ERROR: The Microsoft credentials are not valid. "
+            f"Please ensure you are logged in via the device code flow or have a valid token. "
+            f"Error details: {str(e)}"
+        ) from e
