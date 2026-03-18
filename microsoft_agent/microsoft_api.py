@@ -60,6 +60,13 @@ class MicrosoftGraphApi:
             scopes=SCOPES,
         )
 
+        # Validate login status during initialization
+        status = self.verify_login()
+        if "Not authenticated" in status:
+            from agent_utilities.exceptions import AuthError
+
+            raise AuthError(f"Microsoft authentication failed: {status}")
+
     def login(self, force: bool = False) -> str:
         """Authenticate with Microsoft."""
         if not force:
