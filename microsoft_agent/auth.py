@@ -218,7 +218,7 @@ class AuthManager:
 
 
 async def get_client():
-    from microsoft_agent.microsoft_api import MicrosoftGraphApi
+    from microsoft_agent.api_wrapper import MicrosoftGraphApi
     from agent_utilities.middlewares import local
 
     # These should ideally be in a central config, but for now we'll use env or defaults

@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.2.47*
+*Version: 0.2.48*
 
 ## Overview
 
@@ -146,6 +146,25 @@ flowchart TB
 5. **Supervisor** delegates scheduling to the **Calendar Agent** with the retrieved emails.
 6. **Calendar Agent** calls `post_events` tool.
 7. **Supervisor** confirms completion to the User.
+
+
+## Graph Architecture
+
+This agent uses `pydantic-graph` orchestration for intelligent routing and optimal context management.
+
+```mermaid
+---
+title: Microsoft Agent Graph Agent
+---
+stateDiagram-v2
+  [*] --> RouterNode: User Query
+  RouterNode --> DomainNode: Classified Domain
+  RouterNode --> [*]: Low confidence / Error
+  DomainNode --> [*]: Domain Result
+```
+
+- **RouterNode**: A fast, lightweight LLM (e.g., `gpt-4o-mini`) that classifies the user's query into one of the specialized domains.
+- **DomainNode**: The executor node. For the selected domain, it dynamically sets environment variables to temporarily enable ONLY the tools relevant to that domain, creating a highly focused sub-agent (e.g., `gpt-4o`) to complete the request. This preserves LLM context and prevents tool hallucination.
 
 ## Usage
 
