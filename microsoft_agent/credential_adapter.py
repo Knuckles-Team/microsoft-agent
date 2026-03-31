@@ -21,26 +21,26 @@ class AuthManagerCredential(TokenCredential):
         tenant_id: Optional[str] = None,
         **kwargs: Any,
     ) -> AccessToken:
-        # Note: We ignore the requested scopes here and used the ones configured in AuthManager
-        # because MSAL's acquire_token_silent usually needs the original scopes or a subset.
-        # The SDK usually requests 'https://graph.microsoft.com/.default', which might work
-        # if the app is configured right, but for now we stick to what we have.
+                                                                                               
+                                                                                            
+                                                                                           
+                                                                               
 
         token_details = self.auth_manager.get_token_details()
 
         if not token_details:
-            # If we can't get a token silently, we might need to trigger a login flow
-            # But this method is usually expected to be non-interactive or raise.
-            # Since our agent is interactive via tools, we might just raise
-            # and let the user use the 'login' tool if needed.
+                                                                                     
+                                                                                 
+                                                                           
+                                                              
             pass
-            # Try getting a token even if it might fail, to trigger error
+                                                                         
 
         if token_details and "access_token" in token_details:
-            # MSAL returns expires_in, we need expires_on (timestamp)
-            # It usually also returns "expires_on" in the result if it's from cache?
-            # Let's check.
-            # If not, we calculate it.
+                                                                     
+                                                                                    
+                          
+                                      
             expires_on = token_details.get("expires_on")
             if not expires_on:
                 expires_in = token_details.get("expires_in", 3600)

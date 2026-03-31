@@ -55,12 +55,12 @@ class MicrosoftGraphApi:
         self.credential = AuthManagerCredential(auth_manager)
         self.client = GraphServiceClient(
             credentials=self.credential,
-            # scopes=SCOPES # The SDK uses .default usually, but we can try passing scopes if needed.
-            # actually GraphServiceClient constructor takes scopes.
+                                                                                                     
+                                                                   
             scopes=SCOPES,
         )
 
-        # Validate login status during initialization
+                                                     
         status = self.verify_login()
         if "Not authenticated" in status:
             from agent_utilities.exceptions import AuthError
@@ -76,7 +76,7 @@ class MicrosoftGraphApi:
 
         def callback(msg):
             print(msg)
-            # We could also use logging
+                                       
 
         return self.auth_manager.acquire_token_by_device_code(callback=callback)
 
@@ -100,7 +100,7 @@ class MicrosoftGraphApi:
 
     def search_tools(self, query: str, limit: int = 10) -> List[str]:
         """Search methods in this class."""
-        # Simple implementation searching method names
+                                                      
         matches = []
         for name in dir(self):
             if name.startswith("_"):
@@ -287,34 +287,33 @@ class MicrosoftGraphApi:
         from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.models.email_address import EmailAddress
 
-        # We receive a dict 'data' which should match the expected structure or we map it.
-        # The SDK expects SendMailPostRequestBody which contains 'message' and 'saveToSentItems'.
-        # If 'data' is just the message, we assume saveToSentItems=True or handle it.
+                                                                                          
+                                                                                                 
+                                                                                     
 
-        # NOTE: The previous API expected 'data' to be the body of the request.
-        # But constructing the SDK objects is cleaner.
-        # However, for MCP, it's easier if we accept the dict and try to deserialize it
-        # OR just construct it from known fields.
-        # Given "leverage the sdk", we should use the models if possible,
-        # but manual mapping from dict is safer than trusting input structure matches SDK internals exactly.
+                                                                               
+                                                      
+                                                                                       
+                                                 
+                                                                         
+                                                                                                            
 
-        # Let's support a simplified input format compatible with previous tool usage if possible,
-        # or just the raw Graph API JSON structure.
-        # The best approach for MCP is usually accepting the Graph API JSON structure.
-        # The user provided example uses SDK models.
+                                                                                                  
+                                                   
+                                                                                      
+                                                    
 
-        # I will implement a helper to convert dict to SendMailPostRequestBody if possible,
-        # otherwise I will construct it manually from the dict.
+                                                               
 
-        # Simplified:
-        # data = { "message": { "subject": "...", "body": { "content": "..." }, "toRecipients": [...] } }
+                     
+                                                                                                         
 
-        # We can use the SDK's serialization to create the object from dict?
-        # Only if we use the ParseNode factory... complex.
-        # We'll map manually for common fields.
+                                                                            
+                                                          
+                                               
 
         try:
-            # Basic mapping
+                           
             request_body = SendMailPostRequestBody()
             message = Message()
 
@@ -408,9 +407,9 @@ class MicrosoftGraphApi:
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
-        # Parsing params for request configuration if needed,
-        # but NativeResponseHandler returns raw response so we might just pass params?
-        # The SDK's request builder expects QueryParameters object.
+                                                             
+                                                                                      
+                                                                   
 
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters()
 
@@ -498,11 +497,11 @@ class MicrosoftGraphApi:
             MessageItemRequestBuilder,
         )
 
-        # Construct message object from data
+                                            
         message = Message()
         message.subject = data.get("subject")
         message.is_read = data.get("isRead")
-        # Add other fields as needed
+                                    
 
         request_config = MessageItemRequestBuilder.MessageItemRequestBuilderPatchRequestConfiguration(
             options=[ResponseHandlerOption(NativeResponseHandler())]
@@ -785,7 +784,7 @@ class MicrosoftGraphApi:
             request_body.save_to_sent_items = data.get("saveToSentItems", True)
 
             await self.client.users.by_user_id(user_id).send_mail.post(request_body)
-            # send_mail returns None on success (202 Accepted)
+                                                              
             return {"status": "success"}
         except Exception as e:
             print(f"Error sending shared mailbox mail: {e}")
@@ -933,7 +932,7 @@ class MicrosoftGraphApi:
         try:
             event = Event()
             event.subject = data.get("subject")
-            # ... map other fields as needed ...
+                                                
 
             request_config = self.client.me.events.by_event_id(
                 event_id
@@ -1125,7 +1124,7 @@ class MicrosoftGraphApi:
         try:
             event = Event()
             event.subject = data.get("subject")
-            # ... map other fields ...
+                                      
 
             request_config = self.client.me.calendars.by_calendar_id(
                 calendar_id
@@ -1207,9 +1206,9 @@ class MicrosoftGraphApi:
 
         try:
             request_body = FindMeetingTimesPostRequestBody()
-            # ... map data to request_body ...
-            # This is a complex body, for now we assume it's passed fairly rawly if possible,
-            # or we map minimal fields if we want to be safe.
+                                              
+                                                                                             
+                                                             
 
             request_config = (
                 FindMeetingTimesRequestBuilder.FindMeetingTimesPostRequestConfiguration(
@@ -1324,16 +1323,16 @@ class MicrosoftGraphApi:
     ) -> Any:
         """Download file content."""
         try:
-            # content request returns bytes usually.
+                                                    
             response = (
                 await self.client.drives.by_drive_id(drive_id)
                 .items.by_drive_item_id(driveItem_id)
                 .content.get()
             )
-            # If we want raw response, we might need NativeResponseHandler.
+                                                                           
 
-            # FastMCP expects something serializable if it's a tool return.
-            # Usually we return base64 for file content.
+                                                                           
+                                                        
             import base64
 
             if isinstance(response, bytes):
@@ -1768,8 +1767,8 @@ class MicrosoftGraphApi:
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            # Note: create_onenote_page usually takes multipart/form-data or HTML.
-            # For now we use the HTML body if provided.
+                                                                                  
+                                                       
             html_content = data.get("content", "")
 
             request_config = (
@@ -1873,7 +1872,7 @@ class MicrosoftGraphApi:
         try:
             task = TodoTask()
             task.title = data.get("title")
-            # ... map other fields ...
+                                      
 
             request_config = self.client.me.todo.lists.by_todo_task_list_id(
                 todoTaskList_id
@@ -2044,7 +2043,7 @@ class MicrosoftGraphApi:
             task = PlannerTask()
             task.title = data.get("title")
             task.plan_id = data.get("planId")
-            # ... map other fields ...
+                                      
 
             request_config = self.client.planner.tasks.to_post_request_configuration()
             request_config.options.append(
@@ -2664,8 +2663,8 @@ class MicrosoftGraphApi:
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            # The SDK might have a specific helper for getByPath, or we use the raw way.
-            # Usually it's .get_by_path(path)
+                                                                                        
+                                             
             request_config = (
                 self.client.sites.by_site_id(site_id)
                 .get_by_path(path)
@@ -2719,9 +2718,9 @@ class MicrosoftGraphApi:
         )
 
         try:
-            # This is complex, but basic implementation:
+                                                        
             body = QueryPostRequestBody()
-            # body.requests = ...
+                                 
 
             request_config = self.client.search.query.to_post_request_configuration()
             request_config.options.append(
@@ -2799,9 +2798,9 @@ class MicrosoftGraphApi:
             print(f"Error getting site list item: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Groups
-    # =========================================================================
+                                                                               
+            
+                                                                               
 
     async def list_groups(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List all Microsoft 365 groups and security groups."""
@@ -3102,9 +3101,9 @@ class MicrosoftGraphApi:
             print(f"Error listing group drives: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Admin / Tenant Management
-    # =========================================================================
+                                                                               
+                               
+                                                                               
 
     async def list_service_health(
         self, params: Optional[Dict] = None
@@ -3298,9 +3297,9 @@ class MicrosoftGraphApi:
             print(f"Error updating admin sharepoint: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Organization
-    # =========================================================================
+                                                                               
+                  
+                                                                               
 
     async def list_organization(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List organization properties."""
@@ -3423,9 +3422,9 @@ class MicrosoftGraphApi:
             print(f"Error updating org branding: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Domains
-    # =========================================================================
+                                                                               
+             
+                                                                               
 
     async def list_domains(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List tenant domains."""
@@ -3562,9 +3561,9 @@ class MicrosoftGraphApi:
             print(f"Error listing domain service configuration records: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Subscriptions
-    # =========================================================================
+                                                                               
+                   
+                                                                               
 
     async def list_subscriptions(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List active webhook subscriptions."""
@@ -3695,9 +3694,9 @@ class MicrosoftGraphApi:
             print(f"Error deleting subscription: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Communications / Online Meetings
-    # =========================================================================
+                                                                               
+                                      
+                                                                               
 
     async def list_online_meetings(
         self, params: Optional[Dict] = None
@@ -3949,9 +3948,9 @@ class MicrosoftGraphApi:
             print(f"Error getting my presence: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Invitations
-    # =========================================================================
+                                                                               
+                 
+                                                                               
 
     async def create_invitation(
         self, data: Dict[str, Any], params: Optional[Dict] = None
@@ -3984,9 +3983,9 @@ class MicrosoftGraphApi:
             print(f"Error creating invitation: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Security
-    # =========================================================================
+                                                                               
+              
+                                                                               
 
     async def list_security_alerts(
         self, params: Optional[Dict] = None
@@ -4243,9 +4242,9 @@ class MicrosoftGraphApi:
             print(f"Error running hunting query: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Audit Logs
-    # =========================================================================
+                                                                               
+                
+                                                                               
 
     async def list_directory_audits(
         self, params: Optional[Dict] = None
@@ -4364,9 +4363,9 @@ class MicrosoftGraphApi:
             print(f"Error listing provisioning logs: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Reports
-    # =========================================================================
+                                                                               
+             
+                                                                               
 
     async def get_email_activity_report(
         self, period: str = "D7", params: Optional[Dict] = None
@@ -4528,9 +4527,9 @@ class MicrosoftGraphApi:
             print(f"Error getting OneDrive usage report: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Applications
-    # =========================================================================
+                                                                               
+                  
+                                                                               
 
     async def list_applications(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List app registrations."""
@@ -4712,9 +4711,9 @@ class MicrosoftGraphApi:
             print(f"Error removing application password: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Service Principals
-    # =========================================================================
+                                                                               
+                        
+                                                                               
 
     async def list_service_principals(
         self, params: Optional[Dict] = None
@@ -4846,9 +4845,9 @@ class MicrosoftGraphApi:
             print(f"Error deleting service principal: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Identity (Conditional Access)
-    # =========================================================================
+                                                                               
+                                   
+                                                                               
 
     async def list_conditional_access_policies(
         self, params: Optional[Dict] = None
@@ -4991,9 +4990,9 @@ class MicrosoftGraphApi:
             print(f"Error deleting conditional access policy: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Identity Governance
-    # =========================================================================
+                                                                               
+                         
+                                                                               
 
     async def list_access_reviews(
         self, params: Optional[Dict] = None
@@ -5093,9 +5092,9 @@ class MicrosoftGraphApi:
             print(f"Error listing lifecycle workflows: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Identity Protection
-    # =========================================================================
+                                                                               
+                         
+                                                                               
 
     async def list_risk_detections(
         self, params: Optional[Dict] = None
@@ -5225,9 +5224,9 @@ class MicrosoftGraphApi:
             print(f"Error dismissing risky user: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Directory
-    # =========================================================================
+                                                                               
+               
+                                                                               
 
     async def list_directory_objects(
         self, params: Optional[Dict] = None
@@ -5390,9 +5389,9 @@ class MicrosoftGraphApi:
             print(f"Error restoring deleted item: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Policies
-    # =========================================================================
+                                                                               
+              
+                                                                               
 
     async def get_authorization_policy(
         self, params: Optional[Dict] = None
@@ -5511,9 +5510,9 @@ class MicrosoftGraphApi:
             print(f"Error getting admin consent policy: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Role Management
-    # =========================================================================
+                                                                               
+                     
+                                                                               
 
     async def list_role_definitions(
         self, params: Optional[Dict] = None
@@ -5647,9 +5646,9 @@ class MicrosoftGraphApi:
             print(f"Error creating role assignment: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Devices
-    # =========================================================================
+                                                                               
+             
+                                                                               
 
     async def list_devices(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List devices registered in the directory."""
@@ -5716,9 +5715,9 @@ class MicrosoftGraphApi:
             print(f"Error deleting device: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Device Management
-    # =========================================================================
+                                                                               
+                       
+                                                                               
 
     async def list_managed_devices(
         self, params: Optional[Dict] = None
@@ -5874,9 +5873,9 @@ class MicrosoftGraphApi:
             print(f"Error retiring managed device: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Education
-    # =========================================================================
+                                                                               
+               
+                                                                               
 
     async def list_education_classes(
         self, params: Optional[Dict] = None
@@ -6016,9 +6015,9 @@ class MicrosoftGraphApi:
             print(f"Error listing education assignments: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Agreements
-    # =========================================================================
+                                                                               
+                
+                                                                               
 
     async def list_agreements(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List agreements (terms of use)."""
@@ -6112,9 +6111,9 @@ class MicrosoftGraphApi:
             print(f"Error deleting agreement: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Places
-    # =========================================================================
+                                                                               
+            
+                                                                               
 
     async def list_rooms(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List rooms."""
@@ -6210,9 +6209,9 @@ class MicrosoftGraphApi:
             print(f"Error updating place: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Print
-    # =========================================================================
+                                                                               
+           
+                                                                               
 
     async def list_printers(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List printers."""
@@ -6323,9 +6322,9 @@ class MicrosoftGraphApi:
             print(f"Error listing print shares: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Privacy
-    # =========================================================================
+                                                                               
+             
+                                                                               
 
     async def list_subject_rights_requests(
         self, params: Optional[Dict] = None
@@ -6402,9 +6401,9 @@ class MicrosoftGraphApi:
             print(f"Error creating subject rights request: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Solutions (Bookings & Virtual Events)
-    # =========================================================================
+                                                                               
+                                           
+                                                                               
 
     async def list_booking_businesses(
         self, params: Optional[Dict] = None
@@ -6537,9 +6536,9 @@ class MicrosoftGraphApi:
             print(f"Error listing virtual events: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Storage
-    # =========================================================================
+                                                                               
+             
+                                                                               
 
     async def list_file_storage_containers(
         self, params: Optional[Dict] = None
@@ -6616,9 +6615,9 @@ class MicrosoftGraphApi:
             print(f"Error creating file storage container: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Employee Experience
-    # =========================================================================
+                                                                               
+                         
+                                                                               
 
     async def list_learning_providers(
         self, params: Optional[Dict] = None
@@ -6695,9 +6694,9 @@ class MicrosoftGraphApi:
             print(f"Error listing learning course activities: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # External Connectors
-    # =========================================================================
+                                                                               
+                         
+                                                                               
 
     async def list_external_connections(
         self, params: Optional[Dict] = None
@@ -6802,9 +6801,9 @@ class MicrosoftGraphApi:
             print(f"Error deleting external connection: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Information Protection
-    # =========================================================================
+                                                                               
+                            
+                                                                               
 
     async def list_sensitivity_labels(
         self, params: Optional[Dict] = None
@@ -6856,9 +6855,9 @@ class MicrosoftGraphApi:
             print(f"Error getting sensitivity label: {e}")
             return {"error": str(e)}
 
-    # =========================================================================
-    # Tenant Relationships
-    # =========================================================================
+                                                                               
+                          
+                                                                               
 
     async def list_delegated_admin_relationships(
         self, params: Optional[Dict] = None
