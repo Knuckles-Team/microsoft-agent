@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# coding: utf-8
+
 
 from dotenv import load_dotenv, find_dotenv
 from agent_utilities.base_utilities import to_boolean
@@ -19,7 +19,7 @@ from microsoft_agent.auth import get_client
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-__version__ = "0.2.49"
+__version__ = "0.2.50"
 print(f"Microsoft MCP v{__version__}")
 
 logger = get_logger(name="TokenMiddleware")
@@ -786,7 +786,7 @@ def register_files_tools(mcp: FastMCP):
             drive_id=drive_id,
             worksheet_id=workbookWorksheet_id,
             item_id=driveItem_id,
-            address="",  # address is missing in tool params but needed in API
+            address="",
             data=data,
             params=params,
         )
@@ -813,7 +813,7 @@ def register_files_tools(mcp: FastMCP):
             drive_id=drive_id,
             item_id=driveItem_id,
             worksheet_id=workbookWorksheet_id,
-            address="",  # address is missing in tool params but needed in API
+            address="",
             data=data,
             params=params,
         )
@@ -1350,9 +1350,7 @@ def register_calendar_tools(mcp: FastMCP):
     ) -> Any:
         """list_specific_calendar_events: GET /me/calendars/{calendar-id}/events"""
         client = await get_client()
-        # Note: We might need a specific method in MicrosoftGraphApi for this,
-        # or list_calendar_events could take optional calendar_id.
-        # For now I will assume list_specific_calendar_events exists or I will add it.
+
         return await client.list_specific_calendar_events(
             calendar_id=calendar_id, params=params, timezone=timezone
         )
