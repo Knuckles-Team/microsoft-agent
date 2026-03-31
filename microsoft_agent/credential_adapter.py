@@ -21,26 +21,15 @@ class AuthManagerCredential(TokenCredential):
         tenant_id: Optional[str] = None,
         **kwargs: Any,
     ) -> AccessToken:
-                                                                                               
-                                                                                            
-                                                                                           
-                                                                               
 
         token_details = self.auth_manager.get_token_details()
 
         if not token_details:
-                                                                                     
-                                                                                 
-                                                                           
-                                                              
+
             pass
-                                                                         
 
         if token_details and "access_token" in token_details:
-                                                                     
-                                                                                    
-                          
-                                      
+
             expires_on = token_details.get("expires_on")
             if not expires_on:
                 expires_in = token_details.get("expires_in", 3600)

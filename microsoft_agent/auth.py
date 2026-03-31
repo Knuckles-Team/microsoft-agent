@@ -221,7 +221,6 @@ async def get_client():
     from microsoft_agent.api_wrapper import MicrosoftGraphApi
     from agent_utilities.middlewares import local
 
-                                                                                        
     CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
     AUTHORITY = "https://login.microsoftonline.com/common"
     SCOPES = [
@@ -229,14 +228,13 @@ async def get_client():
         "Mail.ReadWrite",
         "Calendars.ReadWrite",
         "Files.ReadWrite",
-    ]                  
+    ]
 
     auth = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
     token = auth.get_token()
 
     if not token:
         token = getattr(local, "user_token", None)
-                                                                                                           
 
     if not token:
         raise ValueError("Microsoft token is not provided. Please login.")
