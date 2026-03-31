@@ -55,12 +55,9 @@ class MicrosoftGraphApi:
         self.credential = AuthManagerCredential(auth_manager)
         self.client = GraphServiceClient(
             credentials=self.credential,
-                                                                                                     
-                                                                   
             scopes=SCOPES,
         )
 
-                                                     
         status = self.verify_login()
         if "Not authenticated" in status:
             from agent_utilities.exceptions import AuthError
@@ -76,7 +73,6 @@ class MicrosoftGraphApi:
 
         def callback(msg):
             print(msg)
-                                       
 
         return self.auth_manager.acquire_token_by_device_code(callback=callback)
 
@@ -100,7 +96,7 @@ class MicrosoftGraphApi:
 
     def search_tools(self, query: str, limit: int = 10) -> List[str]:
         """Search methods in this class."""
-                                                      
+
         matches = []
         for name in dir(self):
             if name.startswith("_"):
@@ -287,33 +283,8 @@ class MicrosoftGraphApi:
         from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.models.email_address import EmailAddress
 
-                                                                                          
-                                                                                                 
-                                                                                     
-
-                                                                               
-                                                      
-                                                                                       
-                                                 
-                                                                         
-                                                                                                            
-
-                                                                                                  
-                                                   
-                                                                                      
-                                                    
-
-                                                               
-
-                     
-                                                                                                         
-
-                                                                            
-                                                          
-                                               
-
         try:
-                           
+
             request_body = SendMailPostRequestBody()
             message = Message()
 
@@ -407,10 +378,6 @@ class MicrosoftGraphApi:
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
-                                                             
-                                                                                      
-                                                                   
-
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters()
 
         if params:
@@ -497,11 +464,9 @@ class MicrosoftGraphApi:
             MessageItemRequestBuilder,
         )
 
-                                            
         message = Message()
         message.subject = data.get("subject")
         message.is_read = data.get("isRead")
-                                    
 
         request_config = MessageItemRequestBuilder.MessageItemRequestBuilderPatchRequestConfiguration(
             options=[ResponseHandlerOption(NativeResponseHandler())]
@@ -784,7 +749,7 @@ class MicrosoftGraphApi:
             request_body.save_to_sent_items = data.get("saveToSentItems", True)
 
             await self.client.users.by_user_id(user_id).send_mail.post(request_body)
-                                                              
+
             return {"status": "success"}
         except Exception as e:
             print(f"Error sending shared mailbox mail: {e}")
@@ -932,7 +897,6 @@ class MicrosoftGraphApi:
         try:
             event = Event()
             event.subject = data.get("subject")
-                                                
 
             request_config = self.client.me.events.by_event_id(
                 event_id
@@ -1124,7 +1088,6 @@ class MicrosoftGraphApi:
         try:
             event = Event()
             event.subject = data.get("subject")
-                                      
 
             request_config = self.client.me.calendars.by_calendar_id(
                 calendar_id
@@ -1206,9 +1169,6 @@ class MicrosoftGraphApi:
 
         try:
             request_body = FindMeetingTimesPostRequestBody()
-                                              
-                                                                                             
-                                                             
 
             request_config = (
                 FindMeetingTimesRequestBuilder.FindMeetingTimesPostRequestConfiguration(
@@ -1323,16 +1283,13 @@ class MicrosoftGraphApi:
     ) -> Any:
         """Download file content."""
         try:
-                                                    
+
             response = (
                 await self.client.drives.by_drive_id(drive_id)
                 .items.by_drive_item_id(driveItem_id)
                 .content.get()
             )
-                                                                           
 
-                                                                           
-                                                        
             import base64
 
             if isinstance(response, bytes):
@@ -1767,8 +1724,7 @@ class MicrosoftGraphApi:
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-                                                                                  
-                                                       
+
             html_content = data.get("content", "")
 
             request_config = (
@@ -1872,7 +1828,6 @@ class MicrosoftGraphApi:
         try:
             task = TodoTask()
             task.title = data.get("title")
-                                      
 
             request_config = self.client.me.todo.lists.by_todo_task_list_id(
                 todoTaskList_id
@@ -2043,7 +1998,6 @@ class MicrosoftGraphApi:
             task = PlannerTask()
             task.title = data.get("title")
             task.plan_id = data.get("planId")
-                                      
 
             request_config = self.client.planner.tasks.to_post_request_configuration()
             request_config.options.append(
@@ -2663,8 +2617,7 @@ class MicrosoftGraphApi:
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-                                                                                        
-                                             
+
             request_config = (
                 self.client.sites.by_site_id(site_id)
                 .get_by_path(path)
@@ -2718,9 +2671,8 @@ class MicrosoftGraphApi:
         )
 
         try:
-                                                        
+
             body = QueryPostRequestBody()
-                                 
 
             request_config = self.client.search.query.to_post_request_configuration()
             request_config.options.append(
@@ -2797,10 +2749,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error getting site list item: {e}")
             return {"error": str(e)}
-
-                                                                               
-            
-                                                                               
 
     async def list_groups(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List all Microsoft 365 groups and security groups."""
@@ -3101,10 +3049,6 @@ class MicrosoftGraphApi:
             print(f"Error listing group drives: {e}")
             return {"error": str(e)}
 
-                                                                               
-                               
-                                                                               
-
     async def list_service_health(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -3297,10 +3241,6 @@ class MicrosoftGraphApi:
             print(f"Error updating admin sharepoint: {e}")
             return {"error": str(e)}
 
-                                                                               
-                  
-                                                                               
-
     async def list_organization(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List organization properties."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
@@ -3421,10 +3361,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error updating org branding: {e}")
             return {"error": str(e)}
-
-                                                                               
-             
-                                                                               
 
     async def list_domains(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List tenant domains."""
@@ -3561,10 +3497,6 @@ class MicrosoftGraphApi:
             print(f"Error listing domain service configuration records: {e}")
             return {"error": str(e)}
 
-                                                                               
-                   
-                                                                               
-
     async def list_subscriptions(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List active webhook subscriptions."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
@@ -3693,10 +3625,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error deleting subscription: {e}")
             return {"error": str(e)}
-
-                                                                               
-                                      
-                                                                               
 
     async def list_online_meetings(
         self, params: Optional[Dict] = None
@@ -3948,10 +3876,6 @@ class MicrosoftGraphApi:
             print(f"Error getting my presence: {e}")
             return {"error": str(e)}
 
-                                                                               
-                 
-                                                                               
-
     async def create_invitation(
         self, data: Dict[str, Any], params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -3982,10 +3906,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error creating invitation: {e}")
             return {"error": str(e)}
-
-                                                                               
-              
-                                                                               
 
     async def list_security_alerts(
         self, params: Optional[Dict] = None
@@ -4242,10 +4162,6 @@ class MicrosoftGraphApi:
             print(f"Error running hunting query: {e}")
             return {"error": str(e)}
 
-                                                                               
-                
-                                                                               
-
     async def list_directory_audits(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -4362,10 +4278,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error listing provisioning logs: {e}")
             return {"error": str(e)}
-
-                                                                               
-             
-                                                                               
 
     async def get_email_activity_report(
         self, period: str = "D7", params: Optional[Dict] = None
@@ -4526,10 +4438,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error getting OneDrive usage report: {e}")
             return {"error": str(e)}
-
-                                                                               
-                  
-                                                                               
 
     async def list_applications(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List app registrations."""
@@ -4711,10 +4619,6 @@ class MicrosoftGraphApi:
             print(f"Error removing application password: {e}")
             return {"error": str(e)}
 
-                                                                               
-                        
-                                                                               
-
     async def list_service_principals(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -4844,10 +4748,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error deleting service principal: {e}")
             return {"error": str(e)}
-
-                                                                               
-                                   
-                                                                               
 
     async def list_conditional_access_policies(
         self, params: Optional[Dict] = None
@@ -4990,10 +4890,6 @@ class MicrosoftGraphApi:
             print(f"Error deleting conditional access policy: {e}")
             return {"error": str(e)}
 
-                                                                               
-                         
-                                                                               
-
     async def list_access_reviews(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -5091,10 +4987,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error listing lifecycle workflows: {e}")
             return {"error": str(e)}
-
-                                                                               
-                         
-                                                                               
 
     async def list_risk_detections(
         self, params: Optional[Dict] = None
@@ -5223,10 +5115,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error dismissing risky user: {e}")
             return {"error": str(e)}
-
-                                                                               
-               
-                                                                               
 
     async def list_directory_objects(
         self, params: Optional[Dict] = None
@@ -5389,10 +5277,6 @@ class MicrosoftGraphApi:
             print(f"Error restoring deleted item: {e}")
             return {"error": str(e)}
 
-                                                                               
-              
-                                                                               
-
     async def get_authorization_policy(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -5509,10 +5393,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error getting admin consent policy: {e}")
             return {"error": str(e)}
-
-                                                                               
-                     
-                                                                               
 
     async def list_role_definitions(
         self, params: Optional[Dict] = None
@@ -5646,10 +5526,6 @@ class MicrosoftGraphApi:
             print(f"Error creating role assignment: {e}")
             return {"error": str(e)}
 
-                                                                               
-             
-                                                                               
-
     async def list_devices(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List devices registered in the directory."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
@@ -5714,10 +5590,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error deleting device: {e}")
             return {"error": str(e)}
-
-                                                                               
-                       
-                                                                               
 
     async def list_managed_devices(
         self, params: Optional[Dict] = None
@@ -5873,10 +5745,6 @@ class MicrosoftGraphApi:
             print(f"Error retiring managed device: {e}")
             return {"error": str(e)}
 
-                                                                               
-               
-                                                                               
-
     async def list_education_classes(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -6015,10 +5883,6 @@ class MicrosoftGraphApi:
             print(f"Error listing education assignments: {e}")
             return {"error": str(e)}
 
-                                                                               
-                
-                                                                               
-
     async def list_agreements(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List agreements (terms of use)."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
@@ -6110,10 +5974,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error deleting agreement: {e}")
             return {"error": str(e)}
-
-                                                                               
-            
-                                                                               
 
     async def list_rooms(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List rooms."""
@@ -6208,10 +6068,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error updating place: {e}")
             return {"error": str(e)}
-
-                                                                               
-           
-                                                                               
 
     async def list_printers(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List printers."""
@@ -6322,10 +6178,6 @@ class MicrosoftGraphApi:
             print(f"Error listing print shares: {e}")
             return {"error": str(e)}
 
-                                                                               
-             
-                                                                               
-
     async def list_subject_rights_requests(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -6400,10 +6252,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error creating subject rights request: {e}")
             return {"error": str(e)}
-
-                                                                               
-                                           
-                                                                               
 
     async def list_booking_businesses(
         self, params: Optional[Dict] = None
@@ -6536,10 +6384,6 @@ class MicrosoftGraphApi:
             print(f"Error listing virtual events: {e}")
             return {"error": str(e)}
 
-                                                                               
-             
-                                                                               
-
     async def list_file_storage_containers(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -6615,10 +6459,6 @@ class MicrosoftGraphApi:
             print(f"Error creating file storage container: {e}")
             return {"error": str(e)}
 
-                                                                               
-                         
-                                                                               
-
     async def list_learning_providers(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -6693,10 +6533,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error listing learning course activities: {e}")
             return {"error": str(e)}
-
-                                                                               
-                         
-                                                                               
 
     async def list_external_connections(
         self, params: Optional[Dict] = None
@@ -6801,10 +6637,6 @@ class MicrosoftGraphApi:
             print(f"Error deleting external connection: {e}")
             return {"error": str(e)}
 
-                                                                               
-                            
-                                                                               
-
     async def list_sensitivity_labels(
         self, params: Optional[Dict] = None
     ) -> Dict[str, Any]:
@@ -6854,10 +6686,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error getting sensitivity label: {e}")
             return {"error": str(e)}
-
-                                                                               
-                          
-                                                                               
 
     async def list_delegated_admin_relationships(
         self, params: Optional[Dict] = None
