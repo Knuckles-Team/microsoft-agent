@@ -1,5 +1,18 @@
 #!/usr/bin/python
+import warnings
 
+# Filter RequestsDependencyWarning early to prevent log spam
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    try:
+        from requests.exceptions import RequestsDependencyWarning
+        warnings.filterwarnings("ignore", category=RequestsDependencyWarning)
+    except ImportError:
+        pass
+
+# General urllib3/chardet mismatch warnings
+warnings.filterwarnings("ignore", message=".*urllib3.*or chardet.*")
+warnings.filterwarnings("ignore", message=".*urllib3.*or charset_normalizer.*")
 
 from dotenv import load_dotenv, find_dotenv
 from agent_utilities.base_utilities import to_boolean
@@ -39,7 +52,7 @@ def register_prompts(mcp: FastMCP):
         """Summarize email."""
         return f"Please summarize the email thread with subject '{subject}'"
 
-    @mcp.prompt(name="calendar_today", description="Show today's calendar events.")
+    @mcp.tool(name="calendar_today", description="Show today's calendar events.")
     def calendar_today() -> str:
         """Show calendar."""
         return "Please show my calendar events for today."
@@ -127,14 +140,22 @@ def register_auth_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="logout", description="Log out from Microsoft account", tags={"auth"}
-    )
-    async def logout() -> Any:
-        """Log out from Microsoft account"""
-        client = await get_client()
-        return client.logout()
 
-    @mcp.tool(
-        name="verify_login",
+)
+
+        async def logout() -> Any:
+
+            """Log out from Microsoft account"""
+
+            client = await get_client()
+
+            return client.logout()
+
+
+
+        @mcp.tool(
+
+name="verify_login",
         description="Check current Microsoft authentication status",
         tags={"auth"},
     )
@@ -172,7 +193,9 @@ def register_meta_tools(mcp: FastMCP):
 def register_mail_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_mail_messages",
-        description="list_mail_messages: GET /me/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
+        description="list_mail_messages: GET /me/messages
+
+TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags={"mail", "files", "user"},
     )
     async def list_mail_messages(
@@ -199,7 +222,11 @@ def register_mail_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_mail_folder_messages",
-        description="list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
+        description="list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages
+
+
+
+TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags={"mail", "files", "user"},
     )
     async def list_mail_folder_messages(
@@ -234,7 +261,11 @@ def register_mail_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="send_mail",
-        description="send_mail: POST /me/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        description="send_mail: POST /me/sendMail
+
+
+
+TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags={"mail"},
     )
     async def send_mail(
@@ -252,7 +283,11 @@ def register_mail_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_shared_mailbox_messages",
-        description="list_shared_mailbox_messages: GET /users/{user-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
+        description="list_shared_mailbox_messages: GET /users/{user-id}/messages
+
+
+
+TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags={"mail", "files", "user"},
     )
     async def list_shared_mailbox_messages(
@@ -270,7 +305,11 @@ def register_mail_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_shared_mailbox_folder_messages",
-        description="list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages\n\nTIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
+        description="list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages
+
+
+
+TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:alice AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags={"mail", "files", "user"},
     )
     async def list_shared_mailbox_folder_messages(
@@ -309,7 +348,11 @@ def register_mail_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="send_shared_mailbox_mail",
-        description="send_shared_mailbox_mail: POST /users/{user-id}/sendMail\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        description="send_shared_mailbox_mail: POST /users/{user-id}/sendMail
+
+
+
+TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags={"mail"},
     )
     async def send_shared_mailbox_mail(
@@ -645,7 +688,11 @@ def register_mail_tools(mcp: FastMCP):
 def register_files_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_users",
-        description="list_users: GET /users\n\nTIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
+        description="list_users: GET /users
+
+
+
+TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual. When searching users, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'displayName:'. Examples: $search='displayName:john' | $search='displayName:john' OR 'displayName:jane'. Remember: ALWAYS wrap the entire search expression in double quotes and set the ConsistencyLevel header to eventual! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter",
         tags={"files", "user"},
     )
     async def list_users(
@@ -660,9 +707,12 @@ def register_files_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_drives", description="list_drives: GET /me/drives", tags={"files"}
-    )
-    async def list_drives(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+
+)
+
+        async def list_drives(
+
+params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """list_drives: GET /me/drives"""
         client = await get_client()
@@ -864,7 +914,11 @@ def register_files_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_excel_tables",
-        description="list_excel_tables: GET /drives/{drive-id}/items/{driveItem-id}/workbook/tables\n\nList Excel tables in a workbook.",
+        description="list_excel_tables: GET /drives/{drive-id}/items/{driveItem-id}/workbook/tables
+
+
+
+List Excel tables in a workbook.",
         tags={"files"},
     )
     async def list_excel_tables(
@@ -1160,7 +1214,11 @@ def register_files_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_site_lists",
-        description="list_site_lists: GET /sites/{site-id}/lists\n\nList lists for a SharePoint site.",
+        description="list_site_lists: GET /sites/{site-id}/lists
+
+
+
+List lists for a SharePoint site.",
         tags={"files", "sites"},
     )
     async def list_site_lists(
@@ -1175,7 +1233,11 @@ def register_files_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_site_list",
-        description="get_site_list: GET /sites/{site-id}/lists/{list-id}\n\nGet a specific SharePoint site list.",
+        description="get_site_list: GET /sites/{site-id}/lists/{list-id}
+
+
+
+Get a specific SharePoint site list.",
         tags={"files", "sites"},
     )
     async def get_site_list(
@@ -1193,7 +1255,11 @@ def register_files_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_sharepoint_site_list_items",
-        description="list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items\n\nList items in a SharePoint site list.",
+        description="list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items
+
+
+
+List items in a SharePoint site list.",
         tags={"files", "sites"},
     )
     async def list_sharepoint_site_list_items(
@@ -1284,7 +1350,11 @@ def register_calendar_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_calendar_event",
-        description="create_calendar_event: POST /me/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        description="create_calendar_event: POST /me/events
+
+
+
+TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags={"calendar"},
     )
     async def create_calendar_event(
@@ -1302,7 +1372,11 @@ def register_calendar_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_calendar_event",
-        description="update_calendar_event: PATCH /me/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        description="update_calendar_event: PATCH /me/events/{event-id}
+
+
+
+TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags={"calendar"},
     )
     async def update_calendar_event(
@@ -1376,7 +1450,11 @@ def register_calendar_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_specific_calendar_event",
-        description="create_specific_calendar_event: POST /me/calendars/{calendar-id}/events\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        description="create_specific_calendar_event: POST /me/calendars/{calendar-id}/events
+
+
+
+TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags={"calendar"},
     )
     async def create_specific_calendar_event(
@@ -1397,7 +1475,11 @@ def register_calendar_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_specific_calendar_event",
-        description="update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}\n\nTIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
+        description="update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}
+
+
+
+TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the list-users tool to find the email address of the recipients.",
         tags={"calendar"},
     )
     async def update_specific_calendar_event(
@@ -1743,9 +1825,12 @@ def register_contacts_tools(mcp: FastMCP):
 def register_user_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_current_user", description="get_current_user: GET /me", tags={"user"}
-    )
-    async def get_current_user(
-        params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
+
+)
+
+        async def get_current_user(
+
+params: Optional[Dict[(str, Any)]] = Field(None, description="Query parameters")
     ) -> Any:
         """get_current_user: GET /me"""
         client = await get_client()
@@ -1891,7 +1976,11 @@ def register_search_tools(mcp: FastMCP):
 def register_groups_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_groups",
-        description="list_groups: GET /groups\n\nList all Microsoft 365 groups and security groups in the organization. Supports $filter, $search, $select, $top, $orderby, $count query parameters. Requires ConsistencyLevel: eventual header for advanced queries.",
+        description="list_groups: GET /groups
+
+
+
+List all Microsoft 365 groups and security groups in the organization. Supports $filter, $search, $select, $top, $orderby, $count query parameters. Requires ConsistencyLevel: eventual header for advanced queries.",
         tags={"groups"},
     )
     async def list_groups(
@@ -1903,7 +1992,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_group",
-        description="get_group: GET /groups/{group-id}\n\nGet properties and relationships of a group object.",
+        description="get_group: GET /groups/{group-id}
+
+
+
+Get properties and relationships of a group object.",
         tags={"groups"},
     )
     async def get_group(
@@ -1918,7 +2011,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_group",
-        description="create_group: POST /groups\n\nCreate a new Microsoft 365 group or security group. Required fields: displayName, mailNickname, mailEnabled, securityEnabled. For M365 groups, set groupTypes=['Unified'].",
+        description="create_group: POST /groups
+
+
+
+Create a new Microsoft 365 group or security group. Required fields: displayName, mailNickname, mailEnabled, securityEnabled. For M365 groups, set groupTypes=['Unified'].",
         tags={"groups"},
     )
     async def create_group(
@@ -1933,7 +2030,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_group",
-        description="update_group: PATCH /groups/{group-id}\n\nUpdate properties of a group object.",
+        description="update_group: PATCH /groups/{group-id}
+
+
+
+Update properties of a group object.",
         tags={"groups"},
     )
     async def update_group(
@@ -1949,7 +2050,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_group",
-        description="delete_group: DELETE /groups/{group-id}\n\nDelete a group. This permanently removes the group and its associated content.",
+        description="delete_group: DELETE /groups/{group-id}
+
+
+
+Delete a group. This permanently removes the group and its associated content.",
         tags={"groups"},
     )
     async def delete_group(
@@ -1964,7 +2069,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_group_members",
-        description="list_group_members: GET /groups/{group-id}/members\n\nGet a list of the group's direct members.",
+        description="list_group_members: GET /groups/{group-id}/members
+
+
+
+Get a list of the group's direct members.",
         tags={"groups", "user"},
     )
     async def list_group_members(
@@ -1979,7 +2088,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="add_group_member",
-        description="add_group_member: POST /groups/{group-id}/members/$ref\n\nAdd a member to a group. Provide memberId or directoryObjectId in the request body.",
+        description="add_group_member: POST /groups/{group-id}/members/$ref
+
+
+
+Add a member to a group. Provide memberId or directoryObjectId in the request body.",
         tags={"groups", "user"},
     )
     async def add_group_member(
@@ -1999,7 +2112,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="remove_group_member",
-        description="remove_group_member: DELETE /groups/{group-id}/members/{member-id}/$ref\n\nRemove a member from a group.",
+        description="remove_group_member: DELETE /groups/{group-id}/members/{member-id}/$ref
+
+
+
+Remove a member from a group.",
         tags={"groups", "user"},
     )
     async def remove_group_member(
@@ -2019,7 +2136,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_group_owners",
-        description="list_group_owners: GET /groups/{group-id}/owners\n\nGet owners of a group.",
+        description="list_group_owners: GET /groups/{group-id}/owners
+
+
+
+Get owners of a group.",
         tags={"groups", "user"},
     )
     async def list_group_owners(
@@ -2034,7 +2155,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_group_conversations",
-        description="list_group_conversations: GET /groups/{group-id}/conversations\n\nList conversations in a Microsoft 365 group.",
+        description="list_group_conversations: GET /groups/{group-id}/conversations
+
+
+
+List conversations in a Microsoft 365 group.",
         tags={"groups", "chat"},
     )
     async def list_group_conversations(
@@ -2049,7 +2174,11 @@ def register_groups_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_group_drives",
-        description="list_group_drives: GET /groups/{group-id}/drives\n\nList drives (document libraries) of a group.",
+        description="list_group_drives: GET /groups/{group-id}/drives
+
+
+
+List drives (document libraries) of a group.",
         tags={"groups", "files"},
     )
     async def list_group_drives(
@@ -2066,7 +2195,11 @@ def register_groups_tools(mcp: FastMCP):
 def register_admin_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_service_health",
-        description="list_service_health: GET /admin/serviceAnnouncement/healthOverviews\n\nGet the service health status for all services in the tenant.",
+        description="list_service_health: GET /admin/serviceAnnouncement/healthOverviews
+
+
+
+Get the service health status for all services in the tenant.",
         tags={"admin"},
     )
     async def list_service_health(
@@ -2078,7 +2211,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_service_health",
-        description="get_service_health: GET /admin/serviceAnnouncement/healthOverviews/{service-name}\n\nGet the health status for a specific service.",
+        description="get_service_health: GET /admin/serviceAnnouncement/healthOverviews/{service-name}
+
+
+
+Get the health status for a specific service.",
         tags={"admin"},
     )
     async def get_service_health(
@@ -2095,7 +2232,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_service_health_issues",
-        description="list_service_health_issues: GET /admin/serviceAnnouncement/issues\n\nList all service health issues for the tenant.",
+        description="list_service_health_issues: GET /admin/serviceAnnouncement/issues
+
+
+
+List all service health issues for the tenant.",
         tags={"admin"},
     )
     async def list_service_health_issues(
@@ -2107,7 +2248,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_service_health_issue",
-        description="get_service_health_issue: GET /admin/serviceAnnouncement/issues/{issue-id}\n\nGet a specific service health issue.",
+        description="get_service_health_issue: GET /admin/serviceAnnouncement/issues/{issue-id}
+
+
+
+Get a specific service health issue.",
         tags={"admin"},
     )
     async def get_service_health_issue(
@@ -2122,7 +2267,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_service_update_messages",
-        description="list_service_update_messages: GET /admin/serviceAnnouncement/messages\n\nList service update messages (message center posts) for the tenant.",
+        description="list_service_update_messages: GET /admin/serviceAnnouncement/messages
+
+
+
+List service update messages (message center posts) for the tenant.",
         tags={"admin"},
     )
     async def list_service_update_messages(
@@ -2134,7 +2283,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_service_update_message",
-        description="get_service_update_message: GET /admin/serviceAnnouncement/messages/{message-id}\n\nGet a specific service update message.",
+        description="get_service_update_message: GET /admin/serviceAnnouncement/messages/{message-id}
+
+
+
+Get a specific service update message.",
         tags={"admin"},
     )
     async def get_service_update_message(
@@ -2151,7 +2304,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_admin_sharepoint",
-        description="get_admin_sharepoint: GET /admin/sharepoint\n\nGet SharePoint admin settings for the tenant.",
+        description="get_admin_sharepoint: GET /admin/sharepoint
+
+
+
+Get SharePoint admin settings for the tenant.",
         tags={"admin", "sites"},
     )
     async def get_admin_sharepoint(
@@ -2163,7 +2320,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_admin_sharepoint",
-        description="update_admin_sharepoint: PATCH /admin/sharepoint\n\nUpdate SharePoint admin settings for the tenant.",
+        description="update_admin_sharepoint: PATCH /admin/sharepoint
+
+
+
+Update SharePoint admin settings for the tenant.",
         tags={"admin", "sites"},
     )
     async def update_admin_sharepoint(
@@ -2178,7 +2339,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_delegated_admin_relationships",
-        description="list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships\n\nList delegated admin relationships.",
+        description="list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships
+
+
+
+List delegated admin relationships.",
         tags={"admin"},
     )
     async def list_delegated_admin_relationships(
@@ -2192,7 +2357,11 @@ def register_admin_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_delegated_admin_relationship",
-        description="get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}\n\nGet a specific delegated admin relationship.",
+        description="get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}
+
+
+
+Get a specific delegated admin relationship.",
         tags={"admin"},
     )
     async def get_delegated_admin_relationship(
@@ -2211,7 +2380,11 @@ def register_admin_tools(mcp: FastMCP):
 def register_organization_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_organization",
-        description="list_organization: GET /organization\n\nGet the properties and relationships of the currently authenticated organization.",
+        description="list_organization: GET /organization
+
+
+
+Get the properties and relationships of the currently authenticated organization.",
         tags={"organization"},
     )
     async def list_organization(
@@ -2223,7 +2396,11 @@ def register_organization_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_organization",
-        description="get_organization: GET /organization/{org-id}\n\nGet a specific organization by ID.",
+        description="get_organization: GET /organization/{org-id}
+
+
+
+Get a specific organization by ID.",
         tags={"organization"},
     )
     async def get_organization(
@@ -2238,7 +2415,11 @@ def register_organization_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_organization",
-        description="update_organization: PATCH /organization/{org-id}\n\nUpdate organization properties.",
+        description="update_organization: PATCH /organization/{org-id}
+
+
+
+Update organization properties.",
         tags={"organization"},
     )
     async def update_organization(
@@ -2254,7 +2435,11 @@ def register_organization_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_org_branding",
-        description="get_org_branding: GET /organization/{org-id}/branding\n\nGet organization branding properties (sign-in page customization).",
+        description="get_org_branding: GET /organization/{org-id}/branding
+
+
+
+Get organization branding properties (sign-in page customization).",
         tags={"organization"},
     )
     async def get_org_branding(
@@ -2269,7 +2454,11 @@ def register_organization_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_org_branding",
-        description="update_org_branding: PATCH /organization/{org-id}/branding\n\nUpdate organization branding properties.",
+        description="update_org_branding: PATCH /organization/{org-id}/branding
+
+
+
+Update organization branding properties.",
         tags={"organization"},
     )
     async def update_org_branding(
@@ -2287,7 +2476,11 @@ def register_organization_tools(mcp: FastMCP):
 def register_domains_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_domains",
-        description="list_domains: GET /domains\n\nList domains associated with the tenant.",
+        description="list_domains: GET /domains
+
+
+
+List domains associated with the tenant.",
         tags={"domains"},
     )
     async def list_domains(
@@ -2299,7 +2492,11 @@ def register_domains_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_domain",
-        description="get_domain: GET /domains/{domain-id}\n\nGet properties of a specific domain.",
+        description="get_domain: GET /domains/{domain-id}
+
+
+
+Get properties of a specific domain.",
         tags={"domains"},
     )
     async def get_domain(
@@ -2314,7 +2511,11 @@ def register_domains_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_domain",
-        description="create_domain: POST /domains\n\nAdd a domain to the tenant. Provide the domain name as 'id' in the request body.",
+        description="create_domain: POST /domains
+
+
+
+Add a domain to the tenant. Provide the domain name as 'id' in the request body.",
         tags={"domains"},
     )
     async def create_domain(
@@ -2331,7 +2532,11 @@ def register_domains_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_domain",
-        description="delete_domain: DELETE /domains/{domain-id}\n\nDelete a domain from the tenant.",
+        description="delete_domain: DELETE /domains/{domain-id}
+
+
+
+Delete a domain from the tenant.",
         tags={"domains"},
     )
     async def delete_domain(
@@ -2346,7 +2551,11 @@ def register_domains_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="verify_domain",
-        description="verify_domain: POST /domains/{domain-id}/verify\n\nVerify ownership of a domain.",
+        description="verify_domain: POST /domains/{domain-id}/verify
+
+
+
+Verify ownership of a domain.",
         tags={"domains"},
     )
     async def verify_domain(
@@ -2361,7 +2570,11 @@ def register_domains_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_domain_service_configuration_records",
-        description="list_domain_service_configuration_records: GET /domains/{domain-id}/serviceConfigurationRecords\n\nList DNS records required by the domain for Microsoft services.",
+        description="list_domain_service_configuration_records: GET /domains/{domain-id}/serviceConfigurationRecords
+
+
+
+List DNS records required by the domain for Microsoft services.",
         tags={"domains"},
     )
     async def list_domain_service_configuration_records(
@@ -2380,7 +2593,11 @@ def register_domains_tools(mcp: FastMCP):
 def register_subscriptions_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_subscriptions",
-        description="list_subscriptions: GET /subscriptions\n\nList active webhook subscriptions for change notifications.",
+        description="list_subscriptions: GET /subscriptions
+
+
+
+List active webhook subscriptions for change notifications.",
         tags={"subscriptions"},
     )
     async def list_subscriptions(
@@ -2392,7 +2609,11 @@ def register_subscriptions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_subscription",
-        description="get_subscription: GET /subscriptions/{subscription-id}\n\nGet a specific subscription.",
+        description="get_subscription: GET /subscriptions/{subscription-id}
+
+
+
+Get a specific subscription.",
         tags={"subscriptions"},
     )
     async def get_subscription(
@@ -2409,7 +2630,11 @@ def register_subscriptions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_subscription",
-        description="create_subscription: POST /subscriptions\n\nCreate a webhook subscription for change notifications. Required fields: changeType, notificationUrl, resource, expirationDateTime.",
+        description="create_subscription: POST /subscriptions
+
+
+
+Create a webhook subscription for change notifications. Required fields: changeType, notificationUrl, resource, expirationDateTime.",
         tags={"subscriptions"},
     )
     async def create_subscription(
@@ -2424,7 +2649,11 @@ def register_subscriptions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_subscription",
-        description="update_subscription: PATCH /subscriptions/{subscription-id}\n\nRenew a subscription by extending its expiration time.",
+        description="update_subscription: PATCH /subscriptions/{subscription-id}
+
+
+
+Renew a subscription by extending its expiration time.",
         tags={"subscriptions"},
     )
     async def update_subscription(
@@ -2442,7 +2671,11 @@ def register_subscriptions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_subscription",
-        description="delete_subscription: DELETE /subscriptions/{subscription-id}\n\nDelete a webhook subscription.",
+        description="delete_subscription: DELETE /subscriptions/{subscription-id}
+
+
+
+Delete a webhook subscription.",
         tags={"subscriptions"},
     )
     async def delete_subscription(
@@ -2461,7 +2694,11 @@ def register_subscriptions_tools(mcp: FastMCP):
 def register_communications_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_online_meetings",
-        description="list_online_meetings: GET /me/onlineMeetings\n\nList online meetings for the current user. Returns meeting details including subject, join URL, start/end time, and participants.",
+        description="list_online_meetings: GET /me/onlineMeetings
+
+
+
+List online meetings for the current user. Returns meeting details including subject, join URL, start/end time, and participants.",
         tags={"communications"},
     )
     async def list_online_meetings(
@@ -2475,7 +2712,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_online_meeting",
-        description="get_online_meeting: GET /me/onlineMeetings/{onlineMeeting-id}\n\nGet a specific online meeting by ID. Returns full meeting details including join information, audio conferencing, and lobby settings.",
+        description="get_online_meeting: GET /me/onlineMeetings/{onlineMeeting-id}
+
+
+
+Get a specific online meeting by ID. Returns full meeting details including join information, audio conferencing, and lobby settings.",
         tags={"communications"},
     )
     async def get_online_meeting(
@@ -2490,7 +2731,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_online_meeting",
-        description="create_online_meeting: POST /me/onlineMeetings\n\nCreate a new online meeting. Provide subject, startDateTime, endDateTime, and optional lobby bypass settings.",
+        description="create_online_meeting: POST /me/onlineMeetings
+
+
+
+Create a new online meeting. Provide subject, startDateTime, endDateTime, and optional lobby bypass settings.",
         tags={"communications"},
     )
     async def create_online_meeting(
@@ -2505,7 +2750,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_online_meeting",
-        description="update_online_meeting: PATCH /me/onlineMeetings/{onlineMeeting-id}\n\nUpdate an existing online meeting. Modify subject, times, or lobby settings.",
+        description="update_online_meeting: PATCH /me/onlineMeetings/{onlineMeeting-id}
+
+
+
+Update an existing online meeting. Modify subject, times, or lobby settings.",
         tags={"communications"},
     )
     async def update_online_meeting(
@@ -2523,7 +2772,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_online_meeting",
-        description="delete_online_meeting: DELETE /me/onlineMeetings/{onlineMeeting-id}\n\nDelete an online meeting.",
+        description="delete_online_meeting: DELETE /me/onlineMeetings/{onlineMeeting-id}
+
+
+
+Delete an online meeting.",
         tags={"communications"},
     )
     async def delete_online_meeting(
@@ -2538,7 +2791,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_call_records",
-        description="list_call_records: GET /communications/callRecords\n\nList call records. Returns information about calls and meetings including participants, modalities, and duration.",
+        description="list_call_records: GET /communications/callRecords
+
+
+
+List call records. Returns information about calls and meetings including participants, modalities, and duration.",
         tags={"communications"},
     )
     async def list_call_records(
@@ -2552,7 +2809,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_call_record",
-        description="get_call_record: GET /communications/callRecords/{callRecord-id}\n\nGet a specific call record by ID. Returns detailed call information including sessions and segments.",
+        description="get_call_record: GET /communications/callRecords/{callRecord-id}
+
+
+
+Get a specific call record by ID. Returns detailed call information including sessions and segments.",
         tags={"communications"},
     )
     async def get_call_record(
@@ -2567,7 +2828,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_presences",
-        description="list_presences: GET /communications/presences\n\nList presence information for multiple users. Returns availability and activity status.",
+        description="list_presences: GET /communications/presences
+
+
+
+List presence information for multiple users. Returns availability and activity status.",
         tags={"communications"},
     )
     async def list_presences(
@@ -2581,7 +2846,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_presence",
-        description="get_presence: GET /communications/presences/{presence-id}\n\nGet presence for a specific user by user ID. Returns availability (Available, Busy, Away, etc.) and activity.",
+        description="get_presence: GET /communications/presences/{presence-id}
+
+
+
+Get presence for a specific user by user ID. Returns availability (Available, Busy, Away, etc.) and activity.",
         tags={"communications"},
     )
     async def get_presence(
@@ -2596,7 +2865,11 @@ def register_communications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_my_presence",
-        description="get_my_presence: GET /me/presence\n\nGet current user's presence status including availability and activity.",
+        description="get_my_presence: GET /me/presence
+
+
+
+Get current user's presence status including availability and activity.",
         tags={"communications"},
     )
     async def get_my_presence(
@@ -2612,7 +2885,11 @@ def register_communications_tools(mcp: FastMCP):
 def register_identity_tools(mcp: FastMCP):
     @mcp.tool(
         name="create_invitation",
-        description="create_invitation: POST /invitations\n\nCreate an invitation for an external / guest user. Provide invitedUserEmailAddress and inviteRedirectUrl. Optionally set invitedUserDisplayName and sendInvitationMessage.",
+        description="create_invitation: POST /invitations
+
+
+
+Create an invitation for an external / guest user. Provide invitedUserEmailAddress and inviteRedirectUrl. Optionally set invitedUserDisplayName and sendInvitationMessage.",
         tags={"identity"},
     )
     async def create_invitation(
@@ -2627,7 +2904,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_conditional_access_policies",
-        description="list_conditional_access_policies: GET /identity/conditionalAccess/policies\n\nList conditional access policies.",
+        description="list_conditional_access_policies: GET /identity/conditionalAccess/policies
+
+
+
+List conditional access policies.",
         tags={"identity"},
     )
     async def list_conditional_access_policies(
@@ -2641,7 +2922,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_conditional_access_policy",
-        description="get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}\n\nGet a specific conditional access policy.",
+        description="get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}
+
+
+
+Get a specific conditional access policy.",
         tags={"identity"},
     )
     async def get_conditional_access_policy(
@@ -2658,7 +2943,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_conditional_access_policy",
-        description="create_conditional_access_policy: POST /identity/conditionalAccess/policies\n\nCreate a conditional access policy.",
+        description="create_conditional_access_policy: POST /identity/conditionalAccess/policies
+
+
+
+Create a conditional access policy.",
         tags={"identity"},
     )
     async def create_conditional_access_policy(
@@ -2675,7 +2964,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_conditional_access_policy",
-        description="update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}\n\nUpdate a conditional access policy.",
+        description="update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}
+
+
+
+Update a conditional access policy.",
         tags={"identity"},
     )
     async def update_conditional_access_policy(
@@ -2693,7 +2986,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_conditional_access_policy",
-        description="delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}\n\nDelete a conditional access policy.",
+        description="delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}
+
+
+
+Delete a conditional access policy.",
         tags={"identity"},
     )
     async def delete_conditional_access_policy(
@@ -2710,7 +3007,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_access_reviews",
-        description="list_access_reviews: GET /identityGovernance/accessReviewDefinitions\n\nList access review schedule definitions.",
+        description="list_access_reviews: GET /identityGovernance/accessReviewDefinitions
+
+
+
+List access review schedule definitions.",
         tags={"identity"},
     )
     async def list_access_reviews(
@@ -2724,7 +3025,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_access_review",
-        description="get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}\n\nGet a specific access review definition.",
+        description="get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}
+
+
+
+Get a specific access review definition.",
         tags={"identity"},
     )
     async def get_access_review(
@@ -2739,7 +3044,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_entitlement_access_packages",
-        description="list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages\n\nList entitlement management access packages.",
+        description="list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages
+
+
+
+List entitlement management access packages.",
         tags={"identity"},
     )
     async def list_entitlement_access_packages(
@@ -2753,7 +3062,11 @@ def register_identity_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_lifecycle_workflows",
-        description="list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows\n\nList lifecycle management workflows.",
+        description="list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows
+
+
+
+List lifecycle management workflows.",
         tags={"identity"},
     )
     async def list_lifecycle_workflows(
@@ -2769,7 +3082,11 @@ def register_identity_tools(mcp: FastMCP):
 def register_security_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_security_alerts",
-        description="list_security_alerts: GET /security/alerts_v2\n\nList security alerts. Returns alert details including severity, status, and detected threats.",
+        description="list_security_alerts: GET /security/alerts_v2
+
+
+
+List security alerts. Returns alert details including severity, status, and detected threats.",
         tags={"security"},
     )
     async def list_security_alerts(
@@ -2783,7 +3100,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_security_alert",
-        description="get_security_alert: GET /security/alerts_v2/{alert-id}\n\nGet a specific security alert by ID.",
+        description="get_security_alert: GET /security/alerts_v2/{alert-id}
+
+
+
+Get a specific security alert by ID.",
         tags={"security"},
     )
     async def get_security_alert(
@@ -2798,7 +3119,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_security_alert",
-        description="update_security_alert: PATCH /security/alerts_v2/{alert-id}\n\nUpdate a security alert. Change status, assign to user, set classification/determination.",
+        description="update_security_alert: PATCH /security/alerts_v2/{alert-id}
+
+
+
+Update a security alert. Change status, assign to user, set classification/determination.",
         tags={"security"},
     )
     async def update_security_alert(
@@ -2816,7 +3141,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_security_incidents",
-        description="list_security_incidents: GET /security/incidents\n\nList security incidents. Returns correlated alerts grouped into incidents.",
+        description="list_security_incidents: GET /security/incidents
+
+
+
+List security incidents. Returns correlated alerts grouped into incidents.",
         tags={"security"},
     )
     async def list_security_incidents(
@@ -2830,7 +3159,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_security_incident",
-        description="get_security_incident: GET /security/incidents/{incident-id}\n\nGet a specific security incident by ID.",
+        description="get_security_incident: GET /security/incidents/{incident-id}
+
+
+
+Get a specific security incident by ID.",
         tags={"security"},
     )
     async def get_security_incident(
@@ -2847,7 +3180,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_security_incident",
-        description="update_security_incident: PATCH /security/incidents/{incident-id}\n\nUpdate a security incident. Change status, assign, classify.",
+        description="update_security_incident: PATCH /security/incidents/{incident-id}
+
+
+
+Update a security incident. Change status, assign, classify.",
         tags={"security"},
     )
     async def update_security_incident(
@@ -2865,7 +3202,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_secure_scores",
-        description="list_secure_scores: GET /security/secureScores\n\nList tenant secure scores over time.",
+        description="list_secure_scores: GET /security/secureScores
+
+
+
+List tenant secure scores over time.",
         tags={"security"},
     )
     async def list_secure_scores(
@@ -2879,7 +3220,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_threat_intelligence_hosts",
-        description="list_threat_intelligence_hosts: GET /security/threatIntelligence/hosts\n\nList threat intelligence hosts.",
+        description="list_threat_intelligence_hosts: GET /security/threatIntelligence/hosts
+
+
+
+List threat intelligence hosts.",
         tags={"security"},
     )
     async def list_threat_intelligence_hosts(
@@ -2893,7 +3238,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_threat_intelligence_host",
-        description="get_threat_intelligence_host: GET /security/threatIntelligence/hosts/{host-id}\n\nGet a specific threat intelligence host.",
+        description="get_threat_intelligence_host: GET /security/threatIntelligence/hosts/{host-id}
+
+
+
+Get a specific threat intelligence host.",
         tags={"security"},
     )
     async def get_threat_intelligence_host(
@@ -2908,7 +3257,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="run_hunting_query",
-        description="run_hunting_query: POST /security/runHuntingQuery\n\nRun an advanced hunting query using Kusto Query Language (KQL).",
+        description="run_hunting_query: POST /security/runHuntingQuery
+
+
+
+Run an advanced hunting query using Kusto Query Language (KQL).",
         tags={"security"},
     )
     async def run_hunting_query(
@@ -2925,7 +3278,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_risk_detections",
-        description="list_risk_detections: GET /identityProtection/riskDetections\n\nList risk detections (sign-in anomalies, leaked credentials, etc.).",
+        description="list_risk_detections: GET /identityProtection/riskDetections
+
+
+
+List risk detections (sign-in anomalies, leaked credentials, etc.).",
         tags={"security"},
     )
     async def list_risk_detections(
@@ -2939,7 +3296,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_risk_detection",
-        description="get_risk_detection: GET /identityProtection/riskDetections/{id}\n\nGet a specific risk detection.",
+        description="get_risk_detection: GET /identityProtection/riskDetections/{id}
+
+
+
+Get a specific risk detection.",
         tags={"security"},
     )
     async def get_risk_detection(
@@ -2954,7 +3315,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_risky_users",
-        description="list_risky_users: GET /identityProtection/riskyUsers\n\nList users flagged as risky.",
+        description="list_risky_users: GET /identityProtection/riskyUsers
+
+
+
+List users flagged as risky.",
         tags={"security"},
     )
     async def list_risky_users(
@@ -2968,7 +3333,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_risky_user",
-        description="get_risky_user: GET /identityProtection/riskyUsers/{id}\n\nGet a specific risky user.",
+        description="get_risky_user: GET /identityProtection/riskyUsers/{id}
+
+
+
+Get a specific risky user.",
         tags={"security"},
     )
     async def get_risky_user(
@@ -2983,7 +3352,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="dismiss_risky_user",
-        description="dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss\n\nDismiss a risky user (mark as safe).",
+        description="dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss
+
+
+
+Dismiss a risky user (mark as safe).",
         tags={"security"},
     )
     async def dismiss_risky_user(
@@ -2998,7 +3371,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_sensitivity_labels",
-        description="list_sensitivity_labels: GET /informationProtection/policy/labels\n\nList sensitivity labels.",
+        description="list_sensitivity_labels: GET /informationProtection/policy/labels
+
+
+
+List sensitivity labels.",
         tags={"security"},
     )
     async def list_sensitivity_labels(
@@ -3012,7 +3389,11 @@ def register_security_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_sensitivity_label",
-        description="get_sensitivity_label: GET /informationProtection/policy/labels/{id}\n\nGet a specific sensitivity label.",
+        description="get_sensitivity_label: GET /informationProtection/policy/labels/{id}
+
+
+
+Get a specific sensitivity label.",
         tags={"security"},
     )
     async def get_sensitivity_label(
@@ -3029,7 +3410,11 @@ def register_security_tools(mcp: FastMCP):
 def register_audit_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_directory_audits",
-        description="list_directory_audits: GET /auditLogs/directoryAudits\n\nList directory audit log entries. Shows changes to directory objects (users, groups, apps).",
+        description="list_directory_audits: GET /auditLogs/directoryAudits
+
+
+
+List directory audit log entries. Shows changes to directory objects (users, groups, apps).",
         tags={"audit"},
     )
     async def list_directory_audits(
@@ -3043,7 +3428,11 @@ def register_audit_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_directory_audit",
-        description="get_directory_audit: GET /auditLogs/directoryAudits/{directoryAudit-id}\n\nGet a specific directory audit entry.",
+        description="get_directory_audit: GET /auditLogs/directoryAudits/{directoryAudit-id}
+
+
+
+Get a specific directory audit entry.",
         tags={"audit"},
     )
     async def get_directory_audit(
@@ -3058,7 +3447,11 @@ def register_audit_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_sign_in_logs",
-        description="list_sign_in_logs: GET /auditLogs/signIns\n\nList sign-in activity logs. Shows user sign-in events with details.",
+        description="list_sign_in_logs: GET /auditLogs/signIns
+
+
+
+List sign-in activity logs. Shows user sign-in events with details.",
         tags={"audit"},
     )
     async def list_sign_in_logs(
@@ -3072,7 +3465,11 @@ def register_audit_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_sign_in_log",
-        description="get_sign_in_log: GET /auditLogs/signIns/{signIn-id}\n\nGet a specific sign-in log entry.",
+        description="get_sign_in_log: GET /auditLogs/signIns/{signIn-id}
+
+
+
+Get a specific sign-in log entry.",
         tags={"audit"},
     )
     async def get_sign_in_log(
@@ -3087,7 +3484,11 @@ def register_audit_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_provisioning_logs",
-        description="list_provisioning_logs: GET /auditLogs/provisioning\n\nList provisioning logs. Shows automated user/group provisioning events.",
+        description="list_provisioning_logs: GET /auditLogs/provisioning
+
+
+
+List provisioning logs. Shows automated user/group provisioning events.",
         tags={"audit"},
     )
     async def list_provisioning_logs(
@@ -3103,7 +3504,11 @@ def register_audit_tools(mcp: FastMCP):
 def register_reports_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_email_activity_report",
-        description="get_email_activity_report: GET /reports/getEmailActivityUserDetail\n\nGet email activity user detail report. Period: D7, D30, D90, D180.",
+        description="get_email_activity_report: GET /reports/getEmailActivityUserDetail
+
+
+
+Get email activity user detail report. Period: D7, D30, D90, D180.",
         tags={"reports"},
     )
     async def get_email_activity_report(
@@ -3118,7 +3523,11 @@ def register_reports_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_mailbox_usage_report",
-        description="get_mailbox_usage_report: GET /reports/getMailboxUsageDetail\n\nGet mailbox usage detail report. Period: D7, D30, D90, D180.",
+        description="get_mailbox_usage_report: GET /reports/getMailboxUsageDetail
+
+
+
+Get mailbox usage detail report. Period: D7, D30, D90, D180.",
         tags={"reports"},
     )
     async def get_mailbox_usage_report(
@@ -3133,7 +3542,11 @@ def register_reports_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_office365_active_users",
-        description="get_office365_active_users: GET /reports/getOffice365ActiveUserDetail\n\nGet Office 365 active user detail report. Period: D7, D30, D90, D180.",
+        description="get_office365_active_users: GET /reports/getOffice365ActiveUserDetail
+
+
+
+Get Office 365 active user detail report. Period: D7, D30, D90, D180.",
         tags={"reports"},
     )
     async def get_office365_active_users(
@@ -3148,7 +3561,11 @@ def register_reports_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_sharepoint_activity_report",
-        description="get_sharepoint_activity_report: GET /reports/getSharePointActivityUserDetail\n\nGet SharePoint activity user detail report. Period: D7, D30, D90, D180.",
+        description="get_sharepoint_activity_report: GET /reports/getSharePointActivityUserDetail
+
+
+
+Get SharePoint activity user detail report. Period: D7, D30, D90, D180.",
         tags={"reports"},
     )
     async def get_sharepoint_activity_report(
@@ -3163,7 +3580,11 @@ def register_reports_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_teams_user_activity",
-        description="get_teams_user_activity: GET /reports/getTeamsUserActivityUserDetail\n\nGet Teams user activity detail report. Period: D7, D30, D90, D180.",
+        description="get_teams_user_activity: GET /reports/getTeamsUserActivityUserDetail
+
+
+
+Get Teams user activity detail report. Period: D7, D30, D90, D180.",
         tags={"reports"},
     )
     async def get_teams_user_activity(
@@ -3178,7 +3599,11 @@ def register_reports_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_onedrive_usage_report",
-        description="get_onedrive_usage_report: GET /reports/getOneDriveUsageAccountDetail\n\nGet OneDrive usage account detail report. Period: D7, D30, D90, D180.",
+        description="get_onedrive_usage_report: GET /reports/getOneDriveUsageAccountDetail
+
+
+
+Get OneDrive usage account detail report. Period: D7, D30, D90, D180.",
         tags={"reports"},
     )
     async def get_onedrive_usage_report(
@@ -3195,7 +3620,11 @@ def register_reports_tools(mcp: FastMCP):
 def register_applications_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_applications",
-        description="list_applications: GET /applications\n\nList app registrations in the tenant.",
+        description="list_applications: GET /applications
+
+
+
+List app registrations in the tenant.",
         tags={"applications"},
     )
     async def list_applications(
@@ -3209,7 +3638,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_application",
-        description="get_application: GET /applications/{id}\n\nGet a specific app registration.",
+        description="get_application: GET /applications/{id}
+
+
+
+Get a specific app registration.",
         tags={"applications"},
     )
     async def get_application(
@@ -3224,7 +3657,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_application",
-        description="create_application: POST /applications\n\nCreate an app registration.",
+        description="create_application: POST /applications
+
+
+
+Create an app registration.",
         tags={"applications"},
     )
     async def create_application(
@@ -3241,7 +3678,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_application",
-        description="update_application: PATCH /applications/{id}\n\nUpdate an app registration.",
+        description="update_application: PATCH /applications/{id}
+
+
+
+Update an app registration.",
         tags={"applications"},
     )
     async def update_application(
@@ -3257,7 +3698,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_application",
-        description="delete_application: DELETE /applications/{id}\n\nDelete an app registration.",
+        description="delete_application: DELETE /applications/{id}
+
+
+
+Delete an app registration.",
         tags={"applications"},
     )
     async def delete_application(
@@ -3272,7 +3717,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="add_application_password",
-        description="add_application_password: POST /applications/{id}/addPassword\n\nAdd a password credential (client secret) to an app.",
+        description="add_application_password: POST /applications/{id}/addPassword
+
+
+
+Add a password credential (client secret) to an app.",
         tags={"applications"},
     )
     async def add_application_password(
@@ -3292,7 +3741,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="remove_application_password",
-        description="remove_application_password: POST /applications/{id}/removePassword\n\nRemove a password credential from an app.",
+        description="remove_application_password: POST /applications/{id}/removePassword
+
+
+
+Remove a password credential from an app.",
         tags={"applications"},
     )
     async def remove_application_password(
@@ -3312,7 +3765,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_service_principals",
-        description="list_service_principals: GET /servicePrincipals\n\nList service principals (enterprise apps).",
+        description="list_service_principals: GET /servicePrincipals
+
+
+
+List service principals (enterprise apps).",
         tags={"applications"},
     )
     async def list_service_principals(
@@ -3326,7 +3783,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_service_principal",
-        description="get_service_principal: GET /servicePrincipals/{id}\n\nGet a specific service principal.",
+        description="get_service_principal: GET /servicePrincipals/{id}
+
+
+
+Get a specific service principal.",
         tags={"applications"},
     )
     async def get_service_principal(
@@ -3341,7 +3802,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_service_principal",
-        description="create_service_principal: POST /servicePrincipals\n\nCreate a service principal for an app.",
+        description="create_service_principal: POST /servicePrincipals
+
+
+
+Create a service principal for an app.",
         tags={"applications"},
     )
     async def create_service_principal(
@@ -3358,7 +3823,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_service_principal",
-        description="update_service_principal: PATCH /servicePrincipals/{id}\n\nUpdate a service principal.",
+        description="update_service_principal: PATCH /servicePrincipals/{id}
+
+
+
+Update a service principal.",
         tags={"applications"},
     )
     async def update_service_principal(
@@ -3376,7 +3845,11 @@ def register_applications_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_service_principal",
-        description="delete_service_principal: DELETE /servicePrincipals/{id}\n\nDelete a service principal.",
+        description="delete_service_principal: DELETE /servicePrincipals/{id}
+
+
+
+Delete a service principal.",
         tags={"applications"},
     )
     async def delete_service_principal(
@@ -3393,7 +3866,11 @@ def register_applications_tools(mcp: FastMCP):
 def register_directory_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_directory_objects",
-        description="list_directory_objects: GET /directoryObjects\n\nList directory objects.",
+        description="list_directory_objects: GET /directoryObjects
+
+
+
+List directory objects.",
         tags={"directory"},
     )
     async def list_directory_objects(
@@ -3407,7 +3884,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_directory_object",
-        description="get_directory_object: GET /directoryObjects/{id}\n\nGet a specific directory object.",
+        description="get_directory_object: GET /directoryObjects/{id}
+
+
+
+Get a specific directory object.",
         tags={"directory"},
     )
     async def get_directory_object(
@@ -3422,7 +3903,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_directory_roles",
-        description="list_directory_roles: GET /directoryRoles\n\nList activated directory roles.",
+        description="list_directory_roles: GET /directoryRoles
+
+
+
+List activated directory roles.",
         tags={"directory"},
     )
     async def list_directory_roles(
@@ -3436,7 +3921,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_directory_role",
-        description="get_directory_role: GET /directoryRoles/{id}\n\nGet a specific activated directory role.",
+        description="get_directory_role: GET /directoryRoles/{id}
+
+
+
+Get a specific activated directory role.",
         tags={"directory"},
     )
     async def get_directory_role(
@@ -3451,7 +3940,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_directory_role_templates",
-        description="list_directory_role_templates: GET /directoryRoleTemplates\n\nList all directory role templates (built-in role definitions).",
+        description="list_directory_role_templates: GET /directoryRoleTemplates
+
+
+
+List all directory role templates (built-in role definitions).",
         tags={"directory"},
     )
     async def list_directory_role_templates(
@@ -3465,7 +3958,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_deleted_items",
-        description="list_deleted_items: GET /directory/deletedItems\n\nList recently deleted directory items (users, groups, apps).",
+        description="list_deleted_items: GET /directory/deletedItems
+
+
+
+List recently deleted directory items (users, groups, apps).",
         tags={"directory"},
     )
     async def list_deleted_items(
@@ -3479,7 +3976,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="restore_deleted_item",
-        description="restore_deleted_item: POST /directory/deletedItems/{id}/restore\n\nRestore a recently deleted directory item.",
+        description="restore_deleted_item: POST /directory/deletedItems/{id}/restore
+
+
+
+Restore a recently deleted directory item.",
         tags={"directory"},
     )
     async def restore_deleted_item(
@@ -3494,7 +3995,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_role_definitions",
-        description="list_role_definitions: GET /roleManagement/directory/roleDefinitions\n\nList RBAC directory role definitions.",
+        description="list_role_definitions: GET /roleManagement/directory/roleDefinitions
+
+
+
+List RBAC directory role definitions.",
         tags={"directory"},
     )
     async def list_role_definitions(
@@ -3508,7 +4013,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_role_definition",
-        description="get_role_definition: GET /roleManagement/directory/roleDefinitions/{id}\n\nGet a specific RBAC role definition.",
+        description="get_role_definition: GET /roleManagement/directory/roleDefinitions/{id}
+
+
+
+Get a specific RBAC role definition.",
         tags={"directory"},
     )
     async def get_role_definition(
@@ -3523,7 +4032,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_role_assignments",
-        description="list_role_assignments: GET /roleManagement/directory/roleAssignments\n\nList RBAC directory role assignments.",
+        description="list_role_assignments: GET /roleManagement/directory/roleAssignments
+
+
+
+List RBAC directory role assignments.",
         tags={"directory"},
     )
     async def list_role_assignments(
@@ -3537,7 +4050,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_role_assignment",
-        description="get_role_assignment: GET /roleManagement/directory/roleAssignments/{id}\n\nGet a specific RBAC role assignment.",
+        description="get_role_assignment: GET /roleManagement/directory/roleAssignments/{id}
+
+
+
+Get a specific RBAC role assignment.",
         tags={"directory"},
     )
     async def get_role_assignment(
@@ -3554,7 +4071,11 @@ def register_directory_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_role_assignment",
-        description="create_role_assignment: POST /roleManagement/directory/roleAssignments\n\nCreate a new RBAC role assignment.",
+        description="create_role_assignment: POST /roleManagement/directory/roleAssignments
+
+
+
+Create a new RBAC role assignment.",
         tags={"directory"},
     )
     async def create_role_assignment(
@@ -3574,7 +4095,11 @@ def register_directory_tools(mcp: FastMCP):
 def register_policies_tools(mcp: FastMCP):
     @mcp.tool(
         name="get_authorization_policy",
-        description="get_authorization_policy: GET /policies/authorizationPolicy\n\nGet the tenant authorization policy.",
+        description="get_authorization_policy: GET /policies/authorizationPolicy
+
+
+
+Get the tenant authorization policy.",
         tags={"policies"},
     )
     async def get_authorization_policy(
@@ -3588,7 +4113,11 @@ def register_policies_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_token_lifetime_policies",
-        description="list_token_lifetime_policies: GET /policies/tokenLifetimePolicies\n\nList token lifetime policies.",
+        description="list_token_lifetime_policies: GET /policies/tokenLifetimePolicies
+
+
+
+List token lifetime policies.",
         tags={"policies"},
     )
     async def list_token_lifetime_policies(
@@ -3602,7 +4131,11 @@ def register_policies_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_token_issuance_policies",
-        description="list_token_issuance_policies: GET /policies/tokenIssuancePolicies\n\nList token issuance policies.",
+        description="list_token_issuance_policies: GET /policies/tokenIssuancePolicies
+
+
+
+List token issuance policies.",
         tags={"policies"},
     )
     async def list_token_issuance_policies(
@@ -3616,7 +4149,11 @@ def register_policies_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_permission_grant_policies",
-        description="list_permission_grant_policies: GET /policies/permissionGrantPolicies\n\nList permission grant policies.",
+        description="list_permission_grant_policies: GET /policies/permissionGrantPolicies
+
+
+
+List permission grant policies.",
         tags={"policies"},
     )
     async def list_permission_grant_policies(
@@ -3630,7 +4167,11 @@ def register_policies_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_admin_consent_policy",
-        description="get_admin_consent_policy: GET /policies/adminConsentRequestPolicy\n\nGet the admin consent request policy.",
+        description="get_admin_consent_policy: GET /policies/adminConsentRequestPolicy
+
+
+
+Get the admin consent request policy.",
         tags={"policies"},
     )
     async def get_admin_consent_policy(
@@ -3646,7 +4187,11 @@ def register_policies_tools(mcp: FastMCP):
 def register_devices_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_devices",
-        description="list_devices: GET /devices\n\nList devices registered in the directory.",
+        description="list_devices: GET /devices
+
+
+
+List devices registered in the directory.",
         tags={"devices"},
     )
     async def list_devices(
@@ -3660,7 +4205,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_device",
-        description="get_device: GET /devices/{id}\n\nGet a specific device.",
+        description="get_device: GET /devices/{id}
+
+
+
+Get a specific device.",
         tags={"devices"},
     )
     async def get_device(
@@ -3675,7 +4224,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_device",
-        description="delete_device: DELETE /devices/{id}\n\nDelete a device.",
+        description="delete_device: DELETE /devices/{id}
+
+
+
+Delete a device.",
         tags={"devices"},
     )
     async def delete_device(
@@ -3690,7 +4243,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_managed_devices",
-        description="list_managed_devices: GET /deviceManagement/managedDevices\n\nList Intune managed devices.",
+        description="list_managed_devices: GET /deviceManagement/managedDevices
+
+
+
+List Intune managed devices.",
         tags={"devices"},
     )
     async def list_managed_devices(
@@ -3704,7 +4261,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_managed_device",
-        description="get_managed_device: GET /deviceManagement/managedDevices/{id}\n\nGet a specific managed device.",
+        description="get_managed_device: GET /deviceManagement/managedDevices/{id}
+
+
+
+Get a specific managed device.",
         tags={"devices"},
     )
     async def get_managed_device(
@@ -3719,7 +4280,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_device_compliance_policies",
-        description="list_device_compliance_policies: GET /deviceManagement/deviceCompliancePolicies\n\nList device compliance policies.",
+        description="list_device_compliance_policies: GET /deviceManagement/deviceCompliancePolicies
+
+
+
+List device compliance policies.",
         tags={"devices"},
     )
     async def list_device_compliance_policies(
@@ -3733,7 +4298,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_device_configurations",
-        description="list_device_configurations: GET /deviceManagement/deviceConfigurations\n\nList device configuration profiles.",
+        description="list_device_configurations: GET /deviceManagement/deviceConfigurations
+
+
+
+List device configuration profiles.",
         tags={"devices"},
     )
     async def list_device_configurations(
@@ -3747,7 +4316,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="wipe_managed_device",
-        description="wipe_managed_device: POST /deviceManagement/managedDevices/{id}/wipe\n\nWipe a managed device (factory reset).",
+        description="wipe_managed_device: POST /deviceManagement/managedDevices/{id}/wipe
+
+
+
+Wipe a managed device (factory reset).",
         tags={"devices"},
     )
     async def wipe_managed_device(
@@ -3762,7 +4335,11 @@ def register_devices_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="retire_managed_device",
-        description="retire_managed_device: POST /deviceManagement/managedDevices/{id}/retire\n\nRetire a managed device (remove company data).",
+        description="retire_managed_device: POST /deviceManagement/managedDevices/{id}/retire
+
+
+
+Retire a managed device (remove company data).",
         tags={"devices"},
     )
     async def retire_managed_device(
@@ -3779,7 +4356,11 @@ def register_devices_tools(mcp: FastMCP):
 def register_education_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_education_classes",
-        description="list_education_classes: GET /education/classes\n\nList education classes.",
+        description="list_education_classes: GET /education/classes
+
+
+
+List education classes.",
         tags={"education"},
     )
     async def list_education_classes(
@@ -3793,7 +4374,11 @@ def register_education_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_education_class",
-        description="get_education_class: GET /education/classes/{id}\n\nGet a specific education class.",
+        description="get_education_class: GET /education/classes/{id}
+
+
+
+Get a specific education class.",
         tags={"education"},
     )
     async def get_education_class(
@@ -3808,7 +4393,11 @@ def register_education_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_education_schools",
-        description="list_education_schools: GET /education/schools\n\nList education schools.",
+        description="list_education_schools: GET /education/schools
+
+
+
+List education schools.",
         tags={"education"},
     )
     async def list_education_schools(
@@ -3822,7 +4411,11 @@ def register_education_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_education_school",
-        description="get_education_school: GET /education/schools/{id}\n\nGet a specific education school.",
+        description="get_education_school: GET /education/schools/{id}
+
+
+
+Get a specific education school.",
         tags={"education"},
     )
     async def get_education_school(
@@ -3837,7 +4430,11 @@ def register_education_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_education_users",
-        description="list_education_users: GET /education/users\n\nList education users.",
+        description="list_education_users: GET /education/users
+
+
+
+List education users.",
         tags={"education"},
     )
     async def list_education_users(
@@ -3851,7 +4448,11 @@ def register_education_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_education_assignments",
-        description="list_education_assignments: GET /education/classes/{id}/assignments\n\nList assignments for an education class.",
+        description="list_education_assignments: GET /education/classes/{id}/assignments
+
+
+
+List assignments for an education class.",
         tags={"education"},
     )
     async def list_education_assignments(
@@ -3868,7 +4469,11 @@ def register_education_tools(mcp: FastMCP):
 def register_agreements_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_agreements",
-        description="list_agreements: GET /agreements\n\nList terms-of-use agreements.",
+        description="list_agreements: GET /agreements
+
+
+
+List terms-of-use agreements.",
         tags={"agreements"},
     )
     async def list_agreements(
@@ -3882,7 +4487,11 @@ def register_agreements_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_agreement",
-        description="get_agreement: GET /agreements/{id}\n\nGet a specific agreement.",
+        description="get_agreement: GET /agreements/{id}
+
+
+
+Get a specific agreement.",
         tags={"agreements"},
     )
     async def get_agreement(
@@ -3897,7 +4506,11 @@ def register_agreements_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_agreement",
-        description="create_agreement: POST /agreements\n\nCreate a terms-of-use agreement.",
+        description="create_agreement: POST /agreements
+
+
+
+Create a terms-of-use agreement.",
         tags={"agreements"},
     )
     async def create_agreement(
@@ -3914,7 +4527,11 @@ def register_agreements_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_agreement",
-        description="delete_agreement: DELETE /agreements/{id}\n\nDelete an agreement.",
+        description="delete_agreement: DELETE /agreements/{id}
+
+
+
+Delete an agreement.",
         tags={"agreements"},
     )
     async def delete_agreement(
@@ -3931,7 +4548,11 @@ def register_agreements_tools(mcp: FastMCP):
 def register_places_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_rooms",
-        description="list_rooms: GET /places/microsoft.graph.room\n\nList conference rooms.",
+        description="list_rooms: GET /places/microsoft.graph.room
+
+
+
+List conference rooms.",
         tags={"places"},
     )
     async def list_rooms(
@@ -3945,7 +4566,11 @@ def register_places_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_room_lists",
-        description="list_room_lists: GET /places/microsoft.graph.roomList\n\nList room lists.",
+        description="list_room_lists: GET /places/microsoft.graph.roomList
+
+
+
+List room lists.",
         tags={"places"},
     )
     async def list_room_lists(
@@ -3959,7 +4584,11 @@ def register_places_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_place",
-        description="get_place: GET /places/{id}\n\nGet a specific place (room or room list).",
+        description="get_place: GET /places/{id}
+
+
+
+Get a specific place (room or room list).",
         tags={"places"},
     )
     async def get_place(
@@ -3974,7 +4603,11 @@ def register_places_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="update_place",
-        description="update_place: PATCH /places/{id}\n\nUpdate a place (room).",
+        description="update_place: PATCH /places/{id}
+
+
+
+Update a place (room).",
         tags={"places"},
     )
     async def update_place(
@@ -3994,7 +4627,11 @@ def register_places_tools(mcp: FastMCP):
 def register_print_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_printers",
-        description="list_printers: GET /print/printers\n\nList printers registered in the tenant.",
+        description="list_printers: GET /print/printers
+
+
+
+List printers registered in the tenant.",
         tags={"print"},
     )
     async def list_printers(
@@ -4008,7 +4645,11 @@ def register_print_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_printer",
-        description="get_printer: GET /print/printers/{id}\n\nGet a specific printer.",
+        description="get_printer: GET /print/printers/{id}
+
+
+
+Get a specific printer.",
         tags={"print"},
     )
     async def get_printer(
@@ -4023,7 +4664,11 @@ def register_print_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_print_jobs",
-        description="list_print_jobs: GET /print/printers/{id}/jobs\n\nList print jobs for a printer.",
+        description="list_print_jobs: GET /print/printers/{id}/jobs
+
+
+
+List print jobs for a printer.",
         tags={"print"},
     )
     async def list_print_jobs(
@@ -4038,7 +4683,11 @@ def register_print_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_print_job",
-        description="create_print_job: POST /print/printers/{id}/jobs\n\nCreate a print job.",
+        description="create_print_job: POST /print/printers/{id}/jobs
+
+
+
+Create a print job.",
         tags={"print"},
     )
     async def create_print_job(
@@ -4056,7 +4705,11 @@ def register_print_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_print_shares",
-        description="list_print_shares: GET /print/shares\n\nList printer shares.",
+        description="list_print_shares: GET /print/shares
+
+
+
+List printer shares.",
         tags={"print"},
     )
     async def list_print_shares(
@@ -4072,7 +4725,11 @@ def register_print_tools(mcp: FastMCP):
 def register_privacy_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_subject_rights_requests",
-        description="list_subject_rights_requests: GET /privacy/subjectRightsRequests\n\nList subject rights requests (GDPR/CCPA).",
+        description="list_subject_rights_requests: GET /privacy/subjectRightsRequests
+
+
+
+List subject rights requests (GDPR/CCPA).",
         tags={"privacy"},
     )
     async def list_subject_rights_requests(
@@ -4086,7 +4743,11 @@ def register_privacy_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_subject_rights_request",
-        description="get_subject_rights_request: GET /privacy/subjectRightsRequests/{id}\n\nGet a specific subject rights request.",
+        description="get_subject_rights_request: GET /privacy/subjectRightsRequests/{id}
+
+
+
+Get a specific subject rights request.",
         tags={"privacy"},
     )
     async def get_subject_rights_request(
@@ -4103,7 +4764,11 @@ def register_privacy_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_subject_rights_request",
-        description="create_subject_rights_request: POST /privacy/subjectRightsRequests\n\nCreate a subject rights request.",
+        description="create_subject_rights_request: POST /privacy/subjectRightsRequests
+
+
+
+Create a subject rights request.",
         tags={"privacy"},
     )
     async def create_subject_rights_request(
@@ -4122,7 +4787,11 @@ def register_privacy_tools(mcp: FastMCP):
 def register_solutions_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_booking_businesses",
-        description="list_booking_businesses: GET /solutions/bookingBusinesses\n\nList booking businesses.",
+        description="list_booking_businesses: GET /solutions/bookingBusinesses
+
+
+
+List booking businesses.",
         tags={"solutions"},
     )
     async def list_booking_businesses(
@@ -4136,7 +4805,11 @@ def register_solutions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_booking_business",
-        description="get_booking_business: GET /solutions/bookingBusinesses/{id}\n\nGet a specific booking business.",
+        description="get_booking_business: GET /solutions/bookingBusinesses/{id}
+
+
+
+Get a specific booking business.",
         tags={"solutions"},
     )
     async def get_booking_business(
@@ -4151,7 +4824,11 @@ def register_solutions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_booking_appointments",
-        description="list_booking_appointments: GET /solutions/bookingBusinesses/{id}/appointments\n\nList appointments for a booking business.",
+        description="list_booking_appointments: GET /solutions/bookingBusinesses/{id}/appointments
+
+
+
+List appointments for a booking business.",
         tags={"solutions"},
     )
     async def list_booking_appointments(
@@ -4168,7 +4845,11 @@ def register_solutions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_booking_appointment",
-        description="create_booking_appointment: POST /solutions/bookingBusinesses/{id}/appointments\n\nCreate a booking appointment.",
+        description="create_booking_appointment: POST /solutions/bookingBusinesses/{id}/appointments
+
+
+
+Create a booking appointment.",
         tags={"solutions"},
     )
     async def create_booking_appointment(
@@ -4188,7 +4869,11 @@ def register_solutions_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_virtual_events",
-        description="list_virtual_events: GET /solutions/virtualEvents/townhalls\n\nList virtual event townhalls.",
+        description="list_virtual_events: GET /solutions/virtualEvents/townhalls
+
+
+
+List virtual event townhalls.",
         tags={"solutions"},
     )
     async def list_virtual_events(
@@ -4204,7 +4889,11 @@ def register_solutions_tools(mcp: FastMCP):
 def register_storage_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_file_storage_containers",
-        description="list_file_storage_containers: GET /storage/fileStorage/containers\n\nList file storage containers.",
+        description="list_file_storage_containers: GET /storage/fileStorage/containers
+
+
+
+List file storage containers.",
         tags={"storage"},
     )
     async def list_file_storage_containers(
@@ -4218,7 +4907,11 @@ def register_storage_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_file_storage_container",
-        description="get_file_storage_container: GET /storage/fileStorage/containers/{id}\n\nGet a specific file storage container.",
+        description="get_file_storage_container: GET /storage/fileStorage/containers/{id}
+
+
+
+Get a specific file storage container.",
         tags={"storage"},
     )
     async def get_file_storage_container(
@@ -4235,7 +4928,11 @@ def register_storage_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_file_storage_container",
-        description="create_file_storage_container: POST /storage/fileStorage/containers\n\nCreate a file storage container.",
+        description="create_file_storage_container: POST /storage/fileStorage/containers
+
+
+
+Create a file storage container.",
         tags={"storage"},
     )
     async def create_file_storage_container(
@@ -4254,7 +4951,11 @@ def register_storage_tools(mcp: FastMCP):
 def register_employee_experience_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_learning_providers",
-        description="list_learning_providers: GET /employeeExperience/learningProviders\n\nList learning providers.",
+        description="list_learning_providers: GET /employeeExperience/learningProviders
+
+
+
+List learning providers.",
         tags={"employee_experience"},
     )
     async def list_learning_providers(
@@ -4268,7 +4969,11 @@ def register_employee_experience_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_learning_provider",
-        description="get_learning_provider: GET /employeeExperience/learningProviders/{id}\n\nGet a specific learning provider.",
+        description="get_learning_provider: GET /employeeExperience/learningProviders/{id}
+
+
+
+Get a specific learning provider.",
         tags={"employee_experience"},
     )
     async def get_learning_provider(
@@ -4285,7 +4990,11 @@ def register_employee_experience_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="list_learning_course_activities",
-        description="list_learning_course_activities: GET /me/employeeExperience/learningCourseActivities\n\nList learning course activities for the current user.",
+        description="list_learning_course_activities: GET /me/employeeExperience/learningCourseActivities
+
+
+
+List learning course activities for the current user.",
         tags={"employee_experience"},
     )
     async def list_learning_course_activities(
@@ -4301,7 +5010,11 @@ def register_employee_experience_tools(mcp: FastMCP):
 def register_connections_tools(mcp: FastMCP):
     @mcp.tool(
         name="list_external_connections",
-        description="list_external_connections: GET /external/connections\n\nList Microsoft Search external connections.",
+        description="list_external_connections: GET /external/connections
+
+
+
+List Microsoft Search external connections.",
         tags={"connections"},
     )
     async def list_external_connections(
@@ -4315,7 +5028,11 @@ def register_connections_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="get_external_connection",
-        description="get_external_connection: GET /external/connections/{id}\n\nGet a specific external connection.",
+        description="get_external_connection: GET /external/connections/{id}
+
+
+
+Get a specific external connection.",
         tags={"connections"},
     )
     async def get_external_connection(
@@ -4332,7 +5049,11 @@ def register_connections_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="create_external_connection",
-        description="create_external_connection: POST /external/connections\n\nCreate an external connection for Microsoft Search.",
+        description="create_external_connection: POST /external/connections
+
+
+
+Create an external connection for Microsoft Search.",
         tags={"connections"},
     )
     async def create_external_connection(
@@ -4349,7 +5070,11 @@ def register_connections_tools(mcp: FastMCP):
 
     @mcp.tool(
         name="delete_external_connection",
-        description="delete_external_connection: DELETE /external/connections/{id}\n\nDelete an external connection.",
+        description="delete_external_connection: DELETE /external/connections/{id}
+
+
+
+Delete an external connection.",
         tags={"connections"},
     )
     async def delete_external_connection(
@@ -4498,8 +5223,9 @@ def get_mcp_instance() -> tuple[Any, Any, Any, Any]:
 
 def mcp_server() -> None:
     mcp, args, middlewares, registered_tags = get_mcp_instance()
-    print(f"{args.name or 'microsoft-agent'} MCP v{__version__}", file=sys.stderr)
-    print("\nStarting MCP Server", file=sys.stderr)
+    print(f"{'microsoft-agent'} MCP v{__version__}", file=sys.stderr)
+    print("
+Starting MCP Server", file=sys.stderr)
     print(f"  Transport: {args.transport.upper()}", file=sys.stderr)
     print(f"  Auth: {args.auth_type}", file=sys.stderr)
     print(f"  Dynamic Tags Loaded: {len(set(registered_tags))}", file=sys.stderr)
