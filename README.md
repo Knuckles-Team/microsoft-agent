@@ -163,7 +163,7 @@ stateDiagram-v2
   DomainNode --> [*]: Domain Result
 ```
 
-- **RouterNode**: A fast, lightweight LLM (e.g., `nvidia/nemotron-3-super`) that classifies the user's query into one of the specialized domains.
+- **RouterNode**: A fast, lightweight LLM (e.g., `google/gemma-4-31b`) that classifies the user's query into one of the specialized domains.
 - **DomainNode**: The executor node. For the selected domain, it dynamically sets environment variables to temporarily enable ONLY the tools relevant to that domain, creating a highly focused sub-agent (e.g., `gpt-4o`) to complete the request. This preserves LLM context and prevents tool hallucination.
 
 ## Usage
@@ -191,7 +191,7 @@ stateDiagram-v2
 | `--host`          | Host to bind the server to                                     | `0.0.0.0`                      |
 | `--port`          | Port to bind the server to                                     | `9000`                         |
 | `--provider`      | LLM Provider (openai, anthropic, google, huggingface)          | `openai`                       |
-| `--model-id`      | LLM Model ID                                                   | `nvidia/nemotron-3-super`           |
+| `--model-id`      | LLM Model ID                                                   | `google/gemma-4-31b`           |
 | `--mcp-url`       | MCP Server URL                                                 | `http://microsoft-agent:8000/mcp` |
 
 ### Examples
