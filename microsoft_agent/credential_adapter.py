@@ -17,9 +17,9 @@ class AuthManagerCredential(TokenCredential):
     def get_token(
         self,
         *scopes: str,
-        claims: Optional[str] = None,
-        tenant_id: Optional[str] = None,
-        **kwargs: Any,
+        _claims: Optional[str] = None,
+        _tenant_id: Optional[str] = None,
+        **_kwargs: Any,
     ) -> AccessToken:
 
         token_details = self.auth_manager.get_token_details()

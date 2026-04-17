@@ -1350,7 +1350,6 @@ class MicrosoftGraphApi:
         except Exception as e:
             print(f"Error uploading file content: {e}")
             return {"error": str(e)}
-            return {"error": str(e)}
 
     async def list_sites(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """List SharePoint sites."""
