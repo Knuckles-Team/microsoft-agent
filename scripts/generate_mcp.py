@@ -1,7 +1,8 @@
-import json
 import os
 import re
 import sys
+import json
+from pathlib import Path
 
 CATEGORIES = {
     "mail": ["mail", "message", "attachment", "folder", "draft"],
@@ -110,9 +111,26 @@ def generate_tool(endpoint):
 
 
 def main():
-    endpoints_path = "/home/genius/Workspace/microsoft-agent/ms-365-mcp-server-main/src/endpoints.json"
-    if not os.path.exists(endpoints_path):
-        print(f"Error: {endpoints_path} not found", file=sys.stderr)
+    # Try to find endpoints.json relative to the script or via environment variable
+    script_dir = Path(__file__).resolve().parent
+    env_path = os.environ.get("MICROSOFT_ENDPOINTS_JSON")
+    if env_path:
+        endpoints_path = Path(env_path)
+    else:
+        # Check standard locations
+        possible_paths = [
+            script_dir / "endpoints.json",
+            script_dir.parent / "src" / "endpoints.json",
+        ]
+        endpoints_path = next(
+            (p for p in possible_paths if p.exists()), possible_paths[0]
+        )
+
+    if not endpoints_path.exists():
+        print(
+            f"Error: endpoints.json not found. Set MICROSOFT_ENDPOINTS_JSON or place it at {endpoints_path}",
+            file=sys.stderr,
+        )
         return
 
     with open(endpoints_path, "r") as f:

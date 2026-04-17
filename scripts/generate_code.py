@@ -4,10 +4,11 @@ import glob
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-DOCS_DIR = os.path.abspath(
-    "/home/genius/Workspace/microsoft-agent/microsoft-documentation"
-)
-OUTPUT_DIR = os.path.abspath("/home/genius/Workspace/microsoft-agent/microsoft_agent")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
+
+DOCS_DIR = os.path.join(REPO_ROOT, "microsoft-documentation")
+OUTPUT_DIR = os.path.join(REPO_ROOT, "microsoft_agent")
 
 
 @dataclass
