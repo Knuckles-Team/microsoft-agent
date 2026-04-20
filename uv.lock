@@ -1828,7 +1828,7 @@ wheels = [
 
 [[package]]
 name = "microsoft-agent"
-version = "0.2.55"
+version = "0.2.56"
 source = { editable = "." }
 dependencies = [
     { name = "agent-utilities" },
