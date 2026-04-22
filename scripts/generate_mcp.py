@@ -75,7 +75,7 @@ def generate_tool(endpoint):
     )
     if "supportsTimezone" in endpoint:
         func_args.append(
-            'timezone: Optional[str] = Field(None, description="IANA timezone")'
+            'timezone: Optional[str] | None = Field(None, description="IANA timezone")'
         )
 
     timezone_logic = ""

@@ -1,5 +1,6 @@
 import os
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 from msgraph import GraphServiceClient
 from msgraph.generated.users.users_request_builder import UsersRequestBuilder
 
@@ -90,11 +91,11 @@ class MicrosoftGraphApi:
             return f"Authenticated as {username}"
         return "Not authenticated."
 
-    def list_accounts(self) -> List[Dict[str, Any]]:
+    def list_accounts(self) -> list[dict[str, Any]]:
         """List accounts."""
         return self.auth_manager.list_accounts()
 
-    def search_tools(self, query: str, limit: int = 10) -> List[str]:
+    def search_tools(self, query: str, limit: int = 10) -> list[str]:
         """Search methods in this class."""
 
         matches = []
@@ -107,7 +108,7 @@ class MicrosoftGraphApi:
                 break
         return matches
 
-    async def list_mail_messages(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_mail_messages(self, params: dict | None = None) -> dict[str, Any]:
         """List mail messages."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -147,7 +148,7 @@ class MicrosoftGraphApi:
             print(f"Error listing messages: {e}")
             return {"error": str(e)}
 
-    async def list_mail_folders(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_mail_folders(self, params: dict | None = None) -> dict[str, Any]:
         """List mail folders."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -183,8 +184,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_mail_folder_messages(
-        self, mailFolder_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, mailFolder_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List messages in a specific folder."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -220,8 +221,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_mail_message(
-        self, message_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -252,7 +253,7 @@ class MicrosoftGraphApi:
             print(f"Error getting message: {e}")
             return {"error": str(e)}
 
-    async def get_me(self) -> Dict[str, Any]:
+    async def get_me(self) -> dict[str, Any]:
         """Get the current user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -271,20 +272,19 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def send_mail(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Send mail."""
+        from msgraph.generated.models.body_type import BodyType
+        from msgraph.generated.models.email_address import EmailAddress
+        from msgraph.generated.models.item_body import ItemBody
+        from msgraph.generated.models.message import Message
+        from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.users.item.send_mail.send_mail_post_request_body import (
             SendMailPostRequestBody,
         )
-        from msgraph.generated.models.message import Message
-        from msgraph.generated.models.item_body import ItemBody
-        from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.recipient import Recipient
-        from msgraph.generated.models.email_address import EmailAddress
 
         try:
-
             request_body = SendMailPostRequestBody()
             message = Message()
 
@@ -322,16 +322,16 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_draft_email(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create draft email."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.message import Message
-        from msgraph.generated.models.item_body import ItemBody
         from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.models.email_address import EmailAddress
+        from msgraph.generated.models.item_body import ItemBody
+        from msgraph.generated.models.message import Message
+        from msgraph.generated.models.recipient import Recipient
 
         try:
             message = Message()
@@ -373,7 +373,7 @@ class MicrosoftGraphApi:
             print(f"Error creating draft: {e}")
             return {"error": str(e)}
 
-    async def list_users(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_users(self, params: dict | None = None) -> dict[str, Any]:
         """List users."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -413,8 +413,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_mail_message(
-        self, message_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a message."""
         try:
             await self.client.me.messages.by_message_id(message_id).delete()
@@ -423,8 +423,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def move_mail_message(
-        self, message_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Move a message to a folder."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -454,8 +454,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_mail_message(
-        self, message_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -482,16 +482,17 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def add_mail_attachment(
-        self, message_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Add attachment to message."""
+        import base64
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.file_attachment import FileAttachment
         from msgraph.generated.users.item.messages.item.attachments.attachments_request_builder import (
             AttachmentsRequestBuilder,
         )
-        import base64
 
         try:
             attachment = FileAttachment()
@@ -515,8 +516,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_mail_attachments(
-        self, message_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List attachments."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -546,8 +547,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_mail_attachment(
-        self, message_id: str, attachment_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, attachment_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get attachment."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -556,9 +557,7 @@ class MicrosoftGraphApi:
         )
 
         try:
-            query_params = (
-                AttachmentItemRequestBuilder.AttachmentItemRequestBuilderGetQueryParameters()
-            )
+            query_params = AttachmentItemRequestBuilder.AttachmentItemRequestBuilderGetQueryParameters()
             if params:
                 if "$select" in params:
                     query_params.select = params["$select"].split(",")
@@ -579,21 +578,23 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_mail_attachment(
-        self, message_id: str, attachment_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, attachment_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete attachment."""
         try:
-            await self.client.me.messages.by_message_id(
-                message_id
-            ).attachments.by_attachment_id(attachment_id).delete()
+            await (
+                self.client.me.messages.by_message_id(message_id)
+                .attachments.by_attachment_id(attachment_id)
+                .delete()
+            )
             return {"status": "success"}
         except Exception as e:
             print(f"Error deleting attachment: {e}")
             return {"error": str(e)}
 
     async def list_shared_mailbox_messages(
-        self, user_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List messages in a shared mailbox."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -631,8 +632,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_shared_mailbox_folder_messages(
-        self, user_id: str, mailFolder_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, mailFolder_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List messages in a shared mailbox folder."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -672,8 +673,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_shared_mailbox_message(
-        self, user_id: str, message_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, message_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a message from a shared mailbox."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -705,17 +706,17 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def send_shared_mailbox_mail(
-        self, user_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Send mail from a shared mailbox."""
+        from msgraph.generated.models.body_type import BodyType
+        from msgraph.generated.models.email_address import EmailAddress
+        from msgraph.generated.models.item_body import ItemBody
+        from msgraph.generated.models.message import Message
+        from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.users.item.send_mail.send_mail_post_request_body import (
             SendMailPostRequestBody,
         )
-        from msgraph.generated.models.message import Message
-        from msgraph.generated.models.item_body import ItemBody
-        from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.recipient import Recipient
-        from msgraph.generated.models.email_address import EmailAddress
 
         try:
             request_body = SendMailPostRequestBody()
@@ -756,8 +757,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_calendar_events(
-        self, params: Optional[Dict] = None, timezone: Optional[str] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None, timezone: str | None = None
+    ) -> dict[str, Any]:
         """List calendar events."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -796,9 +797,9 @@ class MicrosoftGraphApi:
     async def get_calendar_event(
         self,
         event_id: str,
-        params: Optional[Dict] = None,
-        timezone: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        params: dict | None = None,
+        timezone: str | None = None,
+    ) -> dict[str, Any]:
         """Get calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -833,15 +834,15 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_calendar_event(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.event import Event
-        from msgraph.generated.models.item_body import ItemBody
         from msgraph.generated.models.body_type import BodyType
         from msgraph.generated.models.date_time_time_zone import DateTimeTimeZone
+        from msgraph.generated.models.event import Event
+        from msgraph.generated.models.item_body import ItemBody
 
         try:
             event = Event()
@@ -887,8 +888,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_calendar_event(
-        self, event_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, event_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -915,8 +916,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_calendar_event(
-        self, event_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, event_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete calendar event."""
         try:
             await self.client.me.events.by_event_id(event_id).delete()
@@ -925,7 +926,7 @@ class MicrosoftGraphApi:
             print(f"Error deleting event: {e}")
             return {"error": str(e)}
 
-    async def list_calendars(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_calendars(self, params: dict | None = None) -> dict[str, Any]:
         """List calendars."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -957,8 +958,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_calendar_view(
-        self, params: Optional[Dict] = None, timezone: Optional[str] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None, timezone: str | None = None
+    ) -> dict[str, Any]:
         """Get calendar view."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -967,9 +968,7 @@ class MicrosoftGraphApi:
         )
 
         try:
-            query_params = (
-                CalendarViewRequestBuilder.CalendarViewRequestBuilderGetQueryParameters()
-            )
+            query_params = CalendarViewRequestBuilder.CalendarViewRequestBuilderGetQueryParameters()
             if params:
                 if "startDateTime" in params:
                     query_params.start_date_time = params["startDateTime"]
@@ -997,9 +996,9 @@ class MicrosoftGraphApi:
     async def list_specific_calendar_events(
         self,
         calendar_id: str,
-        params: Optional[Dict] = None,
-        timezone: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        params: dict | None = None,
+        timezone: str | None = None,
+    ) -> dict[str, Any]:
         """List events for a specific calendar."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1039,9 +1038,9 @@ class MicrosoftGraphApi:
         self,
         calendar_id: str,
         event_id: str,
-        params: Optional[Dict] = None,
-        timezone: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        params: dict | None = None,
+        timezone: str | None = None,
+    ) -> dict[str, Any]:
         """Get specific calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1078,8 +1077,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_specific_calendar_event(
-        self, calendar_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, calendar_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create specific calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1109,9 +1108,9 @@ class MicrosoftGraphApi:
         self,
         calendar_id: str,
         event_id: str,
-        data: Dict[str, Any],
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any],
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Update specific calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1142,21 +1141,23 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_specific_calendar_event(
-        self, calendar_id: str, event_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, calendar_id: str, event_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete specific calendar event."""
         try:
-            await self.client.me.calendars.by_calendar_id(
-                calendar_id
-            ).events.by_event_id(event_id).delete()
+            await (
+                self.client.me.calendars.by_calendar_id(calendar_id)
+                .events.by_event_id(event_id)
+                .delete()
+            )
             return {"status": "success"}
         except Exception as e:
             print(f"Error deleting specific calendar event: {e}")
             return {"error": str(e)}
 
     async def find_meeting_times(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Find meeting times."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1184,7 +1185,7 @@ class MicrosoftGraphApi:
             print(f"Error finding meeting times: {e}")
             return {"error": str(e)}
 
-    async def list_drives(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_drives(self, params: dict | None = None) -> dict[str, Any]:
         """List drives."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1214,8 +1215,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_drive_root_item(
-        self, drive_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get drive root item."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1238,14 +1239,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_root_folder(
-        self, drive_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Alias for get_drive_root_item."""
         return await self.get_drive_root_item(drive_id, params)
 
     async def list_folder_files(
-        self, drive_id: str, driveItem_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, driveItem_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List folder files."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1279,11 +1280,10 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def download_onedrive_file_content(
-        self, drive_id: str, driveItem_id: str, params: Optional[Dict] = None
+        self, drive_id: str, driveItem_id: str, params: dict | None = None
     ) -> Any:
         """Download file content."""
         try:
-
             response = (
                 await self.client.drives.by_drive_id(drive_id)
                 .items.by_drive_item_id(driveItem_id)
@@ -1300,13 +1300,15 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_onedrive_file(
-        self, drive_id: str, driveItem_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, driveItem_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete file."""
         try:
-            await self.client.drives.by_drive_id(drive_id).items.by_drive_item_id(
-                driveItem_id
-            ).delete()
+            await (
+                self.client.drives.by_drive_id(drive_id)
+                .items.by_drive_item_id(driveItem_id)
+                .delete()
+            )
             return {"status": "success"}
         except Exception as e:
             print(f"Error deleting file: {e}")
@@ -1316,13 +1318,14 @@ class MicrosoftGraphApi:
         self,
         drive_id: str,
         driveItem_id: str,
-        data: Dict[str, Any],
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any],
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Upload file content."""
+        import base64
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        import base64
 
         try:
             content_bytes = data.get("contentBytes")
@@ -1351,7 +1354,7 @@ class MicrosoftGraphApi:
             print(f"Error uploading file content: {e}")
             return {"error": str(e)}
 
-    async def list_sites(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_sites(self, params: dict | None = None) -> dict[str, Any]:
         """List SharePoint sites."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1379,8 +1382,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_site(
-        self, site_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, site_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get SharePoint site."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1403,8 +1406,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_site_drives(
-        self, site_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, site_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List drives for a SharePoint site."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1434,8 +1437,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_site_lists(
-        self, site_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, site_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List lists for a SharePoint site."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1465,8 +1468,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_site_list(
-        self, site_id: str, list_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, site_id: str, list_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a SharePoint site list."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1493,8 +1496,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_excel_workbook(
-        self, drive_id: str, item_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, item_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Excel workbook."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1521,8 +1524,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_excel_worksheets(
-        self, drive_id: str, item_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, item_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List Excel worksheets."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1558,8 +1561,8 @@ class MicrosoftGraphApi:
         drive_id: str,
         item_id: str,
         worksheet_id: str,
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Get Excel worksheet."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1588,8 +1591,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_excel_tables(
-        self, drive_id: str, item_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, item_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List Excel tables."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1621,8 +1624,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_excel_table(
-        self, drive_id: str, item_id: str, table_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, drive_id: str, item_id: str, table_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Excel table."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1651,8 +1654,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_onenote_notebook_sections(
-        self, notebook_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, notebook_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List Onenote notebook sections."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1675,8 +1678,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_onenote_section_pages(
-        self, onenoteSection_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, onenoteSection_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List Onenote section pages."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1701,7 +1704,7 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_onenote_page_content(
-        self, onenotePage_id: str, params: Optional[Dict] = None
+        self, onenotePage_id: str, params: dict | None = None
     ) -> Any:
         """Get Onenote page content."""
         try:
@@ -1716,14 +1719,13 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_onenote_page(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create Onenote page."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-
             html_content = data.get("content", "")
 
             request_config = (
@@ -1742,9 +1744,7 @@ class MicrosoftGraphApi:
             print(f"Error creating onenote page: {e}")
             return {"error": str(e)}
 
-    async def list_todo_task_lists(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_todo_task_lists(self, params: dict | None = None) -> dict[str, Any]:
         """List Todo task lists."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1765,8 +1765,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_todo_tasks(
-        self, todoTaskList_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, todoTaskList_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List Todo tasks."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1789,8 +1789,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_todo_task(
-        self, todoTaskList_id: str, todoTask_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, todoTaskList_id: str, todoTask_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Todo task."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1817,8 +1817,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_todo_task(
-        self, todoTaskList_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, todoTaskList_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create Todo task."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1848,9 +1848,9 @@ class MicrosoftGraphApi:
         self,
         todoTaskList_id: str,
         todoTask_id: str,
-        data: Dict[str, Any],
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any],
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Update Todo task."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1881,19 +1881,21 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_todo_task(
-        self, todoTaskList_id: str, todoTask_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, todoTaskList_id: str, todoTask_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete Todo task."""
         try:
-            await self.client.me.todo.lists.by_todo_task_list_id(
-                todoTaskList_id
-            ).tasks.by_todo_task_id(todoTask_id).delete()
+            await (
+                self.client.me.todo.lists.by_todo_task_list_id(todoTaskList_id)
+                .tasks.by_todo_task_id(todoTask_id)
+                .delete()
+            )
             return {"status": "success"}
         except Exception as e:
             print(f"Error deleting todo task: {e}")
             return {"error": str(e)}
 
-    async def list_planner_tasks(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_planner_tasks(self, params: dict | None = None) -> dict[str, Any]:
         """List Planner tasks."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1914,8 +1916,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_planner_plan(
-        self, plannerPlan_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, plannerPlan_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Planner plan."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1938,8 +1940,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_plan_tasks(
-        self, plannerPlan_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, plannerPlan_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List tasks for a Planner plan."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1962,8 +1964,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_planner_task(
-        self, plannerTask_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, plannerTask_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Planner task."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -1986,8 +1988,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_planner_task(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create Planner task."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2013,8 +2015,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_planner_task(
-        self, plannerTask_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, plannerTask_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update Planner task."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2041,8 +2043,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_planner_task_details(
-        self, plannerTask_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, plannerTask_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update Planner task details."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2068,9 +2070,7 @@ class MicrosoftGraphApi:
             print(f"Error updating planner task details: {e}")
             return {"error": str(e)}
 
-    async def list_outlook_contacts(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_outlook_contacts(self, params: dict | None = None) -> dict[str, Any]:
         """List Outlook contacts."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2091,8 +2091,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_outlook_contact(
-        self, contact_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, contact_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Outlook contact."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2115,8 +2115,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_outlook_contact(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create Outlook contact."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2150,8 +2150,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_outlook_contact(
-        self, contact_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, contact_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update Outlook contact."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2179,8 +2179,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_outlook_contact(
-        self, contact_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, contact_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete Outlook contact."""
         try:
             await self.client.me.contacts.by_contact_id(contact_id).delete()
@@ -2189,11 +2189,11 @@ class MicrosoftGraphApi:
             print(f"Error deleting outlook contact: {e}")
             return {"error": str(e)}
 
-    async def get_current_user(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def get_current_user(self, params: dict | None = None) -> dict[str, Any]:
         """Get current user (alias for get_me)."""
         return await self.get_me()
 
-    async def list_chats(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_chats(self, params: dict | None = None) -> dict[str, Any]:
         """List user chats."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2214,8 +2214,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_chat(
-        self, chat_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, chat_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get chat."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2238,8 +2238,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_chat_messages(
-        self, chat_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, chat_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List chat messages."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2262,8 +2262,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_chat_message(
-        self, chat_id: str, chatMessage_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, chat_id: str, chatMessage_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get chat message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2290,8 +2290,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def send_chat_message(
-        self, chat_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, chat_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Send chat message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2320,7 +2320,7 @@ class MicrosoftGraphApi:
             print(f"Error sending chat message: {e}")
             return {"error": str(e)}
 
-    async def list_joined_teams(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_joined_teams(self, params: dict | None = None) -> dict[str, Any]:
         """List joined teams."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2341,8 +2341,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_team(
-        self, team_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, team_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get team."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2365,8 +2365,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_team_channels(
-        self, team_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, team_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List team channels."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2389,8 +2389,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_team_channel(
-        self, team_id: str, channel_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, team_id: str, channel_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get team channel."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2417,8 +2417,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_channel_messages(
-        self, team_id: str, channel_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, team_id: str, channel_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List channel messages."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2449,8 +2449,8 @@ class MicrosoftGraphApi:
         team_id: str,
         channel_id: str,
         chatMessage_id: str,
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Get channel message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2482,9 +2482,9 @@ class MicrosoftGraphApi:
         self,
         team_id: str,
         channel_id: str,
-        data: Dict[str, Any],
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any],
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Send channel message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2518,8 +2518,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_team_members(
-        self, team_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, team_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List team members."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2542,8 +2542,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_chat_message_replies(
-        self, chat_id: str, chatMessage_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, chat_id: str, chatMessage_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List chat message replies."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2573,9 +2573,9 @@ class MicrosoftGraphApi:
         self,
         chat_id: str,
         chatMessage_id: str,
-        data: Dict[str, Any],
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any],
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Reply to a chat message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2609,14 +2609,13 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_sharepoint_site_by_path(
-        self, site_id: str, path: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, site_id: str, path: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get SharePoint site by path."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-
             request_config = (
                 self.client.sites.by_site_id(site_id)
                 .get_by_path(path)
@@ -2638,8 +2637,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_sharepoint_sites_delta(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get SharePoint sites delta."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2660,8 +2659,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def search_query(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Search query."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2670,7 +2669,6 @@ class MicrosoftGraphApi:
         )
 
         try:
-
             body = QueryPostRequestBody()
 
             request_config = self.client.search.query.to_post_request_configuration()
@@ -2688,8 +2686,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_sharepoint_site_list_items(
-        self, site_id: str, list_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, site_id: str, list_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List items in a SharePoint site list."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2720,8 +2718,8 @@ class MicrosoftGraphApi:
         site_id: str,
         list_id: str,
         listItem_id: str,
-        params: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        params: dict | None = None,
+    ) -> dict[str, Any]:
         """Get an item in a SharePoint site list."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2749,7 +2747,7 @@ class MicrosoftGraphApi:
             print(f"Error getting site list item: {e}")
             return {"error": str(e)}
 
-    async def list_groups(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_groups(self, params: dict | None = None) -> dict[str, Any]:
         """List all Microsoft 365 groups and security groups."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2792,8 +2790,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_group(
-        self, group_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific group."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2815,8 +2813,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_group(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a new group."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2847,8 +2845,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_group(
-        self, group_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a group."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2878,8 +2876,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_group(
-        self, group_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a group."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2901,8 +2899,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_group_members(
-        self, group_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List group members."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2924,8 +2922,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def add_group_member(
-        self, group_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Add a member to a group."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2953,8 +2951,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def remove_group_member(
-        self, group_id: str, member_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, member_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Remove a member from a group."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -2980,8 +2978,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_group_owners(
-        self, group_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List group owners."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3003,8 +3001,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_group_conversations(
-        self, group_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List group conversations."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3026,8 +3024,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_group_drives(
-        self, group_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, group_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List group drives."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3048,17 +3046,13 @@ class MicrosoftGraphApi:
             print(f"Error listing group drives: {e}")
             return {"error": str(e)}
 
-    async def list_service_health(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_service_health(self, params: dict | None = None) -> dict[str, Any]:
         """List service health overviews."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.admin.service_announcement.health_overviews.to_get_request_configuration()
-            )
+            request_config = self.client.admin.service_announcement.health_overviews.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -3074,8 +3068,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_service_health(
-        self, service_name: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, service_name: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get service health for a specific service."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3089,9 +3083,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.admin.service_announcement.health_overviews.by_service_health_id(
                 service_name
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -3099,16 +3091,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_service_health_issues(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List service health issues."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.admin.service_announcement.issues.to_get_request_configuration()
-            )
+            request_config = self.client.admin.service_announcement.issues.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -3122,8 +3112,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_service_health_issue(
-        self, issue_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, issue_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific service health issue."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3137,9 +3127,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.admin.service_announcement.issues.by_service_health_issue_id(
                 issue_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -3147,16 +3135,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_service_update_messages(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List service update messages."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.admin.service_announcement.messages.to_get_request_configuration()
-            )
+            request_config = self.client.admin.service_announcement.messages.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -3170,8 +3156,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_service_update_message(
-        self, message_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, message_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific service update message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3185,18 +3171,14 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.admin.service_announcement.messages.by_service_update_message_id(
                 message_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
             print(f"Error getting service update message: {e}")
             return {"error": str(e)}
 
-    async def get_admin_sharepoint(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def get_admin_sharepoint(self, params: dict | None = None) -> dict[str, Any]:
         """Get SharePoint admin settings."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3216,8 +3198,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_admin_sharepoint(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update SharePoint admin settings."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3240,7 +3222,7 @@ class MicrosoftGraphApi:
             print(f"Error updating admin sharepoint: {e}")
             return {"error": str(e)}
 
-    async def list_organization(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_organization(self, params: dict | None = None) -> dict[str, Any]:
         """List organization properties."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3260,8 +3242,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_organization(
-        self, org_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, org_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get organization by ID."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3283,8 +3265,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_organization(
-        self, org_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, org_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update organization properties."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3310,8 +3292,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_org_branding(
-        self, org_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, org_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get organization branding."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3333,8 +3315,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_org_branding(
-        self, org_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, org_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update organization branding."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3361,7 +3343,7 @@ class MicrosoftGraphApi:
             print(f"Error updating org branding: {e}")
             return {"error": str(e)}
 
-    async def list_domains(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_domains(self, params: dict | None = None) -> dict[str, Any]:
         """List tenant domains."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3381,8 +3363,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_domain(
-        self, domain_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, domain_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get domain details."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3404,8 +3386,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_domain(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Add a domain to the tenant."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3428,8 +3410,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_domain(
-        self, domain_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, domain_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a domain."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3451,8 +3433,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def verify_domain(
-        self, domain_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, domain_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Verify domain ownership."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3474,8 +3456,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_domain_service_configuration_records(
-        self, domain_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, domain_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List domain service configuration DNS records."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3496,7 +3478,7 @@ class MicrosoftGraphApi:
             print(f"Error listing domain service configuration records: {e}")
             return {"error": str(e)}
 
-    async def list_subscriptions(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_subscriptions(self, params: dict | None = None) -> dict[str, Any]:
         """List active webhook subscriptions."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3516,8 +3498,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_subscription(
-        self, subscription_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, subscription_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific subscription."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3539,10 +3521,11 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_subscription(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a subscription for change notifications."""
         import datetime
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.subscription import Subscription
@@ -3572,10 +3555,11 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_subscription(
-        self, subscription_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, subscription_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update/renew a subscription."""
         import datetime
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.subscription import Subscription
@@ -3603,8 +3587,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_subscription(
-        self, subscription_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, subscription_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a subscription."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3625,9 +3609,7 @@ class MicrosoftGraphApi:
             print(f"Error deleting subscription: {e}")
             return {"error": str(e)}
 
-    async def list_online_meetings(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_online_meetings(self, params: dict | None = None) -> dict[str, Any]:
         """List online meetings for the current user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3649,8 +3631,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_online_meeting(
-        self, meeting_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, meeting_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific online meeting."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3672,10 +3654,11 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_online_meeting(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a new online meeting."""
         import datetime
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.online_meeting import OnlineMeeting
@@ -3708,10 +3691,11 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_online_meeting(
-        self, meeting_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, meeting_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update an online meeting."""
         import datetime
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.online_meeting import OnlineMeeting
@@ -3744,8 +3728,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_online_meeting(
-        self, meeting_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, meeting_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete an online meeting."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3766,7 +3750,7 @@ class MicrosoftGraphApi:
             print(f"Error deleting online meeting: {e}")
             return {"error": str(e)}
 
-    async def list_call_records(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_call_records(self, params: dict | None = None) -> dict[str, Any]:
         """List call records."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3788,8 +3772,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_call_record(
-        self, call_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, call_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific call record."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3812,7 +3796,7 @@ class MicrosoftGraphApi:
             print(f"Error getting call record: {e}")
             return {"error": str(e)}
 
-    async def list_presences(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_presences(self, params: dict | None = None) -> dict[str, Any]:
         """List presence information for users."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3834,8 +3818,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_presence(
-        self, user_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get presence for a specific user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3856,7 +3840,7 @@ class MicrosoftGraphApi:
             print(f"Error getting presence: {e}")
             return {"error": str(e)}
 
-    async def get_my_presence(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def get_my_presence(self, params: dict | None = None) -> dict[str, Any]:
         """Get current user's presence."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3876,8 +3860,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_invitation(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create an invitation for a guest user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3906,9 +3890,7 @@ class MicrosoftGraphApi:
             print(f"Error creating invitation: {e}")
             return {"error": str(e)}
 
-    async def list_security_alerts(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_security_alerts(self, params: dict | None = None) -> dict[str, Any]:
         """List security alerts (v2)."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3930,8 +3912,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_security_alert(
-        self, alert_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, alert_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific security alert."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3953,8 +3935,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_security_alert(
-        self, alert_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, alert_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a security alert (e.g. change status, assign)."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -3986,8 +3968,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_security_incidents(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List security incidents."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4009,8 +3991,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_security_incident(
-        self, incident_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, incident_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific security incident."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4032,8 +4014,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_security_incident(
-        self, incident_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, incident_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a security incident."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4064,7 +4046,7 @@ class MicrosoftGraphApi:
             print(f"Error updating security incident: {e}")
             return {"error": str(e)}
 
-    async def list_secure_scores(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_secure_scores(self, params: dict | None = None) -> dict[str, Any]:
         """List secure scores."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4086,16 +4068,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_threat_intelligence_hosts(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List threat intelligence hosts."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.security.threat_intelligence.hosts.to_get_request_configuration()
-            )
+            request_config = self.client.security.threat_intelligence.hosts.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4109,8 +4089,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_threat_intelligence_host(
-        self, host_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, host_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific threat intelligence host."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4134,8 +4114,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def run_hunting_query(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Run an advanced hunting query."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4146,9 +4126,7 @@ class MicrosoftGraphApi:
         try:
             body = RunHuntingQueryPostRequestBody()
             body.query = data.get("query")
-            request_config = (
-                self.client.security.microsoft_graph_security_run_hunting_query.to_post_request_configuration()
-            )
+            request_config = self.client.security.microsoft_graph_security_run_hunting_query.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4161,9 +4139,7 @@ class MicrosoftGraphApi:
             print(f"Error running hunting query: {e}")
             return {"error": str(e)}
 
-    async def list_directory_audits(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_directory_audits(self, params: dict | None = None) -> dict[str, Any]:
         """List directory audit logs."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4185,8 +4161,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_directory_audit(
-        self, audit_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, audit_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific directory audit entry."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4211,7 +4187,7 @@ class MicrosoftGraphApi:
             print(f"Error getting directory audit: {e}")
             return {"error": str(e)}
 
-    async def list_sign_in_logs(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_sign_in_logs(self, params: dict | None = None) -> dict[str, Any]:
         """List sign-in logs."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4233,8 +4209,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_sign_in_log(
-        self, sign_in_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, sign_in_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific sign-in log entry."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4256,8 +4232,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_provisioning_logs(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List provisioning logs."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4279,8 +4255,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_email_activity_report(
-        self, period: str = "D7", params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, period: str = "D7", params: dict | None = None
+    ) -> dict[str, Any]:
         """Get email activity user detail report."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4306,8 +4282,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_mailbox_usage_report(
-        self, period: str = "D7", params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, period: str = "D7", params: dict | None = None
+    ) -> dict[str, Any]:
         """Get mailbox usage detail report."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4331,8 +4307,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_office365_active_users(
-        self, period: str = "D7", params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, period: str = "D7", params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Office 365 active user detail report."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4358,8 +4334,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_sharepoint_activity_report(
-        self, period: str = "D7", params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, period: str = "D7", params: dict | None = None
+    ) -> dict[str, Any]:
         """Get SharePoint activity user detail report."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4375,9 +4351,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.reports.get_share_point_activity_user_detail_with_period(
                 period
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
@@ -4385,8 +4359,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_teams_user_activity(
-        self, period: str = "D7", params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, period: str = "D7", params: dict | None = None
+    ) -> dict[str, Any]:
         """Get Teams user activity detail report."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4402,9 +4376,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.reports.get_teams_user_activity_user_detail_with_period(
                 period
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
@@ -4412,8 +4384,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_onedrive_usage_report(
-        self, period: str = "D7", params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, period: str = "D7", params: dict | None = None
+    ) -> dict[str, Any]:
         """Get OneDrive usage account detail report."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4429,16 +4401,14 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.reports.get_one_drive_usage_account_detail_with_period(
                 period
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
             print(f"Error getting OneDrive usage report: {e}")
             return {"error": str(e)}
 
-    async def list_applications(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_applications(self, params: dict | None = None) -> dict[str, Any]:
         """List app registrations."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4458,8 +4428,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_application(
-        self, app_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, app_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific application."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4481,8 +4451,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_application(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create an application registration."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4508,8 +4478,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_application(
-        self, app_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, app_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update an application."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4535,8 +4505,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_application(
-        self, app_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, app_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete an application."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4558,8 +4528,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def add_application_password(
-        self, app_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, app_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Add a password credential to an application."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4590,10 +4560,11 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def remove_application_password(
-        self, app_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, app_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Remove a password credential from an application."""
         import uuid
+
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.applications.item.remove_password.remove_password_post_request_body import (
@@ -4619,8 +4590,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_service_principals(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List service principals."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4642,8 +4613,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_service_principal(
-        self, sp_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, sp_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific service principal."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4667,8 +4638,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_service_principal(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a service principal."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4695,8 +4666,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_service_principal(
-        self, sp_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, sp_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a service principal."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4724,8 +4695,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_service_principal(
-        self, sp_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, sp_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a service principal."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4749,16 +4720,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_conditional_access_policies(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List conditional access policies."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.identity.conditional_access.policies.to_get_request_configuration()
-            )
+            request_config = self.client.identity.conditional_access.policies.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4774,8 +4743,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_conditional_access_policy(
-        self, policy_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, policy_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific conditional access policy."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4789,9 +4758,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.identity.conditional_access.policies.by_conditional_access_policy_id(
                 policy_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -4799,8 +4766,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_conditional_access_policy(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a conditional access policy."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4814,9 +4781,7 @@ class MicrosoftGraphApi:
                 policy.display_name = data["displayName"]
             if "state" in data:
                 policy.state = data["state"]
-            request_config = (
-                self.client.identity.conditional_access.policies.to_post_request_configuration()
-            )
+            request_config = self.client.identity.conditional_access.policies.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4832,8 +4797,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_conditional_access_policy(
-        self, policy_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, policy_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a conditional access policy."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4855,9 +4820,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.identity.conditional_access.policies.by_conditional_access_policy_id(
                 policy_id
-            ).patch(
-                policy, request_configuration=request_config
-            )
+            ).patch(policy, request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -4865,8 +4828,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_conditional_access_policy(
-        self, policy_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, policy_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a conditional access policy."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4880,26 +4843,20 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.identity.conditional_access.policies.by_conditional_access_policy_id(
                 policy_id
-            ).delete(
-                request_configuration=request_config
-            )
+            ).delete(request_configuration=request_config)
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
             print(f"Error deleting conditional access policy: {e}")
             return {"error": str(e)}
 
-    async def list_access_reviews(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_access_reviews(self, params: dict | None = None) -> dict[str, Any]:
         """List access review definitions."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.identity_governance.access_reviews.definitions.to_get_request_configuration()
-            )
+            request_config = self.client.identity_governance.access_reviews.definitions.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4915,8 +4872,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_access_review(
-        self, review_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, review_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific access review definition."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -4930,9 +4887,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.identity_governance.access_reviews.definitions.by_access_review_schedule_definition_id(
                 review_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -4940,16 +4895,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_entitlement_access_packages(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List entitlement management access packages."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.identity_governance.entitlement_management.access_packages.to_get_request_configuration()
-            )
+            request_config = self.client.identity_governance.entitlement_management.access_packages.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4963,16 +4916,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_lifecycle_workflows(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List lifecycle management workflows."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.identity_governance.lifecycle_workflows.workflows.to_get_request_configuration()
-            )
+            request_config = self.client.identity_governance.lifecycle_workflows.workflows.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -4987,17 +4938,13 @@ class MicrosoftGraphApi:
             print(f"Error listing lifecycle workflows: {e}")
             return {"error": str(e)}
 
-    async def list_risk_detections(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_risk_detections(self, params: dict | None = None) -> dict[str, Any]:
         """List risk detections."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.identity_protection.risk_detections.to_get_request_configuration()
-            )
+            request_config = self.client.identity_protection.risk_detections.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5011,8 +4958,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_risk_detection(
-        self, risk_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, risk_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific risk detection."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5028,24 +4975,20 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.identity_protection.risk_detections.by_risk_detection_id(
                 risk_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
             print(f"Error getting risk detection: {e}")
             return {"error": str(e)}
 
-    async def list_risky_users(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_risky_users(self, params: dict | None = None) -> dict[str, Any]:
         """List risky users."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.identity_protection.risky_users.to_get_request_configuration()
-            )
+            request_config = self.client.identity_protection.risky_users.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5059,8 +5002,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_risky_user(
-        self, user_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific risky user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5086,8 +5029,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def dismiss_risky_user(
-        self, user_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Dismiss a risky user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5098,9 +5041,7 @@ class MicrosoftGraphApi:
         try:
             body = DismissPostRequestBody()
             body.user_ids = [user_id]
-            request_config = (
-                self.client.identity_protection.risky_users.dismiss.to_post_request_configuration()
-            )
+            request_config = self.client.identity_protection.risky_users.dismiss.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5116,8 +5057,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_directory_objects(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List directory objects."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5139,8 +5080,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_directory_object(
-        self, object_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, object_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific directory object."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5163,9 +5104,7 @@ class MicrosoftGraphApi:
             print(f"Error getting directory object: {e}")
             return {"error": str(e)}
 
-    async def list_directory_roles(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_directory_roles(self, params: dict | None = None) -> dict[str, Any]:
         """List directory roles."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5185,8 +5124,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_directory_role(
-        self, role_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, role_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific directory role."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5208,8 +5147,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_directory_role_templates(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List directory role templates."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5230,7 +5169,7 @@ class MicrosoftGraphApi:
             print(f"Error listing directory role templates: {e}")
             return {"error": str(e)}
 
-    async def list_deleted_items(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_deleted_items(self, params: dict | None = None) -> dict[str, Any]:
         """List deleted directory items."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5252,8 +5191,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def restore_deleted_item(
-        self, object_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, object_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Restore a deleted directory item."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5277,8 +5216,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_authorization_policy(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get the authorization policy."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5300,16 +5239,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_token_lifetime_policies(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List token lifetime policies."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.policies.token_lifetime_policies.to_get_request_configuration()
-            )
+            request_config = self.client.policies.token_lifetime_policies.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5323,16 +5260,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_token_issuance_policies(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List token issuance policies."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.policies.token_issuance_policies.to_get_request_configuration()
-            )
+            request_config = self.client.policies.token_issuance_policies.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5346,16 +5281,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_permission_grant_policies(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List permission grant policies."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.policies.permission_grant_policies.to_get_request_configuration()
-            )
+            request_config = self.client.policies.permission_grant_policies.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5369,16 +5302,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_admin_consent_policy(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get the admin consent request policy."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.policies.admin_consent_request_policy.to_get_request_configuration()
-            )
+            request_config = self.client.policies.admin_consent_request_policy.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5393,17 +5324,13 @@ class MicrosoftGraphApi:
             print(f"Error getting admin consent policy: {e}")
             return {"error": str(e)}
 
-    async def list_role_definitions(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_role_definitions(self, params: dict | None = None) -> dict[str, Any]:
         """List role definitions."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.role_management.directory.role_definitions.to_get_request_configuration()
-            )
+            request_config = self.client.role_management.directory.role_definitions.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5419,8 +5346,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_role_definition(
-        self, role_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, role_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific role definition."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5434,26 +5361,20 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.role_management.directory.role_definitions.by_unified_role_definition_id(
                 role_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
             print(f"Error getting role definition: {e}")
             return {"error": str(e)}
 
-    async def list_role_assignments(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_role_assignments(self, params: dict | None = None) -> dict[str, Any]:
         """List role assignments."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.role_management.directory.role_assignments.to_get_request_configuration()
-            )
+            request_config = self.client.role_management.directory.role_assignments.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5469,8 +5390,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_role_assignment(
-        self, assignment_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, assignment_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific role assignment."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5484,9 +5405,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.role_management.directory.role_assignments.by_unified_role_assignment_id(
                 assignment_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -5494,8 +5413,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_role_assignment(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a role assignment."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5508,9 +5427,7 @@ class MicrosoftGraphApi:
             assignment.role_definition_id = data.get("roleDefinitionId")
             assignment.principal_id = data.get("principalId")
             assignment.directory_scope_id = data.get("directoryScopeId", "/")
-            request_config = (
-                self.client.role_management.directory.role_assignments.to_post_request_configuration()
-            )
+            request_config = self.client.role_management.directory.role_assignments.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5525,7 +5442,7 @@ class MicrosoftGraphApi:
             print(f"Error creating role assignment: {e}")
             return {"error": str(e)}
 
-    async def list_devices(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_devices(self, params: dict | None = None) -> dict[str, Any]:
         """List devices registered in the directory."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5545,8 +5462,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_device(
-        self, device_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, device_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific device."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5568,8 +5485,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_device(
-        self, device_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, device_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete a device."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5590,17 +5507,13 @@ class MicrosoftGraphApi:
             print(f"Error deleting device: {e}")
             return {"error": str(e)}
 
-    async def list_managed_devices(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_managed_devices(self, params: dict | None = None) -> dict[str, Any]:
         """List managed devices."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.device_management.managed_devices.to_get_request_configuration()
-            )
+            request_config = self.client.device_management.managed_devices.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5614,8 +5527,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_managed_device(
-        self, device_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, device_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific managed device."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5631,9 +5544,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.device_management.managed_devices.by_managed_device_id(
                 device_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -5641,16 +5552,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_device_compliance_policies(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List device compliance policies."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.device_management.device_compliance_policies.to_get_request_configuration()
-            )
+            request_config = self.client.device_management.device_compliance_policies.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5666,16 +5575,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_device_configurations(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List device configurations."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.device_management.device_configurations.to_get_request_configuration()
-            )
+            request_config = self.client.device_management.device_configurations.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -5691,8 +5598,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def wipe_managed_device(
-        self, device_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, device_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Wipe a managed device."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5708,9 +5615,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.device_management.managed_devices.by_managed_device_id(
                 device_id
-            ).wipe.post(
-                request_configuration=request_config
-            )
+            ).wipe.post(request_configuration=request_config)
             native_response.raise_for_status()
             return {"status": "wipe initiated"}
         except Exception as e:
@@ -5718,8 +5623,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def retire_managed_device(
-        self, device_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, device_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Retire a managed device."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5735,9 +5640,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.device_management.managed_devices.by_managed_device_id(
                 device_id
-            ).retire.post(
-                request_configuration=request_config
-            )
+            ).retire.post(request_configuration=request_config)
             native_response.raise_for_status()
             return {"status": "retire initiated"}
         except Exception as e:
@@ -5745,8 +5648,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_education_classes(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List education classes."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5768,8 +5671,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_education_class(
-        self, class_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, class_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific education class."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5791,8 +5694,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_education_schools(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List education schools."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5814,8 +5717,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_education_school(
-        self, school_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, school_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific education school."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5838,9 +5741,7 @@ class MicrosoftGraphApi:
             print(f"Error getting education school: {e}")
             return {"error": str(e)}
 
-    async def list_education_users(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_education_users(self, params: dict | None = None) -> dict[str, Any]:
         """List education users."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5860,8 +5761,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_education_assignments(
-        self, class_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, class_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List assignments for an education class."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5882,7 +5783,7 @@ class MicrosoftGraphApi:
             print(f"Error listing education assignments: {e}")
             return {"error": str(e)}
 
-    async def list_agreements(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_agreements(self, params: dict | None = None) -> dict[str, Any]:
         """List agreements (terms of use)."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5902,8 +5803,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_agreement(
-        self, agreement_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, agreement_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific agreement."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5925,8 +5826,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_agreement(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create an agreement."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5952,8 +5853,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_agreement(
-        self, agreement_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, agreement_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete an agreement."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5974,7 +5875,7 @@ class MicrosoftGraphApi:
             print(f"Error deleting agreement: {e}")
             return {"error": str(e)}
 
-    async def list_rooms(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_rooms(self, params: dict | None = None) -> dict[str, Any]:
         """List rooms."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -5995,7 +5896,7 @@ class MicrosoftGraphApi:
             print(f"Error listing rooms: {e}")
             return {"error": str(e)}
 
-    async def list_room_lists(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_room_lists(self, params: dict | None = None) -> dict[str, Any]:
         """List room lists."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6017,8 +5918,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_place(
-        self, place_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, place_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific place."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6040,8 +5941,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def update_place(
-        self, place_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, place_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Update a place."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6068,7 +5969,7 @@ class MicrosoftGraphApi:
             print(f"Error updating place: {e}")
             return {"error": str(e)}
 
-    async def list_printers(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_printers(self, params: dict | None = None) -> dict[str, Any]:
         """List printers."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6088,8 +5989,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_printer(
-        self, printer_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, printer_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific printer."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6111,8 +6012,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_print_jobs(
-        self, printer_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, printer_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List print jobs for a printer."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6134,8 +6035,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_print_job(
-        self, printer_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, printer_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a print job."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6158,7 +6059,7 @@ class MicrosoftGraphApi:
             print(f"Error creating print job: {e}")
             return {"error": str(e)}
 
-    async def list_print_shares(self, params: Optional[Dict] = None) -> Dict[str, Any]:
+    async def list_print_shares(self, params: dict | None = None) -> dict[str, Any]:
         """List print shares."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6178,16 +6079,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_subject_rights_requests(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List subject rights requests."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.privacy.subject_rights_requests.to_get_request_configuration()
-            )
+            request_config = self.client.privacy.subject_rights_requests.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6201,8 +6100,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_subject_rights_request(
-        self, request_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, request_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific subject rights request."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6216,9 +6115,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.privacy.subject_rights_requests.by_subject_rights_request_id(
                 request_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -6226,8 +6123,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_subject_rights_request(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a subject rights request."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6237,9 +6134,7 @@ class MicrosoftGraphApi:
             srr = SubjectRightsRequest()
             srr.display_name = data.get("displayName")
             srr.description = data.get("description")
-            request_config = (
-                self.client.privacy.subject_rights_requests.to_post_request_configuration()
-            )
+            request_config = self.client.privacy.subject_rights_requests.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6253,8 +6148,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_booking_businesses(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List booking businesses."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6276,8 +6171,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_booking_business(
-        self, business_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, business_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific booking business."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6303,8 +6198,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_booking_appointments(
-        self, business_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, business_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """List booking appointments for a business."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6330,8 +6225,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_booking_appointment(
-        self, business_id: str, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, business_id: str, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a booking appointment."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6360,17 +6255,13 @@ class MicrosoftGraphApi:
             print(f"Error creating booking appointment: {e}")
             return {"error": str(e)}
 
-    async def list_virtual_events(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def list_virtual_events(self, params: dict | None = None) -> dict[str, Any]:
         """List virtual event townhalls."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.solutions.virtual_events.townhalls.to_get_request_configuration()
-            )
+            request_config = self.client.solutions.virtual_events.townhalls.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6384,16 +6275,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_file_storage_containers(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List file storage containers."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.storage.file_storage.containers.to_get_request_configuration()
-            )
+            request_config = self.client.storage.file_storage.containers.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6407,8 +6296,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_file_storage_container(
-        self, container_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, container_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific file storage container."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6422,9 +6311,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.storage.file_storage.containers.by_file_storage_container_id(
                 container_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -6432,8 +6319,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_file_storage_container(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create a file storage container."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6443,9 +6330,7 @@ class MicrosoftGraphApi:
             container = FileStorageContainer()
             container.display_name = data.get("displayName")
             container.container_type_id = data.get("containerTypeId")
-            request_config = (
-                self.client.storage.file_storage.containers.to_post_request_configuration()
-            )
+            request_config = self.client.storage.file_storage.containers.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6459,16 +6344,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_learning_providers(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List learning providers."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.employee_experience.learning_providers.to_get_request_configuration()
-            )
+            request_config = self.client.employee_experience.learning_providers.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6484,8 +6367,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_learning_provider(
-        self, provider_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, provider_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific learning provider."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6499,9 +6382,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.employee_experience.learning_providers.by_learning_provider_id(
                 provider_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -6509,16 +6390,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_learning_course_activities(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List learning course activities for the current user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.me.employee_experience.learning_course_activities.to_get_request_configuration()
-            )
+            request_config = self.client.me.employee_experience.learning_course_activities.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6534,8 +6413,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_external_connections(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List external connections."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6557,8 +6436,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_external_connection(
-        self, connection_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, connection_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific external connection."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6582,8 +6461,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def create_external_connection(
-        self, data: Dict[str, Any], params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], params: dict | None = None
+    ) -> dict[str, Any]:
         """Create an external connection."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6612,8 +6491,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def delete_external_connection(
-        self, connection_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, connection_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Delete an external connection."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6637,16 +6516,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_sensitivity_labels(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List sensitivity labels."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.information_protection.policy.labels.to_get_request_configuration()
-            )
+            request_config = self.client.information_protection.policy.labels.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6662,8 +6539,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_sensitivity_label(
-        self, label_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, label_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific sensitivity label."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6677,9 +6554,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.information_protection.policy.labels.by_information_protection_label_id(
                 label_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
@@ -6687,16 +6562,14 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def list_delegated_admin_relationships(
-        self, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, params: dict | None = None
+    ) -> dict[str, Any]:
         """List delegated admin relationships."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
 
         try:
-            request_config = (
-                self.client.tenant_relationships.delegated_admin_relationships.to_get_request_configuration()
-            )
+            request_config = self.client.tenant_relationships.delegated_admin_relationships.to_get_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
             )
@@ -6710,8 +6583,8 @@ class MicrosoftGraphApi:
             return {"error": str(e)}
 
     async def get_delegated_admin_relationship(
-        self, rel_id: str, params: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, rel_id: str, params: dict | None = None
+    ) -> dict[str, Any]:
         """Get a specific delegated admin relationship."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
@@ -6725,9 +6598,7 @@ class MicrosoftGraphApi:
             )
             native_response = await self.client.tenant_relationships.delegated_admin_relationships.by_delegated_admin_relationship_id(
                 rel_id
-            ).get(
-                request_configuration=request_config
-            )
+            ).get(request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:

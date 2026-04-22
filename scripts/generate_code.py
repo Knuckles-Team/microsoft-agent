@@ -161,7 +161,7 @@ def generate_api_code(endpoints: List[ApiEndpoint]) -> str:
         "from urllib.parse import urljoin",
         "",
         "class Api:",
-        "    def __init__(self, base_url: str = 'https://graph.microsoft.com/v1.0', token: Optional[str] = None):",
+        "    def __init__(self, base_url: str = 'https://graph.microsoft.com/v1.0', token: Optional[str] | None = None):",
         "        self.base_url = base_url",
         "        self.token = token",
         "        self._session = requests.Session()",
@@ -172,7 +172,7 @@ def generate_api_code(endpoints: List[ApiEndpoint]) -> str:
         "            headers['Authorization'] = f'Bearer {self.token}'",
         "        return headers",
         "",
-        "    def request(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> Any:",
+        "    def request(self, method: str, endpoint: str, data: Dict | None = None, params: Dict | None = None) -> Any:",
         "        url = urljoin(self.base_url, endpoint.lstrip('/')) if not endpoint.startswith('http') else endpoint",
         "        headers = self.get_headers()",
         "        response = self._session.request(method=method, url=url, headers=headers, json=data, params=params)",
@@ -199,9 +199,9 @@ def generate_api_code(endpoints: List[ApiEndpoint]) -> str:
             args.append(f"{p}: str")
 
         if ep.method in ["POST", "PATCH", "PUT"]:
-            args.append("data: Dict = None")
+            args.append("data: Dict | None = None")
 
-        args.append("params: Dict = None")
+        args.append("params: Dict | None = None")
 
         code.append("")
         code.append(f"    def {ep.name}({', '.join(args)}) -> Any:")
