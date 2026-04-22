@@ -1,13 +1,14 @@
-import os
+import atexit
 import json
 import logging
-import atexit
-from typing import List, Optional, Dict, Any
-import msal
-import keyring
-from keyring.errors import KeyringError
+import os
 from pathlib import Path
+from typing import Any
+
+import keyring
+import msal
 from agent_utilities.exceptions import AuthError, UnauthorizedError
+from keyring.errors import KeyringError
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class AuthManager:
-    def __init__(self, client_id: str, authority: str, scopes: List[str]):
+    def __init__(self, client_id: str, authority: str, scopes: list[str]):
         self.client_id = client_id
         self.authority = authority
         self.scopes = scopes
@@ -30,8 +31,8 @@ class AuthManager:
         self.msal_app = msal.PublicClientApplication(
             self.client_id, authority=self.authority, token_cache=self.token_cache
         )
-        self.access_token: Optional[str] = None
-        self.selected_account_id: Optional[str] = None
+        self.access_token: str | None = None
+        self.selected_account_id: str | None = None
 
         self.load_token_cache()
         atexit.register(self.save_token_cache)
@@ -46,7 +47,7 @@ class AuthManager:
 
         if not cache_data and FALLBACK_PATH.exists():
             try:
-                with open(FALLBACK_PATH, "r") as f:
+                with open(FALLBACK_PATH) as f:
                     cache_data = f.read()
             except Exception as e:
                 logger.error(f"Failed to read token cache file: {e}")
@@ -82,7 +83,7 @@ class AuthManager:
 
         if not data and SELECTED_ACCOUNT_PATH.exists():
             try:
-                with open(SELECTED_ACCOUNT_PATH, "r") as f:
+                with open(SELECTED_ACCOUNT_PATH) as f:
                     data = f.read()
             except Exception as e:
                 logger.error(f"Failed to read selected account file: {e}")
@@ -109,7 +110,7 @@ class AuthManager:
             except Exception as e:
                 logger.error(f"Failed to write selected account file: {e}")
 
-    def get_current_account(self) -> Optional[Dict[str, Any]]:
+    def get_current_account(self) -> dict[str, Any] | None:
         accounts = self.msal_app.get_accounts()
         if not accounts:
             return None
@@ -124,7 +125,7 @@ class AuthManager:
 
         return accounts[0]
 
-    def get_token(self) -> Optional[str]:
+    def get_token(self) -> str | None:
         account = self.get_current_account()
         if not account:
             return None
@@ -135,7 +136,7 @@ class AuthManager:
 
         return None
 
-    def get_token_details(self) -> Optional[Dict[str, Any]]:
+    def get_token_details(self) -> dict[str, Any] | None:
         """Get the full token response from MSAL."""
         account = self.get_current_account()
         if not account:
@@ -192,7 +193,7 @@ class AuthManager:
         if SELECTED_ACCOUNT_PATH.exists():
             SELECTED_ACCOUNT_PATH.unlink()
 
-    def list_accounts(self) -> List[Dict[str, Any]]:
+    def list_accounts(self) -> list[dict[str, Any]]:
         return self.msal_app.get_accounts()
 
     def select_account(self, account_id: str) -> bool:
@@ -218,8 +219,9 @@ class AuthManager:
 
 
 async def get_client():
-    from microsoft_agent.api_wrapper import MicrosoftGraphApi
     from agent_utilities.middlewares import local
+
+    from microsoft_agent.api_wrapper import MicrosoftGraphApi
 
     CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
     AUTHORITY = "https://login.microsoftonline.com/common"

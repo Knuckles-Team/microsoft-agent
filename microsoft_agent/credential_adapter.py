@@ -1,6 +1,7 @@
-from typing import Any, Optional
-from azure.core.credentials import AccessToken, TokenCredential
 import time
+from typing import Any
+
+from azure.core.credentials import AccessToken, TokenCredential
 
 from microsoft_agent.auth import AuthManager
 
@@ -17,19 +18,17 @@ class AuthManagerCredential(TokenCredential):
     def get_token(
         self,
         *scopes: str,
-        _claims: Optional[str] = None,
-        _tenant_id: Optional[str] = None,
+        _claims: str | None = None,
+        _tenant_id: str | None = None,
         **_kwargs: Any,
     ) -> AccessToken:
 
         token_details = self.auth_manager.get_token_details()
 
         if not token_details:
-
             pass
 
         if token_details and "access_token" in token_details:
-
             expires_on = token_details.get("expires_on")
             if not expires_on:
                 expires_in = token_details.get("expires_in", 3600)
