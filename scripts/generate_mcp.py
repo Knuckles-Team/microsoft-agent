@@ -2,6 +2,7 @@ import json
 import os
 import re
 import sys
+from pathlib import Path
 
 CATEGORIES = {
     "mail": ["mail", "message", "attachment", "folder", "draft"],
@@ -30,11 +31,11 @@ CATEGORIES = {
 
 
 def get_tags(tool_name):
-    tags = {}
+    tags: dict[str, bool] = {}
     lower_name = tool_name.lower()
     for cat, keywords in CATEGORIES.items():
         if any(kw in lower_name for kw in keywords):
-            tags.append(cat)
+            tags[cat] = True
     return tags
 
 
@@ -74,7 +75,7 @@ def generate_tool(endpoint):
     )
     if "supportsTimezone" in endpoint:
         func_args.append(
-            'timezone: Optional[str] = Field(None, description="IANA timezone")'
+            'timezone: Optional[str] | None = Field(None, description="IANA timezone")'
         )
 
     timezone_logic = ""
@@ -110,12 +111,29 @@ def generate_tool(endpoint):
 
 
 def main():
-    endpoints_path = "/home/genius/Workspace/microsoft-agent/ms-365-mcp-server-main/src/endpoints.json"
-    if not os.path.exists(endpoints_path):
-        print(f"Error: {endpoints_path} not found", file=sys.stderr)
+    # Try to find endpoints.json relative to the script or via environment variable
+    script_dir = Path(__file__).resolve().parent
+    env_path = os.environ.get("MICROSOFT_ENDPOINTS_JSON")
+    if env_path:
+        endpoints_path = Path(env_path)
+    else:
+        # Check standard locations
+        possible_paths = [
+            script_dir / "endpoints.json",
+            script_dir.parent / "src" / "endpoints.json",
+        ]
+        endpoints_path = next(
+            (p for p in possible_paths if p.exists()), possible_paths[0]
+        )
+
+    if not endpoints_path.exists():
+        print(
+            f"Error: endpoints.json not found. Set MICROSOFT_ENDPOINTS_JSON or place it at {endpoints_path}",
+            file=sys.stderr,
+        )
         return
 
-    with open(endpoints_path, "r") as f:
+    with open(endpoints_path) as f:
         endpoints = json.load(f)
 
     print("#!/usr/bin/python")

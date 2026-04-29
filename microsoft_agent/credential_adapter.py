@@ -1,6 +1,7 @@
-from typing import Any, Optional
-from azure.core.credentials import AccessToken, TokenCredential
 import time
+from typing import Any
+
+from azure.core.credentials import AccessToken, TokenCredential
 
 from microsoft_agent.auth import AuthManager
 
@@ -17,8 +18,8 @@ class AuthManagerCredential(TokenCredential):
     def get_token(
         self,
         *scopes: str,
-        claims: Optional[str] = None,
-        tenant_id: Optional[str] = None,
+        claims: str | None = None,
+        tenant_id: str | None = None,
         **kwargs: Any,
     ) -> AccessToken:
 
