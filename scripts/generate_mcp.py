@@ -1,7 +1,7 @@
+import json
 import os
 import re
 import sys
-import json
 from pathlib import Path
 
 CATEGORIES = {
@@ -31,11 +31,11 @@ CATEGORIES = {
 
 
 def get_tags(tool_name):
-    tags = {}
+    tags: dict[str, bool] = {}
     lower_name = tool_name.lower()
     for cat, keywords in CATEGORIES.items():
         if any(kw in lower_name for kw in keywords):
-            tags.append(cat)
+            tags[cat] = True
     return tags
 
 
@@ -133,7 +133,7 @@ def main():
         )
         return
 
-    with open(endpoints_path, "r") as f:
+    with open(endpoints_path) as f:
         endpoints = json.load(f)
 
     print("#!/usr/bin/python")

@@ -1,8 +1,7 @@
+import glob
 import os
 import re
-import glob
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
@@ -18,8 +17,8 @@ class ApiEndpoint:
     method: str
     url: str
     description: str
-    parameters: List[str] = field(default_factory=list)
-    original_parameters: List[str] = field(default_factory=list)
+    parameters: list[str] = field(default_factory=list)
+    original_parameters: list[str] = field(default_factory=list)
     doc_file: str = ""
 
 
@@ -46,7 +45,7 @@ def derive_param_name(param_raw: str, url_segment: str) -> str:
     return sanitized
 
 
-def parse_markdown(file_path: str) -> Optional[ApiEndpoint]:
+def parse_markdown(file_path: str) -> ApiEndpoint | None:
     filename = os.path.basename(file_path)
     if not filename.startswith("api_"):
         return None
@@ -62,7 +61,7 @@ def parse_markdown(file_path: str) -> Optional[ApiEndpoint]:
     name = f"{operation}_{resource}"
     name = sanitize_name(name)
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         content = f.read()
 
     http_match = re.search(
@@ -150,7 +149,7 @@ def parse_markdown(file_path: str) -> Optional[ApiEndpoint]:
     )
 
 
-def generate_api_code(endpoints: List[ApiEndpoint]) -> str:
+def generate_api_code(endpoints: list[ApiEndpoint]) -> str:
     code = [
         "#!/usr/bin/env python",
         "# coding: utf-8",
@@ -227,7 +226,7 @@ def generate_api_code(endpoints: List[ApiEndpoint]) -> str:
     return "\n".join(code)
 
 
-def generate_mcp_code(endpoints: List[ApiEndpoint]) -> str:
+def generate_mcp_code(endpoints: list[ApiEndpoint]) -> str:
     code = [
         "#!/usr/bin/env python",
         "# coding: utf-8",
@@ -281,7 +280,7 @@ def generate_mcp_code(endpoints: List[ApiEndpoint]) -> str:
     return "\n".join(code)
 
 
-def generate_agent_code(endpoints: List[ApiEndpoint]) -> str:
+def generate_agent_code(endpoints: list[ApiEndpoint]) -> str:
     resources = sorted(list(set(ep.resource for ep in endpoints)))
 
     code = [

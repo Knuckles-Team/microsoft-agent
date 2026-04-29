@@ -23,9 +23,17 @@ from typing import Any
 from agent_utilities.base_utilities import to_boolean
 from agent_utilities.mcp_utilities import (
     create_mcp_server,
+    ctx_confirm_destructive,
+    ctx_progress,
+    ctx_sample,
+    ctx_set_state,
 )
 from dotenv import find_dotenv, load_dotenv
+<<<<<<< HEAD
 from fastmcp import FastMCP
+=======
+from fastmcp import Context, FastMCP
+>>>>>>> a8076f3 (chore: manual fixes)
 from fastmcp.utilities.logging import get_logger
 from pydantic import Field
 from starlette.requests import Request
@@ -54,7 +62,11 @@ def register_prompts(mcp: FastMCP):
         return f"Please summarize the email thread with subject '{subject}'"
 
     @mcp.tool(name="calendar_today", description="Show today's calendar events.")
-    def calendar_today() -> str:
+    def calendar_today(
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+    ) -> str:
         """Show calendar."""
         return "Please show my calendar events for today."
 
@@ -134,16 +146,36 @@ def register_auth_tools(mcp: FastMCP):
         force: bool = Field(
             False, description="Force a new login even if already logged in"
         ),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """Authenticate with Microsoft using device code flow"""
         client = await get_client()
-        return client.login(force=force)
+        result = client.login(force=force)
+        await ctx_set_state(ctx, "microsoft", "auth_status", "authenticated")
+        return result
 
     @mcp.tool(
         name="logout", description="Log out from Microsoft account", tags={"auth"}
     )
+<<<<<<< HEAD
     async def logout() -> Any:
         """Log out from Microsoft account"""
+=======
+    async def logout(
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+    ) -> Any:
+        """Log out from Microsoft account"""
+        if not await ctx_confirm_destructive(ctx, "logout"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
+>>>>>>> a8076f3 (chore: manual fixes)
         client = await get_client()
         return client.logout()
 
@@ -152,17 +184,27 @@ def register_auth_tools(mcp: FastMCP):
         description="Check current Microsoft authentication status",
         tags={"auth"},
     )
-    async def verify_login() -> Any:
+    async def verify_login(
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+    ) -> Any:
         """Check current Microsoft authentication status"""
         client = await get_client()
-        return client.verify_login()
+        result = client.verify_login()
+        await ctx_set_state(ctx, "microsoft", "auth_token", result.get("jwt") if isinstance(result, dict) else None)
+        return result
 
     @mcp.tool(
         name="list_accounts",
         description="List all available Microsoft accounts",
         tags={"auth"},
     )
-    async def list_accounts() -> Any:
+    async def list_accounts(
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+    ) -> Any:
         """List all available Microsoft accounts"""
         client = await get_client()
         return client.list_accounts()
@@ -177,6 +219,9 @@ def register_meta_tools(mcp: FastMCP):
     async def search_tools(
         query: str = Field(..., description="Search query"),
         limit: int = Field(20, description="Max results"),
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
     ) -> Any:
         """Search available Microsoft Graph API tools"""
         client = await get_client()
@@ -193,13 +238,23 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
     )
     async def list_mail_messages(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_mail_messages: GET /me/messages
 
         TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrapped in double quotes. Format: $search='your search query here'. Use KQL (Keyword Query Language) syntax to search specific properties: 'from:', 'subject:', 'body:', 'to:', 'cc:', 'bcc:', 'attachment:', 'hasAttachments:', 'importance:', 'received:', 'sent:'. Examples: $search='from:john@example.com' | $search='subject:meeting AND hasAttachments:true' | $search='body:urgent AND received>=2024-01-01' | $search='from:john AND importance:high'. Remember: ALWAYS wrap the entire search expression in double quotes! Reference: https://learn.microsoft.com/en-us/graph/search-query-parameter
         """
         client = await get_client()
-        return await client.list_mail_messages(params=params)
+        result = await client.list_mail_messages(params=params)
+        summary = await ctx_sample(ctx, f"Summarize these emails concisely: {result}")
+        if summary and isinstance(result, dict):
+            result["ai_summary"] = summary
+        return result
 
     @mcp.tool(
         name="list_mail_folders",
@@ -208,6 +263,12 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
     )
     async def list_mail_folders(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_mail_folders: GET /me/mailFolders"""
         client = await get_client()
@@ -225,6 +286,12 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
     async def list_mail_folder_messages(
         mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_mail_folder_messages: GET /me/mailFolders/{mailFolder-id}/messages
 
@@ -243,6 +310,12 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
     async def get_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_mail_message: GET /me/messages/{message-id}"""
         client = await get_client()
@@ -260,6 +333,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def send_mail(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """send_mail: POST /me/sendMail
 
@@ -280,6 +359,12 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
     async def list_shared_mailbox_messages(
         user_id: str = Field(..., description="Parameter for user-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_shared_mailbox_messages: GET /users/{user-id}/messages
 
@@ -301,6 +386,12 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
         user_id: str = Field(..., description="Parameter for user-id"),
         mailFolder_id: str = Field(..., description="Parameter for mailFolder-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_shared_mailbox_folder_messages: GET /users/{user-id}/mailFolders/{mailFolder-id}/messages
 
@@ -320,6 +411,12 @@ TIP: CRITICAL: When searching emails, the $search parameter value MUST be wrappe
         user_id: str = Field(..., description="Parameter for user-id"),
         message_id: str = Field(..., description="Parameter for message-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_shared_mailbox_message: GET /users/{user-id}/messages/{message-id}"""
         client = await get_client()
@@ -340,6 +437,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         user_id: str = Field(..., description="Parameter for user-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """send_shared_mailbox_mail: POST /users/{user-id}/sendMail
 
@@ -358,6 +461,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def create_draft_email(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_draft_email: POST /me/messages"""
         client = await get_client()
@@ -371,8 +480,17 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def delete_mail_message(
         message_id: str = Field(..., description="Parameter for message-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_mail_message: DELETE /me/messages/{message-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete mail message"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_mail_message(message_id=message_id, params=params)
 
@@ -385,6 +503,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         message_id: str = Field(..., description="Parameter for message-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """move_mail_message: POST /me/messages/{message-id}/move"""
         client = await get_client()
@@ -401,6 +525,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         message_id: str = Field(..., description="Parameter for message-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_mail_message: PATCH /me/messages/{message-id}"""
         client = await get_client()
@@ -417,6 +547,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         message_id: str = Field(..., description="Parameter for message-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """add_mail_attachment: POST /me/messages/{message-id}/attachments"""
         client = await get_client()
@@ -432,6 +568,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def list_mail_attachments(
         message_id: str = Field(..., description="Parameter for message-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_mail_attachments: GET /me/messages/{message-id}/attachments"""
         client = await get_client()
@@ -446,6 +588,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         message_id: str = Field(..., description="Parameter for message-id"),
         attachment_id: str = Field(..., description="Parameter for attachment-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_mail_attachment: GET /me/messages/{message-id}/attachments/{attachment-id}"""
         client = await get_client()
@@ -462,8 +610,17 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         message_id: str = Field(..., description="Parameter for message-id"),
         attachment_id: str = Field(..., description="Parameter for attachment-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_mail_attachment: DELETE /me/messages/{message-id}/attachments/{attachment-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete mail attachment"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_mail_attachment(
             message_id=message_id, attachment_id=attachment_id, params=params
@@ -477,6 +634,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def get_root_folder(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_root_folder: GET /drives/{drive-id}/root"""
         client = await get_client()
@@ -491,6 +654,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_folder_files: GET /drives/{drive-id}/items/{driveItem-id}/children"""
         client = await get_client()
@@ -506,6 +675,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def list_chat_messages(
         chat_id: str = Field(..., description="Parameter for chat-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_chat_messages: GET /chats/{chat-id}/messages"""
         client = await get_client()
@@ -520,6 +695,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         chat_id: str = Field(..., description="Parameter for chat-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_chat_message: GET /chats/{chat-id}/messages/{chatMessage-id}"""
         client = await get_client()
@@ -536,6 +717,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         chat_id: str = Field(..., description="Parameter for chat-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """send_chat_message: POST /chats/{chat-id}/messages"""
         client = await get_client()
@@ -550,6 +737,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         team_id: str = Field(..., description="Parameter for team-id"),
         channel_id: str = Field(..., description="Parameter for channel-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_channel_messages: GET /teams/{team-id}/channels/{channel-id}/messages"""
         client = await get_client()
@@ -567,6 +760,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         channel_id: str = Field(..., description="Parameter for channel-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_channel_message: GET /teams/{team-id}/channels/{channel-id}/messages/{chatMessage-id}"""
         client = await get_client()
@@ -587,6 +786,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         channel_id: str = Field(..., description="Parameter for channel-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """send_channel_message: POST /teams/{team-id}/channels/{channel-id}/messages"""
         client = await get_client()
@@ -603,6 +808,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         chat_id: str = Field(..., description="Parameter for chat-id"),
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_chat_message_replies: GET /chats/{chat-id}/messages/{chatMessage-id}/replies"""
         client = await get_client()
@@ -620,6 +831,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         chatMessage_id: str = Field(..., description="Parameter for chatMessage-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """reply_to_chat_message: POST /chats/{chat-id}/messages/{chatMessage-id}/replies"""
         client = await get_client()
@@ -640,6 +857,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
     )
     async def list_users(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_users: GET /users
 
@@ -653,6 +876,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
     )
     async def list_drives(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_drives: GET /me/drives"""
         client = await get_client()
@@ -666,6 +895,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
     async def get_drive_root_item(
         drive_id: str = Field(..., description="Parameter for drive-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_drive_root_item: GET /drives/{drive-id}/root"""
         client = await get_client()
@@ -680,9 +915,17 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
+        await ctx_progress(ctx, 0, 100)
         """download_onedrive_file_content: GET /drives/{drive-id}/items/{driveItem-id}/content"""
         client = await get_client()
+        await ctx_progress(ctx, 100, 100)
         return await client.download_onedrive_file_content(
             drive_id=drive_id, driveItem_id=driveItem_id, params=params
         )
@@ -696,8 +939,17 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_onedrive_file: DELETE /drives/{drive-id}/items/{driveItem-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete onedrive file"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_onedrive_file(
             drive_id=drive_id, driveItem_id=driveItem_id, params=params
@@ -713,9 +965,17 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
+        await ctx_progress(ctx, 0, 100)
         """upload_file_content: PUT /drives/{drive-id}/items/{driveItem-id}/content"""
         client = await get_client()
+        await ctx_progress(ctx, 100, 100)
         return await client.upload_file_content(
             drive_id=drive_id, driveItem_id=driveItem_id, data=data, params=params
         )
@@ -733,6 +993,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         ),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_excel_chart: POST /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/charts/add"""
         client = await get_client()
@@ -757,6 +1023,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         ),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """format_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/format"""
         client = await get_client()
@@ -782,6 +1054,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         ),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """sort_excel_range: PATCH /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range()/sort"""
         client = await get_client()
@@ -807,6 +1085,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         ),
         address: str = Field(..., description="Parameter for address"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_excel_range: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets/{workbookWorksheet-id}/range(address='{address}')"""
         client = await get_client()
@@ -827,6 +1111,12 @@ TIP: CRITICAL: This request requires the ConsistencyLevel header set to eventual
         drive_id: str = Field(..., description="Parameter for drive-id"),
         driveItem_id: str = Field(..., description="Parameter for driveItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_excel_worksheets: GET /drives/{drive-id}/items/{driveItem-id}/workbook/worksheets"""
         client = await get_client()
@@ -847,6 +1137,12 @@ List Excel tables in a workbook.""",
         drive_id: str = Field(..., description="Parameter for drive-id"),
         item_id: str = Field(..., description="Parameter for driveItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_excel_tables: GET /drives/{drive-id}/items/{driveItem-id}/workbook/tables"""
         client = await get_client()
@@ -863,6 +1159,12 @@ List Excel tables in a workbook.""",
         drive_id: str = Field(..., description="Parameter for drive-id"),
         item_id: str = Field(..., description="Parameter for item-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_excel_workbook: GET /drives/{drive-id}/items/{item-id}/workbook"""
         client = await get_client()
@@ -877,6 +1179,12 @@ List Excel tables in a workbook.""",
     )
     async def list_onenote_notebooks(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_onenote_notebooks: GET /me/onenote/notebooks"""
         client = await get_client()
@@ -890,6 +1198,12 @@ List Excel tables in a workbook.""",
     async def list_onenote_notebook_sections(
         notebook_id: str = Field(..., description="Parameter for notebook-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_onenote_notebook_sections: GET /me/onenote/notebooks/{notebook-id}/sections"""
         client = await get_client()
@@ -907,6 +1221,12 @@ List Excel tables in a workbook.""",
             ..., description="Parameter for onenoteSection-id"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_onenote_section_pages: GET /me/onenote/sections/{onenoteSection-id}/pages"""
         client = await get_client()
@@ -921,6 +1241,12 @@ List Excel tables in a workbook.""",
     )
     async def list_todo_task_lists(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_todo_task_lists: GET /me/todo/lists"""
         client = await get_client()
@@ -934,6 +1260,12 @@ List Excel tables in a workbook.""",
     async def list_todo_tasks(
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_todo_tasks: GET /me/todo/lists/{todoTaskList-id}/tasks"""
         client = await get_client()
@@ -948,6 +1280,12 @@ List Excel tables in a workbook.""",
     )
     async def list_planner_tasks(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_planner_tasks: GET /me/planner/tasks"""
         client = await get_client()
@@ -961,6 +1299,12 @@ List Excel tables in a workbook.""",
     async def list_plan_tasks(
         plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_plan_tasks: GET /planner/plans/{plannerPlan-id}/tasks"""
         client = await get_client()
@@ -975,6 +1319,12 @@ List Excel tables in a workbook.""",
     )
     async def list_outlook_contacts(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_outlook_contacts: GET /me/contacts"""
         client = await get_client()
@@ -987,6 +1337,12 @@ List Excel tables in a workbook.""",
     )
     async def list_chats(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_chats: GET /me/chats"""
         client = await get_client()
@@ -1002,6 +1358,12 @@ List Excel tables in a workbook.""",
         item_id: str = Field(..., description="Parameter for item-id"),
         worksheet_id: str = Field(..., description="Parameter for worksheet-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_excel_worksheet: GET /drives/{drive-id}/items/{item-id}/workbook/worksheets/{worksheet-id}"""
         client = await get_client()
@@ -1019,6 +1381,12 @@ List Excel tables in a workbook.""",
     )
     async def list_joined_teams(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_joined_teams: GET /me/joinedTeams"""
         client = await get_client()
@@ -1032,6 +1400,12 @@ List Excel tables in a workbook.""",
     async def list_team_channels(
         team_id: str = Field(..., description="Parameter for team-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_team_channels: GET /teams/{team-id}/channels"""
         client = await get_client()
@@ -1045,6 +1419,12 @@ List Excel tables in a workbook.""",
     async def list_team_members(
         team_id: str = Field(..., description="Parameter for team-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_team_members: GET /teams/{team-id}/members"""
         client = await get_client()
@@ -1058,6 +1438,12 @@ List Excel tables in a workbook.""",
     async def list_site_drives(
         site_id: str = Field(..., description="Parameter for site-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_site_drives: GET /sites/{site-id}/drives"""
         client = await get_client()
@@ -1072,6 +1458,12 @@ List Excel tables in a workbook.""",
         site_id: str = Field(..., description="Parameter for site-id"),
         drive_id: str = Field(..., description="Parameter for drive-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_site_drive_by_id: GET /sites/{site-id}/drives/{drive-id}"""
         client = await get_client()
@@ -1087,6 +1479,12 @@ List Excel tables in a workbook.""",
     async def list_site_items(
         site_id: str = Field(..., description="Parameter for site-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_site_items: GET /sites/{site-id}/items"""
         client = await get_client()
@@ -1101,6 +1499,12 @@ List Excel tables in a workbook.""",
         site_id: str = Field(..., description="Parameter for site-id"),
         baseItem_id: str = Field(..., description="Parameter for baseItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_site_item: GET /sites/{site-id}/items/{baseItem-id}"""
         client = await get_client()
@@ -1120,6 +1524,12 @@ List lists for a SharePoint site.""",
     async def list_site_lists(
         site_id: str = Field(..., description="Parameter for site-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_site_lists: GET /sites/{site-id}/lists"""
         client = await get_client()
@@ -1138,6 +1548,12 @@ Get a specific SharePoint site list.""",
         site_id: str = Field(..., description="Parameter for site-id"),
         list_id: str = Field(..., description="Parameter for list-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_site_list: GET /sites/{site-id}/lists/{list-id}"""
         client = await get_client()
@@ -1158,6 +1574,12 @@ List items in a SharePoint site list.""",
         site_id: str = Field(..., description="Parameter for site-id"),
         list_id: str = Field(..., description="Parameter for list-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_sharepoint_site_list_items: GET /sites/{site-id}/lists/{list-id}/items"""
         client = await get_client()
@@ -1175,6 +1597,12 @@ List items in a SharePoint site list.""",
         list_id: str = Field(..., description="Parameter for list-id"),
         listItem_id: str = Field(..., description="Parameter for listItem-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_sharepoint_site_list_item: GET /sites/{site-id}/lists/{list-id}/items/{listItem-id}"""
         client = await get_client()
@@ -1192,6 +1620,12 @@ List items in a SharePoint site list.""",
         item_id: str = Field(..., description="Parameter for item-id"),
         table_id: str = Field(..., description="Parameter for table-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_excel_table: GET /drives/{drive-id}/items/{item-id}/workbook/tables/{table-id}"""
         client = await get_client()
@@ -1209,6 +1643,12 @@ def register_calendar_tools(mcp: FastMCP):
     async def list_calendar_events(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
         timezone: str | None = Field(None, description="IANA timezone"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_calendar_events: GET /me/events"""
         client = await get_client()
@@ -1223,6 +1663,12 @@ def register_calendar_tools(mcp: FastMCP):
         event_id: str = Field(..., description="Parameter for event-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
         timezone: str | None = Field(None, description="IANA timezone"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_calendar_event: GET /me/events/{event-id}"""
         client = await get_client()
@@ -1242,6 +1688,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def create_calendar_event(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_calendar_event: POST /me/events
 
@@ -1263,6 +1715,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         event_id: str = Field(..., description="Parameter for event-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_calendar_event: PATCH /me/events/{event-id}
 
@@ -1281,8 +1739,17 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def delete_calendar_event(
         event_id: str = Field(..., description="Parameter for event-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_calendar_event: DELETE /me/events/{event-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete calendar event"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_calendar_event(event_id=event_id, params=params)
 
@@ -1295,6 +1762,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
         timezone: str | None = Field(None, description="IANA timezone"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_specific_calendar_events: GET /me/calendars/{calendar-id}/events"""
         client = await get_client()
@@ -1313,6 +1786,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         event_id: str = Field(..., description="Parameter for event-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
         timezone: str | None = Field(None, description="IANA timezone"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_specific_calendar_event: GET /me/calendars/{calendar-id}/events/{event-id}"""
         client = await get_client()
@@ -1333,6 +1812,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_specific_calendar_event: POST /me/calendars/{calendar-id}/events
 
@@ -1357,6 +1842,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         event_id: str = Field(..., description="Parameter for event-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_specific_calendar_event: PATCH /me/calendars/{calendar-id}/events/{event-id}
 
@@ -1376,8 +1867,17 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
         calendar_id: str = Field(..., description="Parameter for calendar-id"),
         event_id: str = Field(..., description="Parameter for event-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_specific_calendar_event: DELETE /me/calendars/{calendar-id}/events/{event-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete specific calendar event"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_specific_calendar_event(
             calendar_id=calendar_id, event_id=event_id, params=params
@@ -1391,6 +1891,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def get_calendar_view(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
         timezone: str | None = Field(None, description="IANA timezone"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_calendar_view: GET /me/calendarView"""
         client = await get_client()
@@ -1403,6 +1909,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     )
     async def list_calendars(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_calendars: GET /me/calendars"""
         client = await get_client()
@@ -1416,6 +1928,12 @@ TIP: CRITICAL: Do not try to guess the email address of the recipients. Use the 
     async def find_meeting_times(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """find_meeting_times: POST /me/findMeetingTimes"""
         client = await get_client()
@@ -1431,6 +1949,12 @@ def register_notes_tools(mcp: FastMCP):
     async def get_onenote_page_content(
         onenotePage_id: str = Field(..., description="Parameter for onenotePage-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_onenote_page_content: GET /me/onenote/pages/{onenotePage-id}/content"""
         client = await get_client()
@@ -1446,6 +1970,12 @@ def register_notes_tools(mcp: FastMCP):
     async def create_onenote_page(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_onenote_page: POST /me/onenote/pages"""
         client = await get_client()
@@ -1462,6 +1992,12 @@ def register_tasks_tools(mcp: FastMCP):
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_todo_task: GET /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
         client = await get_client()
@@ -1478,6 +2014,12 @@ def register_tasks_tools(mcp: FastMCP):
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_todo_task: POST /me/todo/lists/{todoTaskList-id}/tasks"""
         client = await get_client()
@@ -1495,6 +2037,12 @@ def register_tasks_tools(mcp: FastMCP):
         todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_todo_task: PATCH /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
         client = await get_client()
@@ -1514,8 +2062,17 @@ def register_tasks_tools(mcp: FastMCP):
         todoTaskList_id: str = Field(..., description="Parameter for todoTaskList-id"),
         todoTask_id: str = Field(..., description="Parameter for todoTask-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_todo_task: DELETE /me/todo/lists/{todoTaskList-id}/tasks/{todoTask-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete todo task"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_todo_task(
             todoTaskList_id=todoTaskList_id, todoTask_id=todoTask_id, params=params
@@ -1529,6 +2086,12 @@ def register_tasks_tools(mcp: FastMCP):
     async def get_planner_plan(
         plannerPlan_id: str = Field(..., description="Parameter for plannerPlan-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_planner_plan: GET /planner/plans/{plannerPlan-id}"""
         client = await get_client()
@@ -1544,6 +2107,12 @@ def register_tasks_tools(mcp: FastMCP):
     async def get_planner_task(
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_planner_task: GET /planner/tasks/{plannerTask-id}"""
         client = await get_client()
@@ -1559,6 +2128,12 @@ def register_tasks_tools(mcp: FastMCP):
     async def create_planner_task(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_planner_task: POST /planner/tasks"""
         client = await get_client()
@@ -1573,6 +2148,12 @@ def register_tasks_tools(mcp: FastMCP):
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_planner_task: PATCH /planner/tasks/{plannerTask-id}"""
         client = await get_client()
@@ -1589,6 +2170,12 @@ def register_tasks_tools(mcp: FastMCP):
         plannerTask_id: str = Field(..., description="Parameter for plannerTask-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_planner_task_details: PATCH /planner/tasks/{plannerTask-id}/details"""
         client = await get_client()
@@ -1606,6 +2193,12 @@ def register_contacts_tools(mcp: FastMCP):
     async def get_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_outlook_contact: GET /me/contacts/{contact-id}"""
         client = await get_client()
@@ -1619,6 +2212,12 @@ def register_contacts_tools(mcp: FastMCP):
     async def create_outlook_contact(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_outlook_contact: POST /me/contacts"""
         client = await get_client()
@@ -1633,6 +2232,12 @@ def register_contacts_tools(mcp: FastMCP):
         contact_id: str = Field(..., description="Parameter for contact-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_outlook_contact: PATCH /me/contacts/{contact-id}"""
         client = await get_client()
@@ -1648,8 +2253,17 @@ def register_contacts_tools(mcp: FastMCP):
     async def delete_outlook_contact(
         contact_id: str = Field(..., description="Parameter for contact-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_outlook_contact: DELETE /me/contacts/{contact-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete outlook contact"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_outlook_contact(contact_id=contact_id, params=params)
 
@@ -1660,6 +2274,12 @@ def register_user_tools(mcp: FastMCP):
     )
     async def get_current_user(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_current_user: GET /me"""
         client = await get_client()
@@ -1672,6 +2292,12 @@ def register_user_tools(mcp: FastMCP):
     )
     async def get_me(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_me: GET /me"""
         client = await get_client()
@@ -1685,6 +2311,12 @@ def register_chat_tools(mcp: FastMCP):
     async def get_chat(
         chat_id: str = Field(..., description="Parameter for chat-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_chat: GET /chats/{chat-id}"""
         client = await get_client()
@@ -1698,6 +2330,12 @@ def register_teams_tools(mcp: FastMCP):
     async def get_team(
         team_id: str = Field(..., description="Parameter for team-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_team: GET /teams/{team-id}"""
         client = await get_client()
@@ -1712,6 +2350,12 @@ def register_teams_tools(mcp: FastMCP):
         team_id: str = Field(..., description="Parameter for team-id"),
         channel_id: str = Field(..., description="Parameter for channel-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_team_channel: GET /teams/{team-id}/channels/{channel-id}"""
         client = await get_client()
@@ -1728,6 +2372,12 @@ def register_sites_tools(mcp: FastMCP):
     )
     async def list_sites(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_sites: GET /sites"""
         client = await get_client()
@@ -1741,6 +2391,12 @@ def register_sites_tools(mcp: FastMCP):
     async def get_site(
         site_id: str = Field(..., description="Parameter for site-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_site: GET /sites/{site-id}"""
         client = await get_client()
@@ -1755,6 +2411,12 @@ def register_sites_tools(mcp: FastMCP):
         site_id: str = Field(..., description="Parameter for site-id"),
         path: str = Field(..., description="Parameter for path"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_sharepoint_site_by_path: GET /sites/{site-id}/getByPath(path='{path}')"""
         client = await get_client()
@@ -1769,6 +2431,12 @@ def register_sites_tools(mcp: FastMCP):
     )
     async def get_sharepoint_sites_delta(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_sharepoint_sites_delta: GET /sites/delta()"""
         client = await get_client()
@@ -1784,10 +2452,23 @@ def register_search_tools(mcp: FastMCP):
     async def search_query(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """search_query: POST /search/query"""
         client = await get_client()
-        return await client.search_query(data=data, params=params)
+        result = await client.search_query(data=data, params=params)
+        summary = await ctx_sample(ctx, f"Summarize these Microsoft search results concisely: {result}")
+        if summary:
+            if isinstance(result, dict):
+                result["ai_summary"] = summary
+            elif isinstance(result, list):
+                result = {"results": result, "ai_summary": summary}
+        return result
 
 
 def register_groups_tools(mcp: FastMCP):
@@ -1802,6 +2483,12 @@ List all Microsoft 365 groups and security groups in the organization. Supports 
     )
     async def list_groups(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_groups: GET /groups"""
         client = await get_client()
@@ -1819,6 +2506,12 @@ Get properties and relationships of a group object.""",
     async def get_group(
         group_id: str = Field(..., description="Parameter for group-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_group: GET /groups/{group-id}"""
         client = await get_client()
@@ -1836,6 +2529,12 @@ Create a new Microsoft 365 group or security group. Required fields: displayName
     async def create_group(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_group: POST /groups"""
         client = await get_client()
@@ -1854,6 +2553,12 @@ Update properties of a group object.""",
         group_id: str = Field(..., description="Parameter for group-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_group: PATCH /groups/{group-id}"""
         client = await get_client()
@@ -1871,8 +2576,17 @@ Delete a group. This permanently removes the group and its associated content.""
     async def delete_group(
         group_id: str = Field(..., description="Parameter for group-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_group: DELETE /groups/{group-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete group"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_group(group_id=group_id, params=params)
 
@@ -1888,6 +2602,12 @@ Get a list of the group's direct members.""",
     async def list_group_members(
         group_id: str = Field(..., description="Parameter for group-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_group_members: GET /groups/{group-id}/members"""
         client = await get_client()
@@ -1908,6 +2628,12 @@ Add a member to a group. Provide memberId or directoryObjectId in the request bo
             None, description="Request body data with memberId"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """add_group_member: POST /groups/{group-id}/members/$ref"""
         client = await get_client()
@@ -1930,8 +2656,17 @@ Remove a member from a group.""",
             ..., description="Parameter for member-id (directory object ID)"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """remove_group_member: DELETE /groups/{group-id}/members/{member-id}/$ref"""
+        if not await ctx_confirm_destructive(ctx, "remove group member"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.remove_group_member(
             group_id=group_id, member_id=member_id, params=params
@@ -1949,6 +2684,12 @@ Get owners of a group.""",
     async def list_group_owners(
         group_id: str = Field(..., description="Parameter for group-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_group_owners: GET /groups/{group-id}/owners"""
         client = await get_client()
@@ -1966,6 +2707,12 @@ List conversations in a Microsoft 365 group.""",
     async def list_group_conversations(
         group_id: str = Field(..., description="Parameter for group-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_group_conversations: GET /groups/{group-id}/conversations"""
         client = await get_client()
@@ -1983,6 +2730,12 @@ List drives (document libraries) of a group.""",
     async def list_group_drives(
         group_id: str = Field(..., description="Parameter for group-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_group_drives: GET /groups/{group-id}/drives"""
         client = await get_client()
@@ -2001,6 +2754,12 @@ Get the service health status for all services in the tenant.""",
     )
     async def list_service_health(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_service_health: GET /admin/serviceAnnouncement/healthOverviews"""
         client = await get_client()
@@ -2020,6 +2779,12 @@ Get the health status for a specific service.""",
             ..., description="Service name (e.g. 'Exchange Online')"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_service_health: GET /admin/serviceAnnouncement/healthOverviews/{service-name}"""
         client = await get_client()
@@ -2036,6 +2801,12 @@ List all service health issues for the tenant.""",
     )
     async def list_service_health_issues(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_service_health_issues: GET /admin/serviceAnnouncement/issues"""
         client = await get_client()
@@ -2053,6 +2824,12 @@ Get a specific service health issue.""",
     async def get_service_health_issue(
         issue_id: str = Field(..., description="Parameter for issue-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_service_health_issue: GET /admin/serviceAnnouncement/issues/{issue-id}"""
         client = await get_client()
@@ -2069,6 +2846,12 @@ List service update messages (message center posts) for the tenant.""",
     )
     async def list_service_update_messages(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_service_update_messages: GET /admin/serviceAnnouncement/messages"""
         client = await get_client()
@@ -2086,6 +2869,12 @@ Get a specific service update message.""",
     async def get_service_update_message(
         message_id: str = Field(..., description="Parameter for message-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_service_update_message: GET /admin/serviceAnnouncement/messages/{message-id}"""
         client = await get_client()
@@ -2104,6 +2893,12 @@ Get SharePoint admin settings for the tenant.""",
     )
     async def get_admin_sharepoint(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_admin_sharepoint: GET /admin/sharepoint"""
         client = await get_client()
@@ -2121,6 +2916,12 @@ Update SharePoint admin settings for the tenant.""",
     async def update_admin_sharepoint(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_admin_sharepoint: PATCH /admin/sharepoint"""
         client = await get_client()
@@ -2137,6 +2938,12 @@ List delegated admin relationships.""",
     )
     async def list_delegated_admin_relationships(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_delegated_admin_relationships: GET /tenantRelationships/delegatedAdminRelationships"""
         client = await get_client()
@@ -2154,6 +2961,12 @@ Get a specific delegated admin relationship.""",
     async def get_delegated_admin_relationship(
         rel_id: str = Field(..., description="Delegated admin relationship ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_delegated_admin_relationship: GET /tenantRelationships/delegatedAdminRelationships/{id}"""
         client = await get_client()
@@ -2174,6 +2987,12 @@ Get the properties and relationships of the currently authenticated organization
     )
     async def list_organization(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_organization: GET /organization"""
         client = await get_client()
@@ -2191,6 +3010,12 @@ Get a specific organization by ID.""",
     async def get_organization(
         org_id: str = Field(..., description="Parameter for organization-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_organization: GET /organization/{org-id}"""
         client = await get_client()
@@ -2209,6 +3034,12 @@ Update organization properties.""",
         org_id: str = Field(..., description="Parameter for organization-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_organization: PATCH /organization/{org-id}"""
         client = await get_client()
@@ -2226,6 +3057,12 @@ Get organization branding properties (sign-in page customization).""",
     async def get_org_branding(
         org_id: str = Field(..., description="Parameter for organization-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_org_branding: GET /organization/{org-id}/branding"""
         client = await get_client()
@@ -2244,6 +3081,12 @@ Update organization branding properties.""",
         org_id: str = Field(..., description="Parameter for organization-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_org_branding: PATCH /organization/{org-id}/branding"""
         client = await get_client()
@@ -2262,6 +3105,12 @@ List domains associated with the tenant.""",
     )
     async def list_domains(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_domains: GET /domains"""
         client = await get_client()
@@ -2279,6 +3128,12 @@ Get properties of a specific domain.""",
     async def get_domain(
         domain_id: str = Field(..., description="Domain name (e.g. 'contoso.com')"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_domain: GET /domains/{domain-id}"""
         client = await get_client()
@@ -2298,6 +3153,12 @@ Add a domain to the tenant. Provide the domain name as 'id' in the request body.
             None, description="Request body data with 'id' (domain name)"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_domain: POST /domains"""
         client = await get_client()
@@ -2315,8 +3176,17 @@ Delete a domain from the tenant.""",
     async def delete_domain(
         domain_id: str = Field(..., description="Domain name to delete"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_domain: DELETE /domains/{domain-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete domain"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_domain(domain_id=domain_id, params=params)
 
@@ -2332,6 +3202,12 @@ Verify ownership of a domain.""",
     async def verify_domain(
         domain_id: str = Field(..., description="Domain name to verify"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """verify_domain: POST /domains/{domain-id}/verify"""
         client = await get_client()
@@ -2349,6 +3225,12 @@ List DNS records required by the domain for Microsoft services.""",
     async def list_domain_service_configuration_records(
         domain_id: str = Field(..., description="Domain name"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_domain_service_configuration_records: GET /domains/{domain-id}/serviceConfigurationRecords"""
         client = await get_client()
@@ -2369,6 +3251,12 @@ List active webhook subscriptions for change notifications.""",
     )
     async def list_subscriptions(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_subscriptions: GET /subscriptions"""
         client = await get_client()
@@ -2386,6 +3274,12 @@ Get a specific subscription.""",
     async def get_subscription(
         subscription_id: str = Field(..., description="Parameter for subscription-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_subscription: GET /subscriptions/{subscription-id}"""
         client = await get_client()
@@ -2405,6 +3299,12 @@ Create a webhook subscription for change notifications. Required fields: changeT
     async def create_subscription(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_subscription: POST /subscriptions"""
         client = await get_client()
@@ -2423,6 +3323,12 @@ Renew a subscription by extending its expiration time.""",
         subscription_id: str = Field(..., description="Parameter for subscription-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_subscription: PATCH /subscriptions/{subscription-id}"""
         client = await get_client()
@@ -2442,8 +3348,17 @@ Delete a webhook subscription.""",
     async def delete_subscription(
         subscription_id: str = Field(..., description="Parameter for subscription-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_subscription: DELETE /subscriptions/{subscription-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete subscription"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_subscription(
             subscription_id=subscription_id, params=params
@@ -2462,6 +3377,12 @@ List online meetings for the current user. Returns meeting details including sub
     )
     async def list_online_meetings(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_online_meetings: GET /me/onlineMeetings"""
         client = await get_client()
@@ -2479,6 +3400,12 @@ Get a specific online meeting by ID. Returns full meeting details including join
     async def get_online_meeting(
         meeting_id: str = Field(..., description="Parameter for onlineMeeting-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_online_meeting: GET /me/onlineMeetings/{onlineMeeting-id}"""
         client = await get_client()
@@ -2496,6 +3423,12 @@ Create a new online meeting. Provide subject, startDateTime, endDateTime, and op
     async def create_online_meeting(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_online_meeting: POST /me/onlineMeetings"""
         client = await get_client()
@@ -2514,6 +3447,12 @@ Update an existing online meeting. Modify subject, times, or lobby settings.""",
         meeting_id: str = Field(..., description="Parameter for onlineMeeting-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_online_meeting: PATCH /me/onlineMeetings/{onlineMeeting-id}"""
         client = await get_client()
@@ -2533,8 +3472,17 @@ Delete an online meeting.""",
     async def delete_online_meeting(
         meeting_id: str = Field(..., description="Parameter for onlineMeeting-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_online_meeting: DELETE /me/onlineMeetings/{onlineMeeting-id}"""
+        if not await ctx_confirm_destructive(ctx, "delete online meeting"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_online_meeting(meeting_id=meeting_id, params=params)
 
@@ -2549,6 +3497,12 @@ List call records. Returns information about calls and meetings including partic
     )
     async def list_call_records(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_call_records: GET /communications/callRecords"""
         client = await get_client()
@@ -2566,6 +3520,12 @@ Get a specific call record by ID. Returns detailed call information including se
     async def get_call_record(
         call_id: str = Field(..., description="Parameter for callRecord-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_call_record: GET /communications/callRecords/{callRecord-id}"""
         client = await get_client()
@@ -2582,6 +3542,12 @@ List presence information for multiple users. Returns availability and activity 
     )
     async def list_presences(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_presences: GET /communications/presences"""
         client = await get_client()
@@ -2599,6 +3565,12 @@ Get presence for a specific user by user ID. Returns availability (Available, Bu
     async def get_presence(
         user_id: str = Field(..., description="User ID to get presence for"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_presence: GET /communications/presences/{presence-id}"""
         client = await get_client()
@@ -2615,6 +3587,12 @@ Get current user's presence status including availability and activity.""",
     )
     async def get_my_presence(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_my_presence: GET /me/presence"""
         client = await get_client()
@@ -2634,6 +3612,12 @@ Create an invitation for an external / guest user. Provide invitedUserEmailAddre
     async def create_invitation(
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_invitation: POST /invitations"""
         client = await get_client()
@@ -2650,6 +3634,12 @@ List conditional access policies.""",
     )
     async def list_conditional_access_policies(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_conditional_access_policies: GET /identity/conditionalAccess/policies"""
         client = await get_client()
@@ -2667,6 +3657,12 @@ Get a specific conditional access policy.""",
     async def get_conditional_access_policy(
         policy_id: str = Field(..., description="Conditional access policy ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_conditional_access_policy: GET /identity/conditionalAccess/policies/{id}"""
         client = await get_client()
@@ -2688,6 +3684,12 @@ Create a conditional access policy.""",
             None, description="Request body with displayName, state, conditions, etc."
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_conditional_access_policy: POST /identity/conditionalAccess/policies"""
         client = await get_client()
@@ -2706,6 +3708,12 @@ Update a conditional access policy.""",
         policy_id: str = Field(..., description="Conditional access policy ID"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_conditional_access_policy: PATCH /identity/conditionalAccess/policies/{id}"""
         client = await get_client()
@@ -2725,8 +3733,17 @@ Delete a conditional access policy.""",
     async def delete_conditional_access_policy(
         policy_id: str = Field(..., description="Conditional access policy ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_conditional_access_policy: DELETE /identity/conditionalAccess/policies/{id}"""
+        if not await ctx_confirm_destructive(ctx, "delete conditional access policy"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_conditional_access_policy(
             policy_id=policy_id, params=params
@@ -2743,6 +3760,12 @@ List access review schedule definitions.""",
     )
     async def list_access_reviews(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_access_reviews: GET /identityGovernance/accessReviewDefinitions"""
         client = await get_client()
@@ -2760,6 +3783,12 @@ Get a specific access review definition.""",
     async def get_access_review(
         review_id: str = Field(..., description="Access review schedule definition ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_access_review: GET /identityGovernance/accessReviewDefinitions/{id}"""
         client = await get_client()
@@ -2776,6 +3805,12 @@ List entitlement management access packages.""",
     )
     async def list_entitlement_access_packages(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_entitlement_access_packages: GET /identityGovernance/entitlementManagement/accessPackages"""
         client = await get_client()
@@ -2792,6 +3827,12 @@ List lifecycle management workflows.""",
     )
     async def list_lifecycle_workflows(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_lifecycle_workflows: GET /identityGovernance/lifecycleWorkflows/workflows"""
         client = await get_client()
@@ -2810,6 +3851,12 @@ List security alerts. Returns alert details including severity, status, and dete
     )
     async def list_security_alerts(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_security_alerts: GET /security/alerts_v2"""
         client = await get_client()
@@ -2827,6 +3874,12 @@ Get a specific security alert by ID.""",
     async def get_security_alert(
         alert_id: str = Field(..., description="Parameter for alert-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_security_alert: GET /security/alerts_v2/{alert-id}"""
         client = await get_client()
@@ -2845,6 +3898,12 @@ Update a security alert. Change status, assign to user, set classification/deter
         alert_id: str = Field(..., description="Parameter for alert-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_security_alert: PATCH /security/alerts_v2/{alert-id}"""
         client = await get_client()
@@ -2863,6 +3922,12 @@ List security incidents. Returns correlated alerts grouped into incidents.""",
     )
     async def list_security_incidents(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_security_incidents: GET /security/incidents"""
         client = await get_client()
@@ -2880,6 +3945,12 @@ Get a specific security incident by ID.""",
     async def get_security_incident(
         incident_id: str = Field(..., description="Parameter for incident-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_security_incident: GET /security/incidents/{incident-id}"""
         client = await get_client()
@@ -2900,6 +3971,12 @@ Update a security incident. Change status, assign, classify.""",
         incident_id: str = Field(..., description="Parameter for incident-id"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_security_incident: PATCH /security/incidents/{incident-id}"""
         client = await get_client()
@@ -2918,6 +3995,12 @@ List tenant secure scores over time.""",
     )
     async def list_secure_scores(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_secure_scores: GET /security/secureScores"""
         client = await get_client()
@@ -2934,6 +4017,12 @@ List threat intelligence hosts.""",
     )
     async def list_threat_intelligence_hosts(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_threat_intelligence_hosts: GET /security/threatIntelligence/hosts"""
         client = await get_client()
@@ -2951,6 +4040,12 @@ Get a specific threat intelligence host.""",
     async def get_threat_intelligence_host(
         host_id: str = Field(..., description="Parameter for host-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_threat_intelligence_host: GET /security/threatIntelligence/hosts/{host-id}"""
         client = await get_client()
@@ -2970,9 +4065,17 @@ Run an advanced hunting query using Kusto Query Language (KQL).""",
             None, description="Request body data with 'query' field"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
+        await ctx_progress(ctx, 0, 100)
         """run_hunting_query: POST /security/runHuntingQuery"""
         client = await get_client()
+        await ctx_progress(ctx, 100, 100)
         return await client.run_hunting_query(data=data, params=params)
 
     @mcp.tool(
@@ -2986,6 +4089,12 @@ List risk detections (sign-in anomalies, leaked credentials, etc.).""",
     )
     async def list_risk_detections(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_risk_detections: GET /identityProtection/riskDetections"""
         client = await get_client()
@@ -3003,6 +4112,12 @@ Get a specific risk detection.""",
     async def get_risk_detection(
         risk_id: str = Field(..., description="Risk detection ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_risk_detection: GET /identityProtection/riskDetections/{id}"""
         client = await get_client()
@@ -3019,6 +4134,12 @@ List users flagged as risky.""",
     )
     async def list_risky_users(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_risky_users: GET /identityProtection/riskyUsers"""
         client = await get_client()
@@ -3036,6 +4157,12 @@ Get a specific risky user.""",
     async def get_risky_user(
         user_id: str = Field(..., description="Risky user ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_risky_user: GET /identityProtection/riskyUsers/{id}"""
         client = await get_client()
@@ -3053,8 +4180,17 @@ Dismiss a risky user (mark as safe).""",
     async def dismiss_risky_user(
         user_id: str = Field(..., description="User ID to dismiss"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """dismiss_risky_user: POST /identityProtection/riskyUsers/dismiss"""
+        if not await ctx_confirm_destructive(ctx, "dismiss risky user"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.dismiss_risky_user(user_id=user_id, params=params)
 
@@ -3069,6 +4205,12 @@ List sensitivity labels.""",
     )
     async def list_sensitivity_labels(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_sensitivity_labels: GET /informationProtection/policy/labels"""
         client = await get_client()
@@ -3086,6 +4228,12 @@ Get a specific sensitivity label.""",
     async def get_sensitivity_label(
         label_id: str = Field(..., description="Sensitivity label ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_sensitivity_label: GET /informationProtection/policy/labels/{id}"""
         client = await get_client()
@@ -3104,6 +4252,12 @@ List directory audit log entries. Shows changes to directory objects (users, gro
     )
     async def list_directory_audits(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_directory_audits: GET /auditLogs/directoryAudits"""
         client = await get_client()
@@ -3121,6 +4275,12 @@ Get a specific directory audit entry.""",
     async def get_directory_audit(
         audit_id: str = Field(..., description="Parameter for directoryAudit-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_directory_audit: GET /auditLogs/directoryAudits/{directoryAudit-id}"""
         client = await get_client()
@@ -3137,6 +4297,12 @@ List sign-in activity logs. Shows user sign-in events with details.""",
     )
     async def list_sign_in_logs(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_sign_in_logs: GET /auditLogs/signIns"""
         client = await get_client()
@@ -3154,6 +4320,12 @@ Get a specific sign-in log entry.""",
     async def get_sign_in_log(
         sign_in_id: str = Field(..., description="Parameter for signIn-id"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_sign_in_log: GET /auditLogs/signIns/{signIn-id}"""
         client = await get_client()
@@ -3170,6 +4342,12 @@ List provisioning logs. Shows automated user/group provisioning events.""",
     )
     async def list_provisioning_logs(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_provisioning_logs: GET /auditLogs/provisioning"""
         client = await get_client()
@@ -3189,6 +4367,12 @@ Get email activity user detail report. Period: D7, D30, D90, D180.""",
     async def get_email_activity_report(
         period: str = Field("D7", description="Report period: D7, D30, D90, or D180"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_email_activity_report: GET /reports/getEmailActivityUserDetail"""
         client = await get_client()
@@ -3206,6 +4390,12 @@ Get mailbox usage detail report. Period: D7, D30, D90, D180.""",
     async def get_mailbox_usage_report(
         period: str = Field("D7", description="Report period: D7, D30, D90, or D180"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_mailbox_usage_report: GET /reports/getMailboxUsageDetail"""
         client = await get_client()
@@ -3223,6 +4413,12 @@ Get Office 365 active user detail report. Period: D7, D30, D90, D180.""",
     async def get_office365_active_users(
         period: str = Field("D7", description="Report period: D7, D30, D90, or D180"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_office365_active_users: GET /reports/getOffice365ActiveUserDetail"""
         client = await get_client()
@@ -3240,6 +4436,12 @@ Get SharePoint activity user detail report. Period: D7, D30, D90, D180.""",
     async def get_sharepoint_activity_report(
         period: str = Field("D7", description="Report period: D7, D30, D90, or D180"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_sharepoint_activity_report: GET /reports/getSharePointActivityUserDetail"""
         client = await get_client()
@@ -3257,6 +4459,12 @@ Get Teams user activity detail report. Period: D7, D30, D90, D180.""",
     async def get_teams_user_activity(
         period: str = Field("D7", description="Report period: D7, D30, D90, or D180"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_teams_user_activity: GET /reports/getTeamsUserActivityUserDetail"""
         client = await get_client()
@@ -3274,6 +4482,12 @@ Get OneDrive usage account detail report. Period: D7, D30, D90, D180.""",
     async def get_onedrive_usage_report(
         period: str = Field("D7", description="Report period: D7, D30, D90, or D180"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_onedrive_usage_report: GET /reports/getOneDriveUsageAccountDetail"""
         client = await get_client()
@@ -3292,6 +4506,12 @@ List app registrations in the tenant.""",
     )
     async def list_applications(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_applications: GET /applications"""
         client = await get_client()
@@ -3309,6 +4529,12 @@ Get a specific app registration.""",
     async def get_application(
         app_id: str = Field(..., description="Application object ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_application: GET /applications/{id}"""
         client = await get_client()
@@ -3328,6 +4554,12 @@ Create an app registration.""",
             None, description="Request body with displayName, signInAudience, etc."
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_application: POST /applications"""
         client = await get_client()
@@ -3346,6 +4578,12 @@ Update an app registration.""",
         app_id: str = Field(..., description="Application object ID"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_application: PATCH /applications/{id}"""
         client = await get_client()
@@ -3363,8 +4601,17 @@ Delete an app registration.""",
     async def delete_application(
         app_id: str = Field(..., description="Application object ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_application: DELETE /applications/{id}"""
+        if not await ctx_confirm_destructive(ctx, "delete application"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_application(app_id=app_id, params=params)
 
@@ -3383,6 +4630,12 @@ Add a password credential (client secret) to an app.""",
             None, description="Request body with optional displayName"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """add_application_password: POST /applications/{id}/addPassword"""
         client = await get_client()
@@ -3405,8 +4658,17 @@ Remove a password credential from an app.""",
             None, description="Request body with keyId (UUID of the credential)"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """remove_application_password: POST /applications/{id}/removePassword"""
+        if not await ctx_confirm_destructive(ctx, "remove application password"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.remove_application_password(
             app_id=app_id, data=data, params=params
@@ -3423,6 +4685,12 @@ List service principals (enterprise apps).""",
     )
     async def list_service_principals(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_service_principals: GET /servicePrincipals"""
         client = await get_client()
@@ -3440,6 +4708,12 @@ Get a specific service principal.""",
     async def get_service_principal(
         sp_id: str = Field(..., description="Service principal ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_service_principal: GET /servicePrincipals/{id}"""
         client = await get_client()
@@ -3459,6 +4733,12 @@ Create a service principal for an app.""",
             None, description="Request body with appId"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_service_principal: POST /servicePrincipals"""
         client = await get_client()
@@ -3477,6 +4757,12 @@ Update a service principal.""",
         sp_id: str = Field(..., description="Service principal ID"),
         data: dict[str, Any] | None = Field(None, description="Request body data"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_service_principal: PATCH /servicePrincipals/{id}"""
         client = await get_client()
@@ -3496,8 +4782,17 @@ Delete a service principal.""",
     async def delete_service_principal(
         sp_id: str = Field(..., description="Service principal ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_service_principal: DELETE /servicePrincipals/{id}"""
+        if not await ctx_confirm_destructive(ctx, "delete service principal"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_service_principal(sp_id=sp_id, params=params)
 
@@ -3514,6 +4809,12 @@ List directory objects.""",
     )
     async def list_directory_objects(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_directory_objects: GET /directoryObjects"""
         client = await get_client()
@@ -3531,6 +4832,12 @@ Get a specific directory object.""",
     async def get_directory_object(
         object_id: str = Field(..., description="Directory object ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_directory_object: GET /directoryObjects/{id}"""
         client = await get_client()
@@ -3547,6 +4854,12 @@ List activated directory roles.""",
     )
     async def list_directory_roles(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_directory_roles: GET /directoryRoles"""
         client = await get_client()
@@ -3564,6 +4877,12 @@ Get a specific activated directory role.""",
     async def get_directory_role(
         role_id: str = Field(..., description="Directory role ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_directory_role: GET /directoryRoles/{id}"""
         client = await get_client()
@@ -3580,6 +4899,12 @@ List all directory role templates (built-in role definitions).""",
     )
     async def list_directory_role_templates(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_directory_role_templates: GET /directoryRoleTemplates"""
         client = await get_client()
@@ -3596,8 +4921,17 @@ List recently deleted directory items (users, groups, apps).""",
     )
     async def list_deleted_items(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_deleted_items: GET /directory/deletedItems"""
+        if not await ctx_confirm_destructive(ctx, "list deleted items"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.list_deleted_items(params=params)
 
@@ -3613,8 +4947,17 @@ Restore a recently deleted directory item.""",
     async def restore_deleted_item(
         object_id: str = Field(..., description="Deleted object ID to restore"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """restore_deleted_item: POST /directory/deletedItems/{id}/restore"""
+        if not await ctx_confirm_destructive(ctx, "restore deleted item"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.restore_deleted_item(object_id=object_id, params=params)
 
@@ -3629,6 +4972,12 @@ List RBAC directory role definitions.""",
     )
     async def list_role_definitions(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_role_definitions: GET /roleManagement/directory/roleDefinitions"""
         client = await get_client()
@@ -3646,6 +4995,12 @@ Get a specific RBAC role definition.""",
     async def get_role_definition(
         role_id: str = Field(..., description="Role definition ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_role_definition: GET /roleManagement/directory/roleDefinitions/{id}"""
         client = await get_client()
@@ -3662,6 +5017,12 @@ List RBAC directory role assignments.""",
     )
     async def list_role_assignments(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_role_assignments: GET /roleManagement/directory/roleAssignments"""
         client = await get_client()
@@ -3679,6 +5040,12 @@ Get a specific RBAC role assignment.""",
     async def get_role_assignment(
         assignment_id: str = Field(..., description="Role assignment ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_role_assignment: GET /roleManagement/directory/roleAssignments/{id}"""
         client = await get_client()
@@ -3701,6 +5068,12 @@ Create a new RBAC role assignment.""",
             description="Request body with roleDefinitionId, principalId, directoryScopeId",
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_role_assignment: POST /roleManagement/directory/roleAssignments"""
         client = await get_client()
@@ -3719,6 +5092,12 @@ Get the tenant authorization policy.""",
     )
     async def get_authorization_policy(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_authorization_policy: GET /policies/authorizationPolicy"""
         client = await get_client()
@@ -3735,6 +5114,12 @@ List token lifetime policies.""",
     )
     async def list_token_lifetime_policies(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_token_lifetime_policies: GET /policies/tokenLifetimePolicies"""
         client = await get_client()
@@ -3751,6 +5136,12 @@ List token issuance policies.""",
     )
     async def list_token_issuance_policies(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_token_issuance_policies: GET /policies/tokenIssuancePolicies"""
         client = await get_client()
@@ -3767,6 +5158,12 @@ List permission grant policies.""",
     )
     async def list_permission_grant_policies(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_permission_grant_policies: GET /policies/permissionGrantPolicies"""
         client = await get_client()
@@ -3783,6 +5180,12 @@ Get the admin consent request policy.""",
     )
     async def get_admin_consent_policy(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_admin_consent_policy: GET /policies/adminConsentRequestPolicy"""
         client = await get_client()
@@ -3801,6 +5204,12 @@ List devices registered in the directory.""",
     )
     async def list_devices(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_devices: GET /devices"""
         client = await get_client()
@@ -3818,6 +5227,12 @@ Get a specific device.""",
     async def get_device(
         device_id: str = Field(..., description="Device ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_device: GET /devices/{id}"""
         client = await get_client()
@@ -3835,8 +5250,17 @@ Delete a device.""",
     async def delete_device(
         device_id: str = Field(..., description="Device ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_device: DELETE /devices/{id}"""
+        if not await ctx_confirm_destructive(ctx, "delete device"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_device(device_id=device_id, params=params)
 
@@ -3851,6 +5275,12 @@ List Intune managed devices.""",
     )
     async def list_managed_devices(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_managed_devices: GET /deviceManagement/managedDevices"""
         client = await get_client()
@@ -3868,6 +5298,12 @@ Get a specific managed device.""",
     async def get_managed_device(
         device_id: str = Field(..., description="Managed device ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_managed_device: GET /deviceManagement/managedDevices/{id}"""
         client = await get_client()
@@ -3884,6 +5320,12 @@ List device compliance policies.""",
     )
     async def list_device_compliance_policies(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_device_compliance_policies: GET /deviceManagement/deviceCompliancePolicies"""
         client = await get_client()
@@ -3900,6 +5342,12 @@ List device configuration profiles.""",
     )
     async def list_device_configurations(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_device_configurations: GET /deviceManagement/deviceConfigurations"""
         client = await get_client()
@@ -3917,8 +5365,17 @@ Wipe a managed device (factory reset).""",
     async def wipe_managed_device(
         device_id: str = Field(..., description="Managed device ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """wipe_managed_device: POST /deviceManagement/managedDevices/{id}/wipe"""
+        if not await ctx_confirm_destructive(ctx, "wipe managed device"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.wipe_managed_device(device_id=device_id, params=params)
 
@@ -3934,6 +5391,12 @@ Retire a managed device (remove company data).""",
     async def retire_managed_device(
         device_id: str = Field(..., description="Managed device ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """retire_managed_device: POST /deviceManagement/managedDevices/{id}/retire"""
         client = await get_client()
@@ -3952,6 +5415,12 @@ List education classes.""",
     )
     async def list_education_classes(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_education_classes: GET /education/classes"""
         client = await get_client()
@@ -3969,6 +5438,12 @@ Get a specific education class.""",
     async def get_education_class(
         class_id: str = Field(..., description="Education class ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_education_class: GET /education/classes/{id}"""
         client = await get_client()
@@ -3985,6 +5460,12 @@ List education schools.""",
     )
     async def list_education_schools(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_education_schools: GET /education/schools"""
         client = await get_client()
@@ -4002,6 +5483,12 @@ Get a specific education school.""",
     async def get_education_school(
         school_id: str = Field(..., description="Education school ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_education_school: GET /education/schools/{id}"""
         client = await get_client()
@@ -4018,6 +5505,12 @@ List education users.""",
     )
     async def list_education_users(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_education_users: GET /education/users"""
         client = await get_client()
@@ -4035,6 +5528,12 @@ List assignments for an education class.""",
     async def list_education_assignments(
         class_id: str = Field(..., description="Education class ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_education_assignments: GET /education/classes/{id}/assignments"""
         client = await get_client()
@@ -4053,6 +5552,12 @@ List terms-of-use agreements.""",
     )
     async def list_agreements(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_agreements: GET /agreements"""
         client = await get_client()
@@ -4070,6 +5575,12 @@ Get a specific agreement.""",
     async def get_agreement(
         agreement_id: str = Field(..., description="Agreement ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_agreement: GET /agreements/{id}"""
         client = await get_client()
@@ -4089,6 +5600,12 @@ Create a terms-of-use agreement.""",
             None, description="Request body with displayName"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_agreement: POST /agreements"""
         client = await get_client()
@@ -4106,8 +5623,17 @@ Delete an agreement.""",
     async def delete_agreement(
         agreement_id: str = Field(..., description="Agreement ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_agreement: DELETE /agreements/{id}"""
+        if not await ctx_confirm_destructive(ctx, "delete agreement"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_agreement(agreement_id=agreement_id, params=params)
 
@@ -4124,6 +5650,12 @@ List conference rooms.""",
     )
     async def list_rooms(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_rooms: GET /places/microsoft.graph.room"""
         client = await get_client()
@@ -4140,6 +5672,12 @@ List room lists.""",
     )
     async def list_room_lists(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_room_lists: GET /places/microsoft.graph.roomList"""
         client = await get_client()
@@ -4157,6 +5695,12 @@ Get a specific place (room or room list).""",
     async def get_place(
         place_id: str = Field(..., description="Place ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_place: GET /places/{id}"""
         client = await get_client()
@@ -4177,6 +5721,12 @@ Update a place (room).""",
             None, description="Request body with displayName, capacity, etc."
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """update_place: PATCH /places/{id}"""
         client = await get_client()
@@ -4195,6 +5745,12 @@ List printers registered in the tenant.""",
     )
     async def list_printers(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_printers: GET /print/printers"""
         client = await get_client()
@@ -4212,6 +5768,12 @@ Get a specific printer.""",
     async def get_printer(
         printer_id: str = Field(..., description="Printer ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_printer: GET /print/printers/{id}"""
         client = await get_client()
@@ -4229,6 +5791,12 @@ List print jobs for a printer.""",
     async def list_print_jobs(
         printer_id: str = Field(..., description="Printer ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_print_jobs: GET /print/printers/{id}/jobs"""
         client = await get_client()
@@ -4247,6 +5815,12 @@ Create a print job.""",
         printer_id: str = Field(..., description="Printer ID"),
         data: dict[str, Any] | None = Field(None, description="Request body"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_print_job: POST /print/printers/{id}/jobs"""
         client = await get_client()
@@ -4265,6 +5839,12 @@ List printer shares.""",
     )
     async def list_print_shares(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_print_shares: GET /print/shares"""
         client = await get_client()
@@ -4283,6 +5863,12 @@ List subject rights requests (GDPR/CCPA).""",
     )
     async def list_subject_rights_requests(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_subject_rights_requests: GET /privacy/subjectRightsRequests"""
         client = await get_client()
@@ -4300,6 +5886,12 @@ Get a specific subject rights request.""",
     async def get_subject_rights_request(
         request_id: str = Field(..., description="Subject rights request ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_subject_rights_request: GET /privacy/subjectRightsRequests/{id}"""
         client = await get_client()
@@ -4321,6 +5913,12 @@ Create a subject rights request.""",
             None, description="Request body with displayName, description"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_subject_rights_request: POST /privacy/subjectRightsRequests"""
         client = await get_client()
@@ -4339,6 +5937,12 @@ List booking businesses.""",
     )
     async def list_booking_businesses(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_booking_businesses: GET /solutions/bookingBusinesses"""
         client = await get_client()
@@ -4356,6 +5960,12 @@ Get a specific booking business.""",
     async def get_booking_business(
         business_id: str = Field(..., description="Booking business ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_booking_business: GET /solutions/bookingBusinesses/{id}"""
         client = await get_client()
@@ -4373,6 +5983,12 @@ List appointments for a booking business.""",
     async def list_booking_appointments(
         business_id: str = Field(..., description="Booking business ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_booking_appointments: GET /solutions/bookingBusinesses/{id}/appointments"""
         client = await get_client()
@@ -4395,6 +6011,12 @@ Create a booking appointment.""",
             None, description="Request body with serviceId, customerName"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_booking_appointment: POST /solutions/bookingBusinesses/{id}/appointments"""
         client = await get_client()
@@ -4413,6 +6035,12 @@ List virtual event townhalls.""",
     )
     async def list_virtual_events(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_virtual_events: GET /solutions/virtualEvents/townhalls"""
         client = await get_client()
@@ -4431,6 +6059,12 @@ List file storage containers.""",
     )
     async def list_file_storage_containers(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_file_storage_containers: GET /storage/fileStorage/containers"""
         client = await get_client()
@@ -4448,6 +6082,12 @@ Get a specific file storage container.""",
     async def get_file_storage_container(
         container_id: str = Field(..., description="File storage container ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_file_storage_container: GET /storage/fileStorage/containers/{id}"""
         client = await get_client()
@@ -4469,6 +6109,12 @@ Create a file storage container.""",
             None, description="Request body with displayName, containerTypeId"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_file_storage_container: POST /storage/fileStorage/containers"""
         client = await get_client()
@@ -4487,6 +6133,12 @@ List learning providers.""",
     )
     async def list_learning_providers(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_learning_providers: GET /employeeExperience/learningProviders"""
         client = await get_client()
@@ -4504,6 +6156,12 @@ Get a specific learning provider.""",
     async def get_learning_provider(
         provider_id: str = Field(..., description="Learning provider ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_learning_provider: GET /employeeExperience/learningProviders/{id}"""
         client = await get_client()
@@ -4522,6 +6180,12 @@ List learning course activities for the current user.""",
     )
     async def list_learning_course_activities(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_learning_course_activities: GET /me/employeeExperience/learningCourseActivities"""
         client = await get_client()
@@ -4540,6 +6204,12 @@ List Microsoft Search external connections.""",
     )
     async def list_external_connections(
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """list_external_connections: GET /external/connections"""
         client = await get_client()
@@ -4557,6 +6227,12 @@ Get a specific external connection.""",
     async def get_external_connection(
         connection_id: str = Field(..., description="External connection ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """get_external_connection: GET /external/connections/{id}"""
         client = await get_client()
@@ -4578,6 +6254,12 @@ Create an external connection for Microsoft Search.""",
             None, description="Request body with id, name, description"
         ),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """create_external_connection: POST /external/connections"""
         client = await get_client()
@@ -4595,8 +6277,17 @@ Delete an external connection.""",
     async def delete_external_connection(
         connection_id: str = Field(..., description="External connection ID"),
         params: dict[str, Any] | None = Field(None, description="Query parameters"),
+<<<<<<< HEAD
+=======
+        ctx: Context = Field(
+            description="MCP context for progress reporting", default=None
+        ),
+>>>>>>> a8076f3 (chore: manual fixes)
     ) -> Any:
         """delete_external_connection: DELETE /external/connections/{id}"""
+        if not await ctx_confirm_destructive(ctx, "delete external connection"):
+            return {"status": "cancelled", "message": "Operation cancelled by user"}
+        await ctx_progress(ctx, 0, 100)
         client = await get_client()
         return await client.delete_external_connection(
             connection_id=connection_id, params=params
@@ -4730,7 +6421,7 @@ def get_mcp_instance() -> tuple[Any, Any, Any, Any]:
 
     for mw in middlewares:
         mcp.add_middleware(mw)
-    registered_tags = []
+    registered_tags: list[str] = []
     return mcp, args, middlewares, registered_tags
 
 
