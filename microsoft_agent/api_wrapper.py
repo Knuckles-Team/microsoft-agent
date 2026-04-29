@@ -47,7 +47,12 @@ SCOPES = [
     "LifecycleWorkflows.Read.All",
 ]
 
-auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
+# Only create global auth_manager if not in test mode
+auth_manager: AuthManager | None
+if not os.environ.get("TESTING"):
+    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
+else:
+    auth_manager = None
 
 
 class MicrosoftGraphApi:
@@ -431,7 +436,7 @@ class MicrosoftGraphApi:
         from msgraph.generated.users.item.messages.item.move.move_post_request_body import (
             MovePostRequestBody,
         )
-        from msgraph.generated.users.item.messages.item.move.move_post_request_builder import (
+        from msgraph.generated.users.item.messages.item.move.move_request_builder import (
             MoveRequestBuilder,
         )
 

@@ -1,2 +1,5 @@
+from __future__ import annotations
+
 def test_placeholder():
-    pass
+    """Placeholder test to satisfy pytest when no real tests exist."""
+    assert True

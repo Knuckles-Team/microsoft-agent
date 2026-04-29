@@ -1,6 +1,6 @@
 import asyncio
 import os
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
 from crawl4ai.deep_crawling import BFSDeepCrawlStrategy, FilterChain, URLPatternFilter
