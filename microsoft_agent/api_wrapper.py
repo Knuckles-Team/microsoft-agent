@@ -66,7 +66,7 @@ class MicrosoftGraphApi:
 
         status = self.verify_login()
         if "Not authenticated" in status:
-            from agent_utilities.exceptions import AuthError
+            from agent_utilities.core.exceptions import AuthError
 
             raise AuthError(f"Microsoft authentication failed: {status}")
 

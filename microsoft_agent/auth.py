@@ -7,13 +7,13 @@ from typing import Any
 
 import keyring
 import msal
-from agent_utilities.exceptions import AuthError, UnauthorizedError
+from agent_utilities.core.exceptions import AuthError, UnauthorizedError
 from keyring.errors import KeyringError
 
 logger = logging.getLogger(__name__)
 
 SERVICE_NAME = "microsoft-agent-mcp"
-TOKEN_CACHE_ACCOUNT = "msal_token_cache"
+TOKEN_CACHE_ACCOUNT = "msal_token_cache"  # nosec B105
 SELECTED_ACCOUNT_KEY = "selected_account"
 FALLBACK_DIR = Path.home() / ".microsoft-agent"
 FALLBACK_PATH = FALLBACK_DIR / ".token_cache.json"
@@ -219,7 +219,7 @@ class AuthManager:
 
 
 async def get_client():
-    from agent_utilities.middlewares import local
+    from agent_utilities.mcp.middlewares import local
 
     from microsoft_agent.api_wrapper import MicrosoftGraphApi
 
