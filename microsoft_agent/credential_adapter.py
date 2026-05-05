@@ -23,7 +23,11 @@ class AuthManagerCredential(TokenCredential):
         **kwargs: Any,
     ) -> AccessToken:
 
-        token_details = self.auth_manager.get_token_details()
+        token_details = self.auth_manager.get_token_details(
+            claims=claims,
+            tenant_id=tenant_id,
+            **kwargs
+        )
 
         if not token_details:
 

@@ -13,7 +13,7 @@ from keyring.errors import KeyringError
 logger = logging.getLogger(__name__)
 
 SERVICE_NAME = "microsoft-agent-mcp"
-TOKEN_CACHE_ACCOUNT = "msal_token_cache"
+TOKEN_CACHE_ACCOUNT = "msal_token_cache"  # nosec B105
 SELECTED_ACCOUNT_KEY = "selected_account"
 FALLBACK_DIR = Path.home() / ".microsoft-agent"
 FALLBACK_PATH = FALLBACK_DIR / ".token_cache.json"
@@ -136,13 +136,26 @@ class AuthManager:
 
         return None
 
-    def get_token_details(self) -> dict[str, Any] | None:
+    def get_token_details(
+        self,
+        claims: str | None = None,
+        tenant_id: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | None:
         """Get the full token response from MSAL."""
         account = self.get_current_account()
         if not account:
             return None
 
-        result = self.msal_app.acquire_token_silent(self.scopes, account=account)
+        authority = f"https://login.microsoftonline.com/{tenant_id}" if tenant_id else None
+
+        result = self.msal_app.acquire_token_silent(
+            self.scopes,
+            account=account,
+            claims_challenge=claims,
+            authority=authority,
+            **kwargs
+        )
         if result and "access_token" in result:
             return result
 
@@ -185,7 +198,7 @@ class AuthManager:
         try:
             keyring.delete_password(SERVICE_NAME, TOKEN_CACHE_ACCOUNT)
             keyring.delete_password(SERVICE_NAME, SELECTED_ACCOUNT_KEY)
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
         if FALLBACK_PATH.exists():
