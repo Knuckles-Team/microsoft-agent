@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.6.0*
+*Version: 0.7.0*
 
 ## Overview
 
@@ -255,3 +255,138 @@ Documentation:
 
 [Microsoft API Docs](https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview?view=graph-rest-1.0)
 [Microsoft Graph SDK](https://github.com/microsoftgraph/msgraph-sdk-python)
+
+
+## MCP Configuration Examples
+
+### 1. Standard IO (stdio) Deployment
+
+```json
+{
+  "mcpServers": {
+    "microsoft-agent": {
+      "command": "uv",
+      "args": [
+        "run",
+        "microsoft-mcp"
+      ],
+      "env": {
+        "ADMINTOOL": "True",
+        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
+        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
+        "AGREEMENTSTOOL": "True",
+        "APPLICATIONSTOOL": "True",
+        "AUDITTOOL": "True",
+        "AUTHTOOL": "True",
+        "CALENDARTOOL": "True",
+        "CHATTOOL": "True",
+        "COMMUNICATIONSTOOL": "True",
+        "CONNECTIONSTOOL": "True",
+        "CONTACTSTOOL": "True",
+        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
+        "DEVICESTOOL": "True",
+        "DIRECTORYTOOL": "True",
+        "DOMAINSTOOL": "True",
+        "EDUCATIONTOOL": "True",
+        "EMPLOYEE_EXPERIENCETOOL": "True",
+        "FILESTOOL": "True",
+        "GROUPSTOOL": "True",
+        "IDENTITYTOOL": "True",
+        "MAILTOOL": "True",
+        "METATOOL": "True",
+        "MICROSOFT_ENDPOINTS_JSON": "<YOUR_MICROSOFT_ENDPOINTS_JSON>",
+        "MICROSOFT_TOKEN": "<YOUR_MICROSOFT_TOKEN>",
+        "MISCTOOL": "True",
+        "NOTESTOOL": "True",
+        "OIDC_CLIENT_ID": "<YOUR_OIDC_CLIENT_ID>",
+        "ORGANIZATIONTOOL": "True",
+        "PLACESTOOL": "True",
+        "POLICIESTOOL": "True",
+        "PRINTTOOL": "True",
+        "PRIVACYTOOL": "True",
+        "REPORTSTOOL": "True",
+        "SEARCHTOOL": "True",
+        "SECURITYTOOL": "True",
+        "SITESTOOL": "True",
+        "SOLUTIONSTOOL": "True",
+        "STORAGETOOL": "True",
+        "SUBSCRIPTIONSTOOL": "True",
+        "TASKSTOOL": "True",
+        "TEAMSTOOL": "True",
+        "TESTING": "<YOUR_TESTING>",
+        "USER": "<YOUR_USER>",
+        "USERTOOL": "True"
+      }
+    }
+  }
+}
+```
+
+### 2. Streamable HTTP (SSE) Deployment
+
+```json
+{
+  "mcpServers": {
+    "microsoft-agent": {
+      "command": "uv",
+      "args": [
+        "run",
+        "microsoft-mcp",
+        "--transport",
+        "http",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "env": {
+        "ADMINTOOL": "True",
+        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
+        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
+        "AGREEMENTSTOOL": "True",
+        "APPLICATIONSTOOL": "True",
+        "AUDITTOOL": "True",
+        "AUTHTOOL": "True",
+        "CALENDARTOOL": "True",
+        "CHATTOOL": "True",
+        "COMMUNICATIONSTOOL": "True",
+        "CONNECTIONSTOOL": "True",
+        "CONTACTSTOOL": "True",
+        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
+        "DEVICESTOOL": "True",
+        "DIRECTORYTOOL": "True",
+        "DOMAINSTOOL": "True",
+        "EDUCATIONTOOL": "True",
+        "EMPLOYEE_EXPERIENCETOOL": "True",
+        "FILESTOOL": "True",
+        "GROUPSTOOL": "True",
+        "IDENTITYTOOL": "True",
+        "MAILTOOL": "True",
+        "METATOOL": "True",
+        "MICROSOFT_ENDPOINTS_JSON": "<YOUR_MICROSOFT_ENDPOINTS_JSON>",
+        "MICROSOFT_TOKEN": "<YOUR_MICROSOFT_TOKEN>",
+        "MISCTOOL": "True",
+        "NOTESTOOL": "True",
+        "OIDC_CLIENT_ID": "<YOUR_OIDC_CLIENT_ID>",
+        "ORGANIZATIONTOOL": "True",
+        "PLACESTOOL": "True",
+        "POLICIESTOOL": "True",
+        "PRINTTOOL": "True",
+        "PRIVACYTOOL": "True",
+        "REPORTSTOOL": "True",
+        "SEARCHTOOL": "True",
+        "SECURITYTOOL": "True",
+        "SITESTOOL": "True",
+        "SOLUTIONSTOOL": "True",
+        "STORAGETOOL": "True",
+        "SUBSCRIPTIONSTOOL": "True",
+        "TASKSTOOL": "True",
+        "TEAMSTOOL": "True",
+        "TESTING": "<YOUR_TESTING>",
+        "USER": "<YOUR_USER>",
+        "USERTOOL": "True"
+      }
+    }
+  }
+}
+```

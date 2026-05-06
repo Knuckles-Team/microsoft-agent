@@ -1,0 +1,58 @@
+{
+  "mcpServers": {
+    "microsoft-agent": {
+      "command": "uv",
+      "args": [
+        "run",
+        "microsoft-mcp"
+      ],
+      "env": {
+        "MICROSOFT_ENDPOINTS_JSON": "<YOUR_MICROSOFT_ENDPOINTS_JSON>",
+        "MICROSOFT_TOKEN": "<YOUR_MICROSOFT_TOKEN>",
+        "TESTING": "<YOUR_TESTING>",
+        "ADMINTOOL": "True",
+        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
+        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
+        "AGREEMENTSTOOL": "True",
+        "APPLICATIONSTOOL": "True",
+        "AUDITTOOL": "True",
+        "AUTHTOOL": "True",
+        "CALENDARTOOL": "True",
+        "CHATTOOL": "True",
+        "COMMUNICATIONSTOOL": "True",
+        "CONNECTIONSTOOL": "True",
+        "CONTACTSTOOL": "True",
+        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
+        "DEVICESTOOL": "True",
+        "DIRECTORYTOOL": "True",
+        "DOMAINSTOOL": "True",
+        "EDUCATIONTOOL": "True",
+        "EMPLOYEE_EXPERIENCETOOL": "True",
+        "FILESTOOL": "True",
+        "GROUPSTOOL": "True",
+        "IDENTITYTOOL": "True",
+        "MAILTOOL": "True",
+        "METATOOL": "True",
+        "MISCTOOL": "True",
+        "NOTESTOOL": "True",
+        "OIDC_CLIENT_ID": "<YOUR_OIDC_CLIENT_ID>",
+        "ORGANIZATIONTOOL": "True",
+        "PLACESTOOL": "True",
+        "POLICIESTOOL": "True",
+        "PRINTTOOL": "True",
+        "PRIVACYTOOL": "True",
+        "REPORTSTOOL": "True",
+        "SEARCHTOOL": "True",
+        "SECURITYTOOL": "True",
+        "SITESTOOL": "True",
+        "SOLUTIONSTOOL": "True",
+        "STORAGETOOL": "True",
+        "SUBSCRIPTIONSTOOL": "True",
+        "TASKSTOOL": "True",
+        "TEAMSTOOL": "True",
+        "USER": "<YOUR_USER>",
+        "USERTOOL": "True"
+      }
+    }
+  }
+}
