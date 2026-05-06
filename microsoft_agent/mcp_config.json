@@ -1,10 +1,10 @@
 {
   "mcpServers": {
     "microsoft-agent": {
-      "command": "microsoft-mcp",
+      "command": "uv",
       "args": [
-        "--transport",
-        "stdio"
+        "run",
+        "microsoft-mcp"
       ],
       "env": {
         "MICROSOFT_CLIENT_ID": "${MICROSOFT_CLIENT_ID}",
@@ -47,7 +47,14 @@
         "IDENTITYTOOL": "${ IDENTITYTOOL:-True }",
         "COMMUNICATIONSTOOL": "${ COMMUNICATIONSTOOL:-True }",
         "MAILTOOL": "${ MAILTOOL:-True }",
-        "OIDC_CLIENT_ID": "${OIDC_CLIENT_ID}"
+        "OIDC_CLIENT_ID": "${OIDC_CLIENT_ID}",
+        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
+        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
+        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
+        "MICROSOFT_ENDPOINTS_JSON": "<YOUR_MICROSOFT_ENDPOINTS_JSON>",
+        "MICROSOFT_TOKEN": "<YOUR_MICROSOFT_TOKEN>",
+        "TESTING": "<YOUR_TESTING>",
+        "USER": "<YOUR_USER>"
       }
     }
   }
