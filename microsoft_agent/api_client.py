@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Any
 
 from msgraph import GraphServiceClient
@@ -78,7 +79,7 @@ class MicrosoftGraphApi:
                 return "Already authenticated."
 
         def callback(msg):
-            print(msg)
+            print(msg, file=sys.stderr)
 
         return self.auth_manager.acquire_token_by_device_code(callback=callback)
 
@@ -150,7 +151,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing messages: {e}")
+            print(f"Error listing messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_mail_folders(self, params: dict | None = None) -> dict[str, Any]:
@@ -185,7 +186,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing mail folders: {e}")
+            print(f"Error listing mail folders: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_mail_folder_messages(
@@ -222,7 +223,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing folder messages: {e}")
+            print(f"Error listing folder messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_mail_message(
@@ -255,7 +256,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting message: {e}")
+            print(f"Error getting message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_me(self) -> dict[str, Any]:
@@ -273,7 +274,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting me: {e}")
+            print(f"Error getting me: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def send_mail(
@@ -323,7 +324,7 @@ class MicrosoftGraphApi:
             await self.client.me.send_mail.post(request_body)
             return {"status": "success"}
         except Exception as e:
-            print(f"Error sending mail: {e}")
+            print(f"Error sending mail: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_draft_email(
@@ -375,7 +376,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating draft: {e}")
+            print(f"Error creating draft: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_users(self, params: dict | None = None) -> dict[str, Any]:
@@ -414,7 +415,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing users: {e}")
+            print(f"Error listing users: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_mail_message(
@@ -455,7 +456,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error moving message: {e}")
+            print(f"Error moving message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_mail_message(
@@ -517,7 +518,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error adding attachment: {e}")
+            print(f"Error adding attachment: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_mail_attachments(
@@ -548,7 +549,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing attachments: {e}")
+            print(f"Error listing attachments: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_mail_attachment(
@@ -579,7 +580,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting attachment: {e}")
+            print(f"Error getting attachment: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_mail_attachment(
@@ -594,7 +595,7 @@ class MicrosoftGraphApi:
             )
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting attachment: {e}")
+            print(f"Error deleting attachment: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_shared_mailbox_messages(
@@ -633,7 +634,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing shared mailbox messages: {e}")
+            print(f"Error listing shared mailbox messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_shared_mailbox_folder_messages(
@@ -674,7 +675,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing shared mailbox folder messages: {e}")
+            print(f"Error listing shared mailbox folder messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_shared_mailbox_message(
@@ -707,7 +708,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting shared mailbox message: {e}")
+            print(f"Error getting shared mailbox message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def send_shared_mailbox_mail(
@@ -758,7 +759,7 @@ class MicrosoftGraphApi:
 
             return {"status": "success"}
         except Exception as e:
-            print(f"Error sending shared mailbox mail: {e}")
+            print(f"Error sending shared mailbox mail: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_calendar_events(
@@ -796,7 +797,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing events: {e}")
+            print(f"Error listing events: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_calendar_event(
@@ -835,7 +836,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting event: {e}")
+            print(f"Error getting event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_calendar_event(
@@ -889,7 +890,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating event: {e}")
+            print(f"Error creating event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_calendar_event(
@@ -917,7 +918,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating event: {e}")
+            print(f"Error updating event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_calendar_event(
@@ -928,7 +929,7 @@ class MicrosoftGraphApi:
             await self.client.me.events.by_event_id(event_id).delete()
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting event: {e}")
+            print(f"Error deleting event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_calendars(self, params: dict | None = None) -> dict[str, Any]:
@@ -959,7 +960,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing calendars: {e}")
+            print(f"Error listing calendars: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_calendar_view(
@@ -995,7 +996,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting calendar view: {e}")
+            print(f"Error getting calendar view: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_specific_calendar_events(
@@ -1036,7 +1037,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing specific calendar events: {e}")
+            print(f"Error listing specific calendar events: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_specific_calendar_event(
@@ -1078,7 +1079,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting specific calendar event: {e}")
+            print(f"Error getting specific calendar event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_specific_calendar_event(
@@ -1106,7 +1107,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating specific calendar event: {e}")
+            print(f"Error creating specific calendar event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_specific_calendar_event(
@@ -1142,7 +1143,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating specific calendar event: {e}")
+            print(f"Error updating specific calendar event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_specific_calendar_event(
@@ -1157,7 +1158,7 @@ class MicrosoftGraphApi:
             )
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting specific calendar event: {e}")
+            print(f"Error deleting specific calendar event: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def find_meeting_times(
@@ -1187,7 +1188,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error finding meeting times: {e}")
+            print(f"Error finding meeting times: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_drives(self, params: dict | None = None) -> dict[str, Any]:
@@ -1216,7 +1217,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing drives: {e}")
+            print(f"Error listing drives: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_drive_root_item(
@@ -1240,7 +1241,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting drive root item: {e}")
+            print(f"Error getting drive root item: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_root_folder(
@@ -1281,7 +1282,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing folder files: {e}")
+            print(f"Error listing folder files: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def download_onedrive_file_content(
@@ -1301,7 +1302,7 @@ class MicrosoftGraphApi:
                 return {"content": base64.b64encode(response).decode("utf-8")}
             return {"error": "Unexpected response type"}
         except Exception as e:
-            print(f"Error downloading file content: {e}")
+            print(f"Error downloading file content: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_onedrive_file(
@@ -1316,7 +1317,7 @@ class MicrosoftGraphApi:
             )
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting file: {e}")
+            print(f"Error deleting file: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def upload_file_content(
@@ -1356,7 +1357,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error uploading file content: {e}")
+            print(f"Error uploading file content: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_sites(self, params: dict | None = None) -> dict[str, Any]:
@@ -1383,7 +1384,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing sites: {e}")
+            print(f"Error listing sites: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_site(
@@ -1407,7 +1408,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting site: {e}")
+            print(f"Error getting site: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_site_drives(
@@ -1438,7 +1439,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing site drives: {e}")
+            print(f"Error listing site drives: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_site_lists(
@@ -1469,7 +1470,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing site lists: {e}")
+            print(f"Error listing site lists: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_site_list(
@@ -1497,7 +1498,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting site list: {e}")
+            print(f"Error getting site list: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_excel_workbook(
@@ -1525,7 +1526,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting excel workbook: {e}")
+            print(f"Error getting excel workbook: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_excel_worksheets(
@@ -1558,7 +1559,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing excel worksheets: {e}")
+            print(f"Error listing excel worksheets: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_excel_worksheet(
@@ -1592,7 +1593,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting excel worksheet: {e}")
+            print(f"Error getting excel worksheet: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_excel_tables(
@@ -1625,7 +1626,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing excel tables: {e}")
+            print(f"Error listing excel tables: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_excel_table(
@@ -1655,7 +1656,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting excel table: {e}")
+            print(f"Error getting excel table: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_onenote_notebook_sections(
@@ -1679,7 +1680,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing onenote sections: {e}")
+            print(f"Error listing onenote sections: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_onenote_section_pages(
@@ -1705,7 +1706,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing onenote pages: {e}")
+            print(f"Error listing onenote pages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_onenote_page_content(
@@ -1720,7 +1721,7 @@ class MicrosoftGraphApi:
                 return {"content": response.decode("utf-8")}
             return {"error": "Unexpected response type"}
         except Exception as e:
-            print(f"Error getting onenote page content: {e}")
+            print(f"Error getting onenote page content: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_onenote_page(
@@ -1746,7 +1747,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating onenote page: {e}")
+            print(f"Error creating onenote page: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_todo_task_lists(self, params: dict | None = None) -> dict[str, Any]:
@@ -1766,7 +1767,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing todo task lists: {e}")
+            print(f"Error listing todo task lists: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_todo_tasks(
@@ -1790,7 +1791,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing todo tasks: {e}")
+            print(f"Error listing todo tasks: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_todo_task(
@@ -1818,7 +1819,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting todo task: {e}")
+            print(f"Error getting todo task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_todo_task(
@@ -1846,7 +1847,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating todo task: {e}")
+            print(f"Error creating todo task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_todo_task(
@@ -1882,7 +1883,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating todo task: {e}")
+            print(f"Error updating todo task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_todo_task(
@@ -1897,7 +1898,7 @@ class MicrosoftGraphApi:
             )
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting todo task: {e}")
+            print(f"Error deleting todo task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_planner_tasks(self, params: dict | None = None) -> dict[str, Any]:
@@ -1917,7 +1918,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing planner tasks: {e}")
+            print(f"Error listing planner tasks: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_planner_plan(
@@ -1941,7 +1942,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting planner plan: {e}")
+            print(f"Error getting planner plan: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_plan_tasks(
@@ -1965,7 +1966,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing plan tasks: {e}")
+            print(f"Error listing plan tasks: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_planner_task(
@@ -1989,7 +1990,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting planner task: {e}")
+            print(f"Error getting planner task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_planner_task(
@@ -2016,7 +2017,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating planner task: {e}")
+            print(f"Error creating planner task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_planner_task(
@@ -2044,7 +2045,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating planner task: {e}")
+            print(f"Error updating planner task: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_planner_task_details(
@@ -2072,7 +2073,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating planner task details: {e}")
+            print(f"Error updating planner task details: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_outlook_contacts(self, params: dict | None = None) -> dict[str, Any]:
@@ -2092,7 +2093,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing outlook contacts: {e}")
+            print(f"Error listing outlook contacts: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_outlook_contact(
@@ -2116,7 +2117,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting outlook contact: {e}")
+            print(f"Error getting outlook contact: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_outlook_contact(
@@ -2151,7 +2152,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating outlook contact: {e}")
+            print(f"Error creating outlook contact: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_outlook_contact(
@@ -2180,7 +2181,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating outlook contact: {e}")
+            print(f"Error updating outlook contact: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_outlook_contact(
@@ -2191,7 +2192,7 @@ class MicrosoftGraphApi:
             await self.client.me.contacts.by_contact_id(contact_id).delete()
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting outlook contact: {e}")
+            print(f"Error deleting outlook contact: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_current_user(self, params: dict | None = None) -> dict[str, Any]:
@@ -2215,7 +2216,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing chats: {e}")
+            print(f"Error listing chats: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_chat(
@@ -2239,7 +2240,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting chat: {e}")
+            print(f"Error getting chat: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_chat_messages(
@@ -2263,7 +2264,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing chat messages: {e}")
+            print(f"Error listing chat messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_chat_message(
@@ -2291,7 +2292,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting chat message: {e}")
+            print(f"Error getting chat message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def send_chat_message(
@@ -2322,7 +2323,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error sending chat message: {e}")
+            print(f"Error sending chat message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_joined_teams(self, params: dict | None = None) -> dict[str, Any]:
@@ -2342,7 +2343,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing joined teams: {e}")
+            print(f"Error listing joined teams: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_team(
@@ -2366,7 +2367,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting team: {e}")
+            print(f"Error getting team: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_team_channels(
@@ -2390,7 +2391,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing team channels: {e}")
+            print(f"Error listing team channels: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_team_channel(
@@ -2418,7 +2419,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting team channel: {e}")
+            print(f"Error getting team channel: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_channel_messages(
@@ -2446,7 +2447,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing channel messages: {e}")
+            print(f"Error listing channel messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_channel_message(
@@ -2480,7 +2481,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting channel message: {e}")
+            print(f"Error getting channel message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def send_channel_message(
@@ -2519,7 +2520,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error sending channel message: {e}")
+            print(f"Error sending channel message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_team_members(
@@ -2543,7 +2544,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing team members: {e}")
+            print(f"Error listing team members: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_chat_message_replies(
@@ -2571,7 +2572,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing chat message replies: {e}")
+            print(f"Error listing chat message replies: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def reply_to_chat_message(
@@ -2610,7 +2611,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error replying to chat message: {e}")
+            print(f"Error replying to chat message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_sharepoint_site_by_path(
@@ -2638,7 +2639,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting sharepoint site by path: {e}")
+            print(f"Error getting sharepoint site by path: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_sharepoint_sites_delta(
@@ -2660,7 +2661,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting sharepoint sites delta: {e}")
+            print(f"Error getting sharepoint sites delta: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def search_query(
@@ -2687,7 +2688,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error performing search query: {e}")
+            print(f"Error performing search query: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_sharepoint_site_list_items(
@@ -2715,7 +2716,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing site list items: {e}")
+            print(f"Error listing site list items: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_sharepoint_site_list_item(
@@ -2749,7 +2750,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting site list item: {e}")
+            print(f"Error getting site list item: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_groups(self, params: dict | None = None) -> dict[str, Any]:
@@ -2791,7 +2792,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing groups: {e}")
+            print(f"Error listing groups: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_group(
@@ -2814,7 +2815,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting group: {e}")
+            print(f"Error getting group: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_group(
@@ -2846,7 +2847,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating group: {e}")
+            print(f"Error creating group: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_group(
@@ -2877,7 +2878,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating group: {e}")
+            print(f"Error updating group: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_group(
@@ -2900,7 +2901,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting group: {e}")
+            print(f"Error deleting group: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_group_members(
@@ -2923,7 +2924,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group members: {e}")
+            print(f"Error listing group members: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def add_group_member(
@@ -2952,7 +2953,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "member added"}
         except Exception as e:
-            print(f"Error adding group member: {e}")
+            print(f"Error adding group member: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def remove_group_member(
@@ -2979,7 +2980,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "member removed"}
         except Exception as e:
-            print(f"Error removing group member: {e}")
+            print(f"Error removing group member: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_group_owners(
@@ -3002,7 +3003,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group owners: {e}")
+            print(f"Error listing group owners: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_group_conversations(
@@ -3025,7 +3026,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group conversations: {e}")
+            print(f"Error listing group conversations: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_group_drives(
@@ -3048,7 +3049,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group drives: {e}")
+            print(f"Error listing group drives: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_service_health(self, params: dict | None = None) -> dict[str, Any]:
@@ -3069,7 +3070,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service health: {e}")
+            print(f"Error listing service health: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_service_health(
@@ -3092,7 +3093,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service health: {e}")
+            print(f"Error getting service health: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_service_health_issues(
@@ -3113,7 +3114,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service health issues: {e}")
+            print(f"Error listing service health issues: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_service_health_issue(
@@ -3136,7 +3137,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service health issue: {e}")
+            print(f"Error getting service health issue: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_service_update_messages(
@@ -3157,7 +3158,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service update messages: {e}")
+            print(f"Error listing service update messages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_service_update_message(
@@ -3180,7 +3181,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service update message: {e}")
+            print(f"Error getting service update message: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_admin_sharepoint(self, params: dict | None = None) -> dict[str, Any]:
@@ -3199,7 +3200,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting admin sharepoint: {e}")
+            print(f"Error getting admin sharepoint: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_admin_sharepoint(
@@ -3224,7 +3225,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating admin sharepoint: {e}")
+            print(f"Error updating admin sharepoint: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_organization(self, params: dict | None = None) -> dict[str, Any]:
@@ -3243,7 +3244,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing organization: {e}")
+            print(f"Error listing organization: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_organization(
@@ -3266,7 +3267,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting organization: {e}")
+            print(f"Error getting organization: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_organization(
@@ -3293,7 +3294,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating organization: {e}")
+            print(f"Error updating organization: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_org_branding(
@@ -3316,7 +3317,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting org branding: {e}")
+            print(f"Error getting org branding: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_org_branding(
@@ -3345,7 +3346,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating org branding: {e}")
+            print(f"Error updating org branding: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_domains(self, params: dict | None = None) -> dict[str, Any]:
@@ -3364,7 +3365,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing domains: {e}")
+            print(f"Error listing domains: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_domain(
@@ -3387,7 +3388,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting domain: {e}")
+            print(f"Error getting domain: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_domain(
@@ -3411,7 +3412,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating domain: {e}")
+            print(f"Error creating domain: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_domain(
@@ -3434,7 +3435,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting domain: {e}")
+            print(f"Error deleting domain: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def verify_domain(
@@ -3457,7 +3458,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error verifying domain: {e}")
+            print(f"Error verifying domain: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_domain_service_configuration_records(
@@ -3480,7 +3481,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing domain service configuration records: {e}")
+            print(f"Error listing domain service configuration records: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_subscriptions(self, params: dict | None = None) -> dict[str, Any]:
@@ -3499,7 +3500,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing subscriptions: {e}")
+            print(f"Error listing subscriptions: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_subscription(
@@ -3522,7 +3523,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting subscription: {e}")
+            print(f"Error getting subscription: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_subscription(
@@ -3556,7 +3557,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating subscription: {e}")
+            print(f"Error creating subscription: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_subscription(
@@ -3588,7 +3589,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating subscription: {e}")
+            print(f"Error updating subscription: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_subscription(
@@ -3611,7 +3612,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting subscription: {e}")
+            print(f"Error deleting subscription: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_online_meetings(self, params: dict | None = None) -> dict[str, Any]:
@@ -3632,7 +3633,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing online meetings: {e}")
+            print(f"Error listing online meetings: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_online_meeting(
@@ -3655,7 +3656,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting online meeting: {e}")
+            print(f"Error getting online meeting: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_online_meeting(
@@ -3692,7 +3693,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating online meeting: {e}")
+            print(f"Error creating online meeting: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_online_meeting(
@@ -3729,7 +3730,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating online meeting: {e}")
+            print(f"Error updating online meeting: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_online_meeting(
@@ -3752,7 +3753,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting online meeting: {e}")
+            print(f"Error deleting online meeting: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_call_records(self, params: dict | None = None) -> dict[str, Any]:
@@ -3773,7 +3774,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing call records: {e}")
+            print(f"Error listing call records: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_call_record(
@@ -3798,7 +3799,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting call record: {e}")
+            print(f"Error getting call record: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_presences(self, params: dict | None = None) -> dict[str, Any]:
@@ -3819,7 +3820,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing presences: {e}")
+            print(f"Error listing presences: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_presence(
@@ -3842,7 +3843,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting presence: {e}")
+            print(f"Error getting presence: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_my_presence(self, params: dict | None = None) -> dict[str, Any]:
@@ -3861,7 +3862,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting my presence: {e}")
+            print(f"Error getting my presence: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_invitation(
@@ -3892,7 +3893,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating invitation: {e}")
+            print(f"Error creating invitation: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_security_alerts(self, params: dict | None = None) -> dict[str, Any]:
@@ -3913,7 +3914,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing security alerts: {e}")
+            print(f"Error listing security alerts: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_security_alert(
@@ -3936,7 +3937,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting security alert: {e}")
+            print(f"Error getting security alert: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_security_alert(
@@ -3969,7 +3970,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating security alert: {e}")
+            print(f"Error updating security alert: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_security_incidents(
@@ -3992,7 +3993,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing security incidents: {e}")
+            print(f"Error listing security incidents: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_security_incident(
@@ -4015,7 +4016,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting security incident: {e}")
+            print(f"Error getting security incident: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_security_incident(
@@ -4048,7 +4049,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating security incident: {e}")
+            print(f"Error updating security incident: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_secure_scores(self, params: dict | None = None) -> dict[str, Any]:
@@ -4069,7 +4070,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing secure scores: {e}")
+            print(f"Error listing secure scores: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_threat_intelligence_hosts(
@@ -4090,7 +4091,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing threat intelligence hosts: {e}")
+            print(f"Error listing threat intelligence hosts: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_threat_intelligence_host(
@@ -4115,7 +4116,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting threat intelligence host: {e}")
+            print(f"Error getting threat intelligence host: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def run_hunting_query(
@@ -4141,7 +4142,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error running hunting query: {e}")
+            print(f"Error running hunting query: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_directory_audits(self, params: dict | None = None) -> dict[str, Any]:
@@ -4162,7 +4163,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory audits: {e}")
+            print(f"Error listing directory audits: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_directory_audit(
@@ -4189,7 +4190,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting directory audit: {e}")
+            print(f"Error getting directory audit: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_sign_in_logs(self, params: dict | None = None) -> dict[str, Any]:
@@ -4210,7 +4211,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing sign-in logs: {e}")
+            print(f"Error listing sign-in logs: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_sign_in_log(
@@ -4233,7 +4234,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting sign-in log: {e}")
+            print(f"Error getting sign-in log: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_provisioning_logs(
@@ -4256,7 +4257,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing provisioning logs: {e}")
+            print(f"Error listing provisioning logs: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_email_activity_report(
@@ -4283,7 +4284,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting email activity report: {e}")
+            print(f"Error getting email activity report: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_mailbox_usage_report(
@@ -4308,7 +4309,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting mailbox usage report: {e}")
+            print(f"Error getting mailbox usage report: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_office365_active_users(
@@ -4335,7 +4336,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting active users report: {e}")
+            print(f"Error getting active users report: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_sharepoint_activity_report(
@@ -4360,7 +4361,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting SharePoint activity report: {e}")
+            print(f"Error getting SharePoint activity report: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_teams_user_activity(
@@ -4385,7 +4386,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting Teams user activity report: {e}")
+            print(f"Error getting Teams user activity report: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_onedrive_usage_report(
@@ -4410,7 +4411,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting OneDrive usage report: {e}")
+            print(f"Error getting OneDrive usage report: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_applications(self, params: dict | None = None) -> dict[str, Any]:
@@ -4429,7 +4430,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing applications: {e}")
+            print(f"Error listing applications: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_application(
@@ -4452,7 +4453,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting application: {e}")
+            print(f"Error getting application: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_application(
@@ -4479,7 +4480,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating application: {e}")
+            print(f"Error creating application: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_application(
@@ -4506,7 +4507,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating application: {e}")
+            print(f"Error updating application: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_application(
@@ -4529,7 +4530,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting application: {e}")
+            print(f"Error deleting application: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def add_application_password(
@@ -4561,7 +4562,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error adding application password: {e}")
+            print(f"Error adding application password: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def remove_application_password(
@@ -4591,7 +4592,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "password removed"}
         except Exception as e:
-            print(f"Error removing application password: {e}")
+            print(f"Error removing application password: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_service_principals(
@@ -4614,7 +4615,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service principals: {e}")
+            print(f"Error listing service principals: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_service_principal(
@@ -4639,7 +4640,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service principal: {e}")
+            print(f"Error getting service principal: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_service_principal(
@@ -4667,7 +4668,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating service principal: {e}")
+            print(f"Error creating service principal: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_service_principal(
@@ -4696,7 +4697,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating service principal: {e}")
+            print(f"Error updating service principal: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_service_principal(
@@ -4721,7 +4722,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting service principal: {e}")
+            print(f"Error deleting service principal: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_conditional_access_policies(
@@ -4744,7 +4745,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing conditional access policies: {e}")
+            print(f"Error listing conditional access policies: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_conditional_access_policy(
@@ -4767,7 +4768,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting conditional access policy: {e}")
+            print(f"Error getting conditional access policy: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_conditional_access_policy(
@@ -4798,7 +4799,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating conditional access policy: {e}")
+            print(f"Error creating conditional access policy: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_conditional_access_policy(
@@ -4829,7 +4830,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating conditional access policy: {e}")
+            print(f"Error updating conditional access policy: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_conditional_access_policy(
@@ -4852,7 +4853,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting conditional access policy: {e}")
+            print(f"Error deleting conditional access policy: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_access_reviews(self, params: dict | None = None) -> dict[str, Any]:
@@ -4873,7 +4874,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing access reviews: {e}")
+            print(f"Error listing access reviews: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_access_review(
@@ -4896,7 +4897,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting access review: {e}")
+            print(f"Error getting access review: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_entitlement_access_packages(
@@ -4917,7 +4918,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing access packages: {e}")
+            print(f"Error listing access packages: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_lifecycle_workflows(
@@ -4940,7 +4941,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing lifecycle workflows: {e}")
+            print(f"Error listing lifecycle workflows: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_risk_detections(self, params: dict | None = None) -> dict[str, Any]:
@@ -4959,7 +4960,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing risk detections: {e}")
+            print(f"Error listing risk detections: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_risk_detection(
@@ -4984,7 +4985,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting risk detection: {e}")
+            print(f"Error getting risk detection: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_risky_users(self, params: dict | None = None) -> dict[str, Any]:
@@ -5003,7 +5004,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing risky users: {e}")
+            print(f"Error listing risky users: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_risky_user(
@@ -5030,7 +5031,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting risky user: {e}")
+            print(f"Error getting risky user: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def dismiss_risky_user(
@@ -5058,7 +5059,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "dismissed"}
         except Exception as e:
-            print(f"Error dismissing risky user: {e}")
+            print(f"Error dismissing risky user: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_directory_objects(
@@ -5081,7 +5082,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory objects: {e}")
+            print(f"Error listing directory objects: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_directory_object(
@@ -5106,7 +5107,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting directory object: {e}")
+            print(f"Error getting directory object: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_directory_roles(self, params: dict | None = None) -> dict[str, Any]:
@@ -5125,7 +5126,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory roles: {e}")
+            print(f"Error listing directory roles: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_directory_role(
@@ -5148,7 +5149,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting directory role: {e}")
+            print(f"Error getting directory role: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_directory_role_templates(
@@ -5171,7 +5172,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory role templates: {e}")
+            print(f"Error listing directory role templates: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_deleted_items(self, params: dict | None = None) -> dict[str, Any]:
@@ -5192,7 +5193,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing deleted items: {e}")
+            print(f"Error listing deleted items: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def restore_deleted_item(
@@ -5217,7 +5218,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error restoring deleted item: {e}")
+            print(f"Error restoring deleted item: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_authorization_policy(
@@ -5240,7 +5241,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting authorization policy: {e}")
+            print(f"Error getting authorization policy: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_token_lifetime_policies(
@@ -5261,7 +5262,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing token lifetime policies: {e}")
+            print(f"Error listing token lifetime policies: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_token_issuance_policies(
@@ -5282,7 +5283,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing token issuance policies: {e}")
+            print(f"Error listing token issuance policies: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_permission_grant_policies(
@@ -5303,7 +5304,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing permission grant policies: {e}")
+            print(f"Error listing permission grant policies: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_admin_consent_policy(
@@ -5326,7 +5327,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting admin consent policy: {e}")
+            print(f"Error getting admin consent policy: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_role_definitions(self, params: dict | None = None) -> dict[str, Any]:
@@ -5347,7 +5348,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing role definitions: {e}")
+            print(f"Error listing role definitions: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_role_definition(
@@ -5370,7 +5371,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting role definition: {e}")
+            print(f"Error getting role definition: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_role_assignments(self, params: dict | None = None) -> dict[str, Any]:
@@ -5391,7 +5392,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing role assignments: {e}")
+            print(f"Error listing role assignments: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_role_assignment(
@@ -5414,7 +5415,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting role assignment: {e}")
+            print(f"Error getting role assignment: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_role_assignment(
@@ -5444,7 +5445,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating role assignment: {e}")
+            print(f"Error creating role assignment: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_devices(self, params: dict | None = None) -> dict[str, Any]:
@@ -5463,7 +5464,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing devices: {e}")
+            print(f"Error listing devices: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_device(
@@ -5486,7 +5487,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting device: {e}")
+            print(f"Error getting device: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_device(
@@ -5509,7 +5510,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting device: {e}")
+            print(f"Error deleting device: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_managed_devices(self, params: dict | None = None) -> dict[str, Any]:
@@ -5528,7 +5529,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing managed devices: {e}")
+            print(f"Error listing managed devices: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_managed_device(
@@ -5553,7 +5554,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting managed device: {e}")
+            print(f"Error getting managed device: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_device_compliance_policies(
@@ -5576,7 +5577,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing device compliance policies: {e}")
+            print(f"Error listing device compliance policies: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_device_configurations(
@@ -5599,7 +5600,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing device configurations: {e}")
+            print(f"Error listing device configurations: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def wipe_managed_device(
@@ -5624,7 +5625,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "wipe initiated"}
         except Exception as e:
-            print(f"Error wiping managed device: {e}")
+            print(f"Error wiping managed device: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def retire_managed_device(
@@ -5649,7 +5650,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "retire initiated"}
         except Exception as e:
-            print(f"Error retiring managed device: {e}")
+            print(f"Error retiring managed device: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_education_classes(
@@ -5672,7 +5673,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing education classes: {e}")
+            print(f"Error listing education classes: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_education_class(
@@ -5695,7 +5696,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting education class: {e}")
+            print(f"Error getting education class: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_education_schools(
@@ -5718,7 +5719,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing education schools: {e}")
+            print(f"Error listing education schools: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_education_school(
@@ -5743,7 +5744,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting education school: {e}")
+            print(f"Error getting education school: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_education_users(self, params: dict | None = None) -> dict[str, Any]:
@@ -5762,7 +5763,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing education users: {e}")
+            print(f"Error listing education users: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_education_assignments(
@@ -5785,7 +5786,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing education assignments: {e}")
+            print(f"Error listing education assignments: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_agreements(self, params: dict | None = None) -> dict[str, Any]:
@@ -5804,7 +5805,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing agreements: {e}")
+            print(f"Error listing agreements: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_agreement(
@@ -5827,7 +5828,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting agreement: {e}")
+            print(f"Error getting agreement: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_agreement(
@@ -5854,7 +5855,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating agreement: {e}")
+            print(f"Error creating agreement: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_agreement(
@@ -5877,7 +5878,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting agreement: {e}")
+            print(f"Error deleting agreement: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_rooms(self, params: dict | None = None) -> dict[str, Any]:
@@ -5898,7 +5899,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing rooms: {e}")
+            print(f"Error listing rooms: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_room_lists(self, params: dict | None = None) -> dict[str, Any]:
@@ -5919,7 +5920,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing room lists: {e}")
+            print(f"Error listing room lists: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_place(
@@ -5942,7 +5943,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting place: {e}")
+            print(f"Error getting place: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def update_place(
@@ -5971,7 +5972,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating place: {e}")
+            print(f"Error updating place: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_printers(self, params: dict | None = None) -> dict[str, Any]:
@@ -5990,7 +5991,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing printers: {e}")
+            print(f"Error listing printers: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_printer(
@@ -6013,7 +6014,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting printer: {e}")
+            print(f"Error getting printer: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_print_jobs(
@@ -6036,7 +6037,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing print jobs: {e}")
+            print(f"Error listing print jobs: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_print_job(
@@ -6061,7 +6062,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating print job: {e}")
+            print(f"Error creating print job: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_print_shares(self, params: dict | None = None) -> dict[str, Any]:
@@ -6080,7 +6081,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing print shares: {e}")
+            print(f"Error listing print shares: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_subject_rights_requests(
@@ -6101,7 +6102,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing subject rights requests: {e}")
+            print(f"Error listing subject rights requests: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_subject_rights_request(
@@ -6124,7 +6125,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting subject rights request: {e}")
+            print(f"Error getting subject rights request: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_subject_rights_request(
@@ -6149,7 +6150,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating subject rights request: {e}")
+            print(f"Error creating subject rights request: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_booking_businesses(
@@ -6172,7 +6173,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing booking businesses: {e}")
+            print(f"Error listing booking businesses: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_booking_business(
@@ -6199,7 +6200,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting booking business: {e}")
+            print(f"Error getting booking business: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_booking_appointments(
@@ -6226,7 +6227,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing booking appointments: {e}")
+            print(f"Error listing booking appointments: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_booking_appointment(
@@ -6257,7 +6258,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating booking appointment: {e}")
+            print(f"Error creating booking appointment: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_virtual_events(self, params: dict | None = None) -> dict[str, Any]:
@@ -6276,7 +6277,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing virtual events: {e}")
+            print(f"Error listing virtual events: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_file_storage_containers(
@@ -6297,7 +6298,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing file storage containers: {e}")
+            print(f"Error listing file storage containers: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_file_storage_container(
@@ -6320,7 +6321,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting file storage container: {e}")
+            print(f"Error getting file storage container: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_file_storage_container(
@@ -6345,7 +6346,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating file storage container: {e}")
+            print(f"Error creating file storage container: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_learning_providers(
@@ -6368,7 +6369,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing learning providers: {e}")
+            print(f"Error listing learning providers: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_learning_provider(
@@ -6391,7 +6392,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting learning provider: {e}")
+            print(f"Error getting learning provider: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_learning_course_activities(
@@ -6414,7 +6415,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing learning course activities: {e}")
+            print(f"Error listing learning course activities: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_external_connections(
@@ -6437,7 +6438,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing external connections: {e}")
+            print(f"Error listing external connections: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_external_connection(
@@ -6462,7 +6463,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting external connection: {e}")
+            print(f"Error getting external connection: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def create_external_connection(
@@ -6492,7 +6493,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating external connection: {e}")
+            print(f"Error creating external connection: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def delete_external_connection(
@@ -6517,7 +6518,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting external connection: {e}")
+            print(f"Error deleting external connection: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_sensitivity_labels(
@@ -6540,7 +6541,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing sensitivity labels: {e}")
+            print(f"Error listing sensitivity labels: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_sensitivity_label(
@@ -6563,7 +6564,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting sensitivity label: {e}")
+            print(f"Error getting sensitivity label: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def list_delegated_admin_relationships(
@@ -6584,7 +6585,7 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing delegated admin relationships: {e}")
+            print(f"Error listing delegated admin relationships: {e}", file=sys.stderr)
             return {"error": str(e)}
 
     async def get_delegated_admin_relationship(
@@ -6607,5 +6608,5 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting delegated admin relationship: {e}")
+            print(f"Error getting delegated admin relationship: {e}", file=sys.stderr)
             return {"error": str(e)}

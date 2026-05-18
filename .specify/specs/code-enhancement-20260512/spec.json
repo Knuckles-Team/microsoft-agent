@@ -1,0 +1,192 @@
+{
+  "feature_id": "code-enhancement-20260512",
+  "title": "Code Enhancement: microsoft-agent",
+  "created": "2026-05-12T14:14:41.009617+00:00",
+  "overview": "Automated code enhancement review for microsoft-agent. Covers 17 analysis domains.",
+  "user_stories": [
+    {
+      "role": "developer",
+      "action": "address Project Analysis findings (grade: C, score: 74)",
+      "value": "improve project project analysis from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Codebase Optimization findings (grade: D, score: 68)",
+      "value": "improve project codebase optimization from D to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Test Coverage findings (grade: D, score: 60)",
+      "value": "improve project test coverage from D to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Documentation & Governance findings (grade: C, score: 79)",
+      "value": "improve project documentation & governance from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Architecture & Design Patterns findings (grade: C, score: 75)",
+      "value": "improve project architecture & design patterns from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Concept Traceability findings (grade: F, score: 46)",
+      "value": "improve project concept traceability from F to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Changelog Audit findings (grade: C, score: 75)",
+      "value": "improve project changelog audit from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Environment Variables findings (grade: C, score: 75)",
+      "value": "improve project environment variables from C to at least B (80+)"
+    }
+  ],
+  "functional_requirements": [
+    {
+      "id": "FR-001",
+      "description": "Minor update: msgraph-sdk 1.56.0 (installed) -> 1.57.0",
+      "testable": true
+    },
+    {
+      "id": "FR-002",
+      "description": "10 functions exceed 200 lines (actionable refactoring targets): register_files_tools (682L), register_mail_tools (534L), register_security_tools (348L), register_calendar_tools (265L), register_applications_tools (265L)",
+      "testable": true
+    },
+    {
+      "id": "FR-003",
+      "description": "Monolithic: mcp_server.py (5656L) \u2014 11 functions with high complexity (worst: register_files_tools at 682L, CC=2); Low cohesion: 43 distinct concepts in one file",
+      "testable": true
+    },
+    {
+      "id": "FR-004",
+      "description": "Needs attention: api_wrapper.py (6611L) \u2014 God class: MicrosoftGraphApi (258 methods) \u2014 consider mixins/composition",
+      "testable": true
+    },
+    {
+      "id": "FR-005",
+      "description": "1 HIGH severity vulnerabilities found",
+      "testable": true
+    },
+    {
+      "id": "FR-006",
+      "description": "Low test-to-source ratio: 0.14",
+      "testable": true
+    },
+    {
+      "id": "FR-007",
+      "description": "Test suite lacks intent diversity (only one type)",
+      "testable": true
+    },
+    {
+      "id": "FR-008",
+      "description": "27 potential doc-test drift items",
+      "testable": true
+    },
+    {
+      "id": "FR-009",
+      "description": "README.md missing sections: installation",
+      "testable": true
+    },
+    {
+      "id": "FR-010",
+      "description": "README missing: Has a Table of Contents",
+      "testable": true
+    },
+    {
+      "id": "FR-011",
+      "description": "README missing: References /docs directory material",
+      "testable": true
+    },
+    {
+      "id": "FR-012",
+      "description": "SRP: 2 modules exceed 500 lines (god modules)",
+      "testable": true
+    },
+    {
+      "id": "FR-013",
+      "description": "SRP: 1 classes have >15 methods",
+      "testable": true
+    },
+    {
+      "id": "FR-014",
+      "description": "No discernible layer architecture (no domain/service/adapter separation)",
+      "testable": true
+    },
+    {
+      "id": "FR-015",
+      "description": "Low traceability ratio: 0% concepts fully traced",
+      "testable": true
+    },
+    {
+      "id": "FR-016",
+      "description": "2 test functions missing concept markers",
+      "testable": true
+    },
+    {
+      "id": "FR-017",
+      "description": "509 significant functions (>10 lines) missing concept markers in docstrings",
+      "testable": true
+    },
+    {
+      "id": "FR-018",
+      "description": "Total lint findings: 0 (high/error: 0, medium/warning: 0, low: 0)",
+      "testable": true
+    },
+    {
+      "id": "FR-019",
+      "description": "1 hook(s) may be outdated: ruff-pre-commit",
+      "testable": true
+    },
+    {
+      "id": "FR-020",
+      "description": "1 rogue/throwaway scripts detected (fix_*, validate_*, patch_*, etc.): scripts/validate_a2a_agent.py",
+      "testable": true
+    },
+    {
+      "id": "FR-021",
+      "description": "CHANGELOG.md is missing \u2014 create one following Keep a Changelog format",
+      "testable": true
+    },
+    {
+      "id": "FR-022",
+      "description": "CHANGELOG.md is missing",
+      "testable": true
+    },
+    {
+      "id": "FR-023",
+      "description": "Partial env var documentation: 59% coverage",
+      "testable": true
+    },
+    {
+      "id": "FR-024",
+      "description": "Undocumented env vars: ALLOWED_CLIENT_REDIRECT_URIS, AUTH_TYPE, ENABLE_OTEL, EUNOMIA_POLICY_FILE, EUNOMIA_REMOTE_URL, EUNOMIA_TYPE, LLM_API_KEY, LLM_BASE_URL, MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET",
+      "testable": true
+    },
+    {
+      "id": "FR-025",
+      "description": "42 Python env vars not in .env.example: ADMINTOOL, AGREEMENTSTOOL, APPLICATIONSTOOL, AUDITTOOL, AUTHTOOL",
+      "testable": true
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "Overall GPA",
+      "current": 2.76,
+      "target": 3.0
+    },
+    {
+      "metric": "Domains at B or above",
+      "current": 9,
+      "target": 17
+    },
+    {
+      "metric": "Actionable findings",
+      "current": 25,
+      "target": 0
+    }
+  ]
+}

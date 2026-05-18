@@ -9,7 +9,7 @@ description = "Microsoft Graph Agent MCP Server"
 readme = "README.md"
 classifiers = [ "Development Status :: 3 - Alpha", "License :: OSI Approved :: MIT License", "Environment :: Console", "Operating System :: POSIX :: Linux", "Programming Language :: Python :: 3",]
 requires-python = ">=3.11, <3.14"
-dependencies = [ "agent-utilities>=0.9.0", "msal>=1.31.0", "keyring>=25.1.0", "msgraph-sdk>=1.54.0",]
+dependencies = [ "agent-utilities>=0.11.0", "msal>=1.31.0", "keyring>=25.1.0", "msgraph-sdk>=1.54.0",]
 [[project.authors]]
 name = "Audel Rouhi"
 email = "knucklessg1@gmail.com"
@@ -18,10 +18,10 @@ email = "knucklessg1@gmail.com"
 text = "MIT"
 
 [project.optional-dependencies]
-mcp = [ "agent-utilities[mcp]>=0.9.0",]
-agent = [ "agent-utilities[agent,logfire]>=0.9.0",]
-all = [ "agent-utilities[mcp,agent,logfire]>=0.9.0",]
-test = [ "pytest", "pytest-asyncio", "pytest-cov",]
+mcp = [ "agent-utilities[mcp]>=0.11.0",]
+agent = [ "agent-utilities[agent,logfire]>=0.11.0",]
+all = [ "agent-utilities[mcp,agent,logfire]>=0.11.0",]
+test = [ "pytest", "pytest-asyncio", "pytest-cov", "pytest-cov",]
 
 [project.scripts]
 microsoft-mcp = "microsoft_agent.mcp_server:mcp_server"
@@ -53,3 +53,6 @@ ignore = [ "E402", "E501", "B008",]
 
 [tool.setuptools.packages.find]
 where = [ ".",]
+
+[tool.vulture]
+ignore_names = ["request", "config"]
