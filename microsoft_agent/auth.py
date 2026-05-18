@@ -1,3 +1,19 @@
+"""Microsoft Agent Authentication Module.
+
+Authentication priority:
+1. **OIDC Delegation** — If ``ENABLE_DELEGATION`` is active, exchanges
+   the IdP-issued user token for a downstream Microsoft Graph access
+   token via RFC 8693 Token Exchange.
+2. **MSAL Device Code Flow** — Interactive device code flow via the
+   ``AuthManager`` class using Microsoft's MSAL library.
+3. **MSAL Token Cache** — Silent token acquisition from cached MSAL
+   tokens (via keyring or file fallback).
+4. **MCP User Token** — Direct use of the ``user_token`` from
+   ``UserTokenMiddleware`` as a Microsoft Graph bearer token.
+
+See ``docs/guides/oauth_sso.md`` in agent-utilities for full details.
+"""
+
 import atexit
 import json
 import logging
@@ -232,9 +248,21 @@ class AuthManager:
 
 
 async def get_client():
-    from agent_utilities.middlewares import local
+    """Create a Microsoft Graph API client with the best available auth method.
 
-    from microsoft_agent.api_wrapper import MicrosoftGraphApi
+    Authentication priority:
+    1. OIDC Delegation (RFC 8693 Token Exchange) — if ENABLE_DELEGATION is True
+    2. MSAL cached token — silent acquisition from keyring/file cache
+    3. MCP User Token — direct use from UserTokenMiddleware (fallback)
+    """
+    from agent_utilities.mcp.delegated_auth import (
+        get_delegated_token,
+        get_user_identity,
+        get_user_token,
+        is_delegation_enabled,
+    )
+
+    from microsoft_agent.api_client import MicrosoftGraphApi
 
     CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
     AUTHORITY = "https://login.microsoftonline.com/common"
@@ -245,20 +273,50 @@ async def get_client():
         "Files.ReadWrite",
     ]
 
+    # --- Path 1: OIDC Delegation (RFC 8693 Token Exchange) ---
+    if is_delegation_enabled():
+        try:
+            delegated_token = get_delegated_token(
+                audience=os.environ.get("AUDIENCE", "https://graph.microsoft.com"),
+                scopes=os.environ.get("DELEGATED_SCOPES", " ".join(SCOPES)),
+            )
+            identity = get_user_identity()
+            logger.info(
+                "Using OIDC delegated token for Microsoft Graph API",
+                extra={"user_email": identity.get("email")},
+            )
+            # Create AuthManager and inject the delegated token
+            auth = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
+            auth.access_token = delegated_token
+            return MicrosoftGraphApi(auth)
+        except Exception as e:
+            logger.warning(f"OIDC delegation failed, falling back to MSAL: {e}")
+
+    # --- Path 2: MSAL Token Cache (silent acquisition) ---
     auth = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
     token = auth.get_token()
 
-    if not token:
-        token = getattr(local, "user_token", None)
+    if token:
+        logger.info("Using cached MSAL token for Microsoft Graph API")
+        try:
+            return MicrosoftGraphApi(auth)
+        except (AuthError, UnauthorizedError) as e:
+            logger.warning(f"Cached MSAL token failed: {e}")
 
-    if not token:
-        raise ValueError("Microsoft token is not provided. Please login.")
+    # --- Path 3: MCP User Token (direct passthrough) ---
+    user_token = get_user_token()
+    if user_token:
+        logger.info("Using MCP user token passthrough for Microsoft Graph API")
+        auth.access_token = user_token
+        try:
+            return MicrosoftGraphApi(auth)
+        except (AuthError, UnauthorizedError) as e:
+            raise RuntimeError(
+                f"AUTHENTICATION ERROR: The Microsoft credentials are not valid. "
+                f"Error details: {str(e)}"
+            ) from e
 
-    try:
-        return MicrosoftGraphApi(auth)
-    except (AuthError, UnauthorizedError) as e:
-        raise RuntimeError(
-            f"AUTHENTICATION ERROR: The Microsoft credentials are not valid. "
-            f"Please ensure you are logged in via the device code flow or have a valid token. "
-            f"Error details: {str(e)}"
-        ) from e
+    raise ValueError(
+        "Microsoft token is not provided. Please login via device code flow, "
+        "configure OIDC delegation, or ensure a valid MCP user token is available."
+    )
