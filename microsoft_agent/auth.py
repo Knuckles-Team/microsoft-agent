@@ -19,12 +19,15 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import keyring
 import msal
 from agent_utilities.exceptions import AuthError, UnauthorizedError
 from keyring.errors import KeyringError
+
+if TYPE_CHECKING:
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -163,14 +166,16 @@ class AuthManager:
         if not account:
             return None
 
-        authority = f"https://login.microsoftonline.com/{tenant_id}" if tenant_id else None
+        authority = (
+            f"https://login.microsoftonline.com/{tenant_id}" if tenant_id else None
+        )
 
         result = self.msal_app.acquire_token_silent(
             self.scopes,
             account=account,
             claims_challenge=claims,
             authority=authority,
-            **kwargs
+            **kwargs,
         )
         if result and "access_token" in result:
             return result
@@ -248,6 +253,8 @@ class AuthManager:
 
 
 async def get_client():
+    from microsoft_agent.api_client import MicrosoftGraphApi
+
     """Create a Microsoft Graph API client with the best available auth method.
 
     Authentication priority:
@@ -261,8 +268,6 @@ async def get_client():
         get_user_token,
         is_delegation_enabled,
     )
-
-    from microsoft_agent.api_client import MicrosoftGraphApi
 
     CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
     AUTHORITY = "https://login.microsoftonline.com/common"

@@ -272,8 +272,6 @@ Documentation:
       ],
       "env": {
         "ADMINTOOL": "True",
-        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
-        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
         "AGREEMENTSTOOL": "True",
         "APPLICATIONSTOOL": "True",
         "AUDITTOOL": "True",
@@ -283,7 +281,6 @@ Documentation:
         "COMMUNICATIONSTOOL": "True",
         "CONNECTIONSTOOL": "True",
         "CONTACTSTOOL": "True",
-        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
         "DEVICESTOOL": "True",
         "DIRECTORYTOOL": "True",
         "DOMAINSTOOL": "True",
@@ -341,8 +338,6 @@ Documentation:
       ],
       "env": {
         "ADMINTOOL": "True",
-        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
-        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
         "AGREEMENTSTOOL": "True",
         "APPLICATIONSTOOL": "True",
         "AUDITTOOL": "True",
@@ -352,7 +347,6 @@ Documentation:
         "COMMUNICATIONSTOOL": "True",
         "CONNECTIONSTOOL": "True",
         "CONTACTSTOOL": "True",
-        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
         "DEVICESTOOL": "True",
         "DIRECTORYTOOL": "True",
         "DOMAINSTOOL": "True",
