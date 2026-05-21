@@ -3481,7 +3481,10 @@ class MicrosoftGraphApi:
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing domain service configuration records: {e}", file=sys.stderr)
+            print(
+                f"Error listing domain service configuration records: {e}",
+                file=sys.stderr,
+            )
             return {"error": str(e)}
 
     async def list_subscriptions(self, params: dict | None = None) -> dict[str, Any]:

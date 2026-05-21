@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.12.0*
+*Version: 0.12.1*
 
 ## Overview
 
@@ -197,6 +197,42 @@ stateDiagram-v2
 microsoft-agent-server --provider openai --model-id gpt-4o --api-key sk-... --mcp-url http://localhost:8000/mcp
 ```
 
+## Security & Governance
+
+This project is built on [`agent-utilities`](https://github.com/Knuckles-Team/agent-utilities), inheriting enterprise-grade security and governance features.
+
+### Authentication & Authorization
+| Feature | Description |
+|---------|-------------|
+| **OIDC Token Delegation** | RFC 8693 token exchange for user-context propagation from A2A → MCP |
+| **Eunomia Policies** | Fine-grained, policy-driven tool authorization (`none`, `embedded`, `remote`) |
+| **Scoped Credentials** | Tools execute with the caller's scoped identity where possible |
+| **3LO / OAuth / API Token** | Multiple auth strategies with graceful fallback |
+
+### Eunomia Policy Enforcement
+Eunomia provides a policy enforcement point for all tool calls:
+- **Embedded mode**: Load local `mcp_policies.json` for role-based access, sensitivity gating, and audit logging
+- **Remote mode**: Forward authorization decisions to a central Eunomia policy server for multi-agent governance
+- Enable via CLI: `--eunomia-type embedded --eunomia-policy-file mcp_policies.json`
+
+### Runtime Protections
+| Protection | Description |
+|------------|-------------|
+| **Tool Guard** | Sensitivity detection with human-in-the-loop approval gating |
+| **Prompt Injection Defense** | Input scanning and repetition/loop guards |
+| **Content Filtering** | Output schema enforcement and cost budget controls |
+| **Stuck Loop Detection** | Automatic detection and recovery from agent loops |
+| **Context Limit Warnings** | Proactive alerts before context window exhaustion |
+
+### Graph Agent Architecture
+The A2A agent uses `pydantic-graph` orchestration with:
+- **RouterNode**: Lightweight classifier that routes queries to specialized domains
+- **DomainNode**: Focused executor with only relevant tools loaded, preventing tool hallucination
+- **Approval Gates**: Policy-driven approval workflows before sensitive operations
+- **Usage Guards**: Budget and rate limiting enforcement
+
+> **Production Recommendation**: Enable `--eunomia-type embedded` (or `remote`) + OIDC delegation + containerized deployment. See [`agent-utilities` documentation](https://github.com/Knuckles-Team/agent-utilities) for full policy configuration.
+
 ## Docker
 
 ### Build
@@ -255,133 +291,29 @@ Documentation:
 
 ## MCP Configuration Examples
 
-### 1. Standard IO (stdio) Deployment
-
+### stdio (recommended for local development)
 ```json
 {
   "mcpServers": {
-    "microsoft-agent": {
-      "command": "uv",
-      "args": [
-        "run",
-        "microsoft-mcp"
-      ],
+    "microsoft": {
+      "command": ".venv/bin/microsoft-mcp",
+      "args": [],
       "env": {
-        "ADMINTOOL": "True",
-        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
-        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
-        "AGREEMENTSTOOL": "True",
-        "APPLICATIONSTOOL": "True",
-        "AUDITTOOL": "True",
-        "AUTHTOOL": "True",
-        "CALENDARTOOL": "True",
-        "CHATTOOL": "True",
-        "COMMUNICATIONSTOOL": "True",
-        "CONNECTIONSTOOL": "True",
-        "CONTACTSTOOL": "True",
-        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
-        "DEVICESTOOL": "True",
-        "DIRECTORYTOOL": "True",
-        "DOMAINSTOOL": "True",
-        "EDUCATIONTOOL": "True",
-        "EMPLOYEE_EXPERIENCETOOL": "True",
-        "FILESTOOL": "True",
-        "GROUPSTOOL": "True",
-        "IDENTITYTOOL": "True",
-        "MAILTOOL": "True",
-        "METATOOL": "True",
-        "MICROSOFT_ENDPOINTS_JSON": "<YOUR_MICROSOFT_ENDPOINTS_JSON>",
-        "MICROSOFT_TOKEN": "<YOUR_MICROSOFT_TOKEN>",
-        "MISCTOOL": "True",
-        "NOTESTOOL": "True",
-        "OIDC_CLIENT_ID": "<YOUR_OIDC_CLIENT_ID>",
-        "ORGANIZATIONTOOL": "True",
-        "PLACESTOOL": "True",
-        "POLICIESTOOL": "True",
-        "PRINTTOOL": "True",
-        "PRIVACYTOOL": "True",
-        "REPORTSTOOL": "True",
-        "SEARCHTOOL": "True",
-        "SECURITYTOOL": "True",
-        "SITESTOOL": "True",
-        "SOLUTIONSTOOL": "True",
-        "STORAGETOOL": "True",
-        "SUBSCRIPTIONSTOOL": "True",
-        "TASKSTOOL": "True",
-        "TEAMSTOOL": "True",
-        "TESTING": "<YOUR_TESTING>",
-        "USER": "<YOUR_USER>",
-        "USERTOOL": "True"
-      }
+        "MICROSOFT_CLIENT_ID": "",
+        "MICROSOFT_CLIENT_SECRET": "",
+        "MICROSOFT_TENANT_ID": ""
+}
     }
   }
 }
 ```
 
-### 2. Streamable HTTP (SSE) Deployment
-
+### Streamable HTTP (recommended for production)
 ```json
 {
   "mcpServers": {
-    "microsoft-agent": {
-      "command": "uv",
-      "args": [
-        "run",
-        "microsoft-mcp",
-        "--transport",
-        "http",
-        "--host",
-        "0.0.0.0",
-        "--port",
-        "8000"
-      ],
-      "env": {
-        "ADMINTOOL": "True",
-        "AGENT_DESCRIPTION": "<YOUR_AGENT_DESCRIPTION>",
-        "AGENT_SYSTEM_PROMPT": "<YOUR_AGENT_SYSTEM_PROMPT>",
-        "AGREEMENTSTOOL": "True",
-        "APPLICATIONSTOOL": "True",
-        "AUDITTOOL": "True",
-        "AUTHTOOL": "True",
-        "CALENDARTOOL": "True",
-        "CHATTOOL": "True",
-        "COMMUNICATIONSTOOL": "True",
-        "CONNECTIONSTOOL": "True",
-        "CONTACTSTOOL": "True",
-        "DEFAULT_AGENT_NAME": "<YOUR_DEFAULT_AGENT_NAME>",
-        "DEVICESTOOL": "True",
-        "DIRECTORYTOOL": "True",
-        "DOMAINSTOOL": "True",
-        "EDUCATIONTOOL": "True",
-        "EMPLOYEE_EXPERIENCETOOL": "True",
-        "FILESTOOL": "True",
-        "GROUPSTOOL": "True",
-        "IDENTITYTOOL": "True",
-        "MAILTOOL": "True",
-        "METATOOL": "True",
-        "MICROSOFT_ENDPOINTS_JSON": "<YOUR_MICROSOFT_ENDPOINTS_JSON>",
-        "MICROSOFT_TOKEN": "<YOUR_MICROSOFT_TOKEN>",
-        "MISCTOOL": "True",
-        "NOTESTOOL": "True",
-        "OIDC_CLIENT_ID": "<YOUR_OIDC_CLIENT_ID>",
-        "ORGANIZATIONTOOL": "True",
-        "PLACESTOOL": "True",
-        "POLICIESTOOL": "True",
-        "PRINTTOOL": "True",
-        "PRIVACYTOOL": "True",
-        "REPORTSTOOL": "True",
-        "SEARCHTOOL": "True",
-        "SECURITYTOOL": "True",
-        "SITESTOOL": "True",
-        "SOLUTIONSTOOL": "True",
-        "STORAGETOOL": "True",
-        "SUBSCRIPTIONSTOOL": "True",
-        "TASKSTOOL": "True",
-        "TEAMSTOOL": "True",
-        "TESTING": "<YOUR_TESTING>",
-        "USER": "<YOUR_USER>",
-        "USERTOOL": "True"
-      }
+    "microsoft": {
+      "url": "http://localhost:8080/microsoft-mcp/mcp"
     }
   }
 }
