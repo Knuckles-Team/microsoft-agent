@@ -1,0 +1,282 @@
+{
+  "feature_id": "code-enhancement-20260524",
+  "title": "Code Enhancement: microsoft-agent",
+  "created": "2026-05-24T04:17:16.209766+00:00",
+  "overview": "Automated code enhancement review for microsoft-agent. Covers 17 analysis domains.",
+  "user_stories": [
+    {
+      "role": "developer",
+      "action": "address Project Analysis findings (grade: C, score: 74)",
+      "value": "improve project project analysis from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Codebase Optimization findings (grade: F, score: 53)",
+      "value": "improve project codebase optimization from F to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Test Coverage findings (grade: C, score: 70)",
+      "value": "improve project test coverage from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Architecture & Design Patterns findings (grade: F, score: 55)",
+      "value": "improve project architecture & design patterns from F to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Concept Traceability findings (grade: F, score: 39)",
+      "value": "improve project concept traceability from F to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Test Execution findings (grade: F, score: 25)",
+      "value": "improve project test execution from F to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Version Sync Analysis findings (grade: D, score: 60)",
+      "value": "improve project version sync analysis from D to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Changelog Audit findings (grade: C, score: 75)",
+      "value": "improve project changelog audit from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address Environment Variables findings (grade: C, score: 75)",
+      "value": "improve project environment variables from C to at least B (80+)"
+    },
+    {
+      "role": "developer",
+      "action": "address analyze_xdg_kg findings (grade: F, score: 0)",
+      "value": "improve project analyze_xdg_kg from F to at least B (80+)"
+    }
+  ],
+  "functional_requirements": [
+    {
+      "id": "FR-001",
+      "description": "Minor update: agent-utilities 0.2.40 (installed) -> 0.16.0",
+      "testable": true
+    },
+    {
+      "id": "FR-002",
+      "description": "Minor update: msgraph-sdk 1.54.0 (constraint \u2014 not installed) -> 1.58.0",
+      "testable": true
+    },
+    {
+      "id": "FR-003",
+      "description": "Minor update: msal 1.31.0 (constraint \u2014 not installed) -> 1.36.0",
+      "testable": true
+    },
+    {
+      "id": "FR-004",
+      "description": "35 functions exceed 50 lines",
+      "testable": true
+    },
+    {
+      "id": "FR-005",
+      "description": "Monolithic: mcp_server.py (1771L) \u2014 7 functions with high complexity (worst: get_mcp_instance at 127L, CC=38); Low cohesion: 41 distinct concepts in one file",
+      "testable": true
+    },
+    {
+      "id": "FR-006",
+      "description": "Needs attention: api_client_other.py (2025L) \u2014 God class: MicrosoftGraphApiOther (82 methods) \u2014 consider mixins/composition",
+      "testable": true
+    },
+    {
+      "id": "FR-007",
+      "description": "Needs attention: api_client_apps.py (631L) \u2014 God class: MicrosoftGraphApiApps (22 methods) \u2014 consider mixins/composition",
+      "testable": true
+    },
+    {
+      "id": "FR-008",
+      "description": "Needs attention: api_client_directory.py (749L) \u2014 God class: MicrosoftGraphApiDirectory (28 methods) \u2014 consider mixins/composition",
+      "testable": true
+    },
+    {
+      "id": "FR-009",
+      "description": "6 functions with nesting depth >4",
+      "testable": true
+    },
+    {
+      "id": "FR-010",
+      "description": "1 flat directories with >15 Python files: microsoft_agent/mcp",
+      "testable": true
+    },
+    {
+      "id": "FR-011",
+      "description": "1 HIGH severity vulnerabilities found",
+      "testable": true
+    },
+    {
+      "id": "FR-012",
+      "description": "Test suite lacks intent diversity (only one type)",
+      "testable": true
+    },
+    {
+      "id": "FR-013",
+      "description": "28 potential doc-test drift items",
+      "testable": true
+    },
+    {
+      "id": "FR-014",
+      "description": "2 broken internal links in README.md",
+      "testable": true
+    },
+    {
+      "id": "FR-015",
+      "description": "SRP: 9 modules exceed 500 lines (god modules)",
+      "testable": true
+    },
+    {
+      "id": "FR-016",
+      "description": "SRP: 7 classes have >15 methods",
+      "testable": true
+    },
+    {
+      "id": "FR-017",
+      "description": "No discernible layer architecture (no domain/service/adapter separation)",
+      "testable": true
+    },
+    {
+      "id": "FR-018",
+      "description": "Low dependency injection ratio: 7%",
+      "testable": true
+    },
+    {
+      "id": "FR-019",
+      "description": "23 Python files at top level \u2014 consider package organization",
+      "testable": true
+    },
+    {
+      "id": "FR-020",
+      "description": "Low traceability ratio: 2% concepts fully traced",
+      "testable": true
+    },
+    {
+      "id": "FR-021",
+      "description": "44 orphaned concepts (only in one source)",
+      "testable": true
+    },
+    {
+      "id": "FR-022",
+      "description": "3 test functions missing concept markers",
+      "testable": true
+    },
+    {
+      "id": "FR-023",
+      "description": "426 significant functions (>10 lines) missing concept markers in docstrings",
+      "testable": true
+    },
+    {
+      "id": "FR-024",
+      "description": "Total lint findings: 0 (high/error: 0, medium/warning: 0, low: 0)",
+      "testable": true
+    },
+    {
+      "id": "FR-025",
+      "description": "1 hook(s) may be outdated: ruff-pre-commit",
+      "testable": true
+    },
+    {
+      "id": "FR-026",
+      "description": "1 directories with >20 files: microsoft_agent/mcp",
+      "testable": true
+    },
+    {
+      "id": "FR-027",
+      "description": "1 rogue/throwaway scripts detected (fix_*, validate_*, patch_*, etc.): scripts/validate_a2a_agent.py",
+      "testable": true
+    },
+    {
+      "id": "FR-028",
+      "description": "Found 2 file(s) with version '0.15.0' that are NOT tracked in .bumpversion.cfg:",
+      "testable": true
+    },
+    {
+      "id": "FR-029",
+      "description": "  - domain_results.json",
+      "testable": true
+    },
+    {
+      "id": "FR-030",
+      "description": "  - .specify/reports/code_enhancement_report.md",
+      "testable": true
+    },
+    {
+      "id": "FR-031",
+      "description": "CHANGELOG.md exists but could not be parsed \u2014 check format compliance",
+      "testable": true
+    },
+    {
+      "id": "FR-032",
+      "description": "No changelog entries within the last 30 days",
+      "testable": true
+    },
+    {
+      "id": "FR-033",
+      "description": "keepachangelog not installed \u2014 pip install 'universal-skills[code-enhancer]'",
+      "testable": true
+    },
+    {
+      "id": "FR-034",
+      "description": "1 test files exceed 500 lines \u2014 split into focused modules",
+      "testable": true
+    },
+    {
+      "id": "FR-035",
+      "description": "Test directory lacks subdirectory organization (consider unit/, integration/, e2e/)",
+      "testable": true
+    },
+    {
+      "id": "FR-036",
+      "description": "No @pytest.mark.parametrize usage \u2014 consider data-driven tests",
+      "testable": true
+    },
+    {
+      "id": "FR-037",
+      "description": "1 tests have no assertions",
+      "testable": true
+    },
+    {
+      "id": "FR-038",
+      "description": "Partial env var documentation: 37% coverage",
+      "testable": true
+    },
+    {
+      "id": "FR-039",
+      "description": "Undocumented env vars: ADMINTOOL, AGREEMENTSTOOL, APPLICATIONSTOOL, AUDITTOOL, AUTHTOOL, CALENDARTOOL, CHATTOOL, COMMUNICATIONSTOOL, CONNECTIONSTOOL, CONTACTSTOOL",
+      "testable": true
+    },
+    {
+      "id": "FR-040",
+      "description": "5 Python env vars not in .env.example: AUDIENCE, MICROSOFT_ENDPOINTS_JSON, TESTING, USER, XDG_DATA_HOME",
+      "testable": true
+    },
+    {
+      "id": "FR-041",
+      "description": "Analysis error: No module named 'agent_utilities.knowledge_graph'",
+      "testable": true
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "Overall GPA",
+      "current": 2.06,
+      "target": 3.0
+    },
+    {
+      "metric": "Domains at B or above",
+      "current": 7,
+      "target": 17
+    },
+    {
+      "metric": "Actionable findings",
+      "current": 41,
+      "target": 0
+    }
+  ]
+}

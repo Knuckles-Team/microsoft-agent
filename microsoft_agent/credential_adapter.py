@@ -1,3 +1,8 @@
+"""Credential Adapter module.
+
+CONCEPT:ECO-4.1
+"""
+
 import time
 from typing import Any
 

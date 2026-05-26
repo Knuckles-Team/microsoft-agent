@@ -12,6 +12,8 @@ Authentication priority:
    ``UserTokenMiddleware`` as a Microsoft Graph bearer token.
 
 See ``docs/guides/oauth_sso.md`` in agent-utilities for full details.
+
+CONCEPT:ECO-4.1
 """
 
 import atexit
@@ -34,7 +36,28 @@ logger = logging.getLogger(__name__)
 SERVICE_NAME = "microsoft-agent-mcp"
 TOKEN_CACHE_ACCOUNT = "msal_token_cache"  # nosec B105
 SELECTED_ACCOUNT_KEY = "selected_account"
-FALLBACK_DIR = Path.home() / ".microsoft-agent"
+
+# XDG Compliance: use XDG_DATA_HOME/microsoft-agent, migrate from ~/.microsoft-agent
+_OLD_FALLBACK_DIR = Path.home() / ".microsoft-agent"
+_XDG_DATA_HOME = os.environ.get("XDG_DATA_HOME")
+if _XDG_DATA_HOME:
+    FALLBACK_DIR = Path(_XDG_DATA_HOME) / "microsoft-agent"
+else:
+    FALLBACK_DIR = Path.home() / ".local" / "share" / "microsoft-agent"
+
+# Migrate old config directory if it exists and has cache files
+if _OLD_FALLBACK_DIR.exists():
+    try:
+        FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
+        for old_file in _OLD_FALLBACK_DIR.iterdir():
+            new_file = FALLBACK_DIR / old_file.name
+            if old_file.is_file() and not new_file.exists():
+                new_file.write_text(
+                    old_file.read_text(encoding="utf-8"), encoding="utf-8"
+                )
+    except Exception as e:
+        logger.warning(f"Failed to migrate old fallback directory: {e}")
+
 FALLBACK_PATH = FALLBACK_DIR / ".token_cache.json"
 SELECTED_ACCOUNT_PATH = FALLBACK_DIR / ".selected_account.json"
 
@@ -42,6 +65,11 @@ FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class AuthManager:
+    """Authentication manager for Microsoft Graph API credentials.
+
+    CONCEPT:ECO-4.1 — MCP & Universal Skills
+    """
+
     def __init__(self, client_id: str, authority: str, scopes: list[str]):
         self.client_id = client_id
         self.authority = authority

@@ -1,5 +1,6 @@
 import os
 import re
+import pytest
 
 # Paths
 ROOT_DIR = "/home/apps/workspace/agent-packages/agents/microsoft-agent"
@@ -55,6 +56,7 @@ def extract_concepts_from_codebase(directory):
     return found_concepts
 
 
+@pytest.mark.concept("ECO-4.1")
 def test_concept_parity():
     """
     Enforces that all concepts documented or used in microsoft-agent

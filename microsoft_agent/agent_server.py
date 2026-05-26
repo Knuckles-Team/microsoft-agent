@@ -1,4 +1,10 @@
 #!/usr/bin/python
+"""
+Microsoft Agent A2A Supervisor Agent Server implementation.
+
+CONCEPT:ECO-4.1
+"""
+
 import logging
 import os
 import sys

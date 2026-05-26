@@ -1,0 +1,87 @@
+# Tasks: Code Enhancement: microsoft-agent
+
+Generated: 2026-05-24T04:17:16.209766+00:00
+Skipped informational: 4
+
+- [ ] [P] **T001** [Dependency Audit] Minor update: agent-utilities 0.2.40 (installed) -> 0.16.0
+  - Priority: P3-Low | Effort: Small
+- [ ] [P] **T002** [Dependency Audit] Minor update: msgraph-sdk 1.54.0 (constraint — not installed) -> 1.58.0
+  - Priority: P3-Low | Effort: Small
+- [ ] [P] **T003** [Dependency Audit] Minor update: msal 1.31.0 (constraint — not installed) -> 1.36.0
+  - Priority: P3-Low | Effort: Small
+- [ ] [P] **T004** [Codebase Optimization] 35 functions exceed 50 lines
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T005** [Codebase Optimization] Monolithic: mcp_server.py (1771L) — 7 functions with high complexity (worst: get
+  - Priority: P1-High | Effort: Large
+- [ ] [P] **T006** [Codebase Optimization] Needs attention: api_client_other.py (2025L) — God class: MicrosoftGraphApiOther
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T007** [Codebase Optimization] Needs attention: api_client_apps.py (631L) — God class: MicrosoftGraphApiApps (2
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T008** [Codebase Optimization] Needs attention: api_client_directory.py (749L) — God class: MicrosoftGraphApiDi
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T009** [Codebase Optimization] 6 functions with nesting depth >4
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T010** [Codebase Optimization] 1 flat directories with >15 Python files: microsoft_agent/mcp
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T011** [Security Analysis] 1 HIGH severity vulnerabilities found
+  - Priority: P1-High | Effort: Medium
+- [ ] [P] **T012** [Test Coverage] Test suite lacks intent diversity (only one type)
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T013** [Test Coverage] 28 potential doc-test drift items
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T014** [Documentation & Governance] 2 broken internal links in README.md
+  - Priority: P4-Enhancement | Effort: Medium
+- [ ] [P] **T015** [Architecture & Design Patterns] SRP: 9 modules exceed 500 lines (god modules)
+  - Priority: P2-Medium | Effort: Large
+- [ ] [P] **T016** [Architecture & Design Patterns] SRP: 7 classes have >15 methods
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T017** [Architecture & Design Patterns] No discernible layer architecture (no domain/service/adapter separation)
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T018** [Architecture & Design Patterns] Low dependency injection ratio: 7%
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T019** [Architecture & Design Patterns] 23 Python files at top level — consider package organization
+  - Priority: P2-Medium | Effort: Large
+- [ ] [P] **T020** [Concept Traceability] Low traceability ratio: 2% concepts fully traced
+  - Priority: P4-Enhancement | Effort: Medium
+- [ ] [P] **T021** [Concept Traceability] 44 orphaned concepts (only in one source)
+  - Priority: P4-Enhancement | Effort: Medium
+- [ ] [P] **T022** [Concept Traceability] 3 test functions missing concept markers
+  - Priority: P4-Enhancement | Effort: Small
+- [ ] [P] **T023** [Concept Traceability] 426 significant functions (>10 lines) missing concept markers in docstrings
+  - Priority: P4-Enhancement | Effort: Small
+- [ ] [P] **T024** [Linting & Formatting] Total lint findings: 0 (high/error: 0, medium/warning: 0, low: 0)
+  - Priority: P4-Enhancement | Effort: Medium
+- [ ] [P] **T025** [Pre-Commit Compliance] 1 hook(s) may be outdated: ruff-pre-commit
+  - Priority: P2-Medium | Effort: Small
+- [ ] [P] **T026** [Directory Organization] 1 directories with >20 files: microsoft_agent/mcp
+  - Priority: P4-Enhancement | Effort: Medium
+- [ ] [P] **T027** [Directory Organization] 1 rogue/throwaway scripts detected (fix_*, validate_*, patch_*, etc.): scripts/v
+  - Priority: P4-Enhancement | Effort: Medium
+- [ ] [P] **T028** [Version Sync Analysis] Found 2 file(s) with version '0.15.0' that are NOT tracked in .bumpversion.cfg:
+  - Priority: P2-Medium | Effort: Small
+- [ ] [P] **T029** [Version Sync Analysis]   - domain_results.json
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T030** [Version Sync Analysis]   - .specify/reports/code_enhancement_report.md
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T031** [Changelog Audit] CHANGELOG.md exists but could not be parsed — check format compliance
+  - Priority: P3-Low | Effort: Medium
+- [ ] [P] **T032** [Changelog Audit] No changelog entries within the last 30 days
+  - Priority: P3-Low | Effort: Medium
+- [ ] [P] **T033** [Changelog Audit] keepachangelog not installed — pip install 'universal-skills[code-enhancer]'
+  - Priority: P3-Low | Effort: Small
+- [ ] [P] **T034** [Pytest Quality] 1 test files exceed 500 lines — split into focused modules
+  - Priority: P3-Low | Effort: Large
+- [ ] [P] **T035** [Pytest Quality] Test directory lacks subdirectory organization (consider unit/, integration/, e2
+  - Priority: P3-Low | Effort: Medium
+- [ ] [P] **T036** [Pytest Quality] No @pytest.mark.parametrize usage — consider data-driven tests
+  - Priority: P3-Low | Effort: Medium
+- [ ] [P] **T037** [Pytest Quality] 1 tests have no assertions
+  - Priority: P3-Low | Effort: Medium
+- [ ] [P] **T038** [Environment Variables] Partial env var documentation: 37% coverage
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T039** [Environment Variables] Undocumented env vars: ADMINTOOL, AGREEMENTSTOOL, APPLICATIONSTOOL, AUDITTOOL, A
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T040** [Environment Variables] 5 Python env vars not in .env.example: AUDIENCE, MICROSOFT_ENDPOINTS_JSON, TESTI
+  - Priority: P2-Medium | Effort: Medium
+- [ ] [P] **T041** [analyze_xdg_kg] Analysis error: No module named 'agent_utilities.knowledge_graph'
+  - Priority: P1-High | Effort: Medium

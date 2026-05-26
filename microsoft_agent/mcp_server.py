@@ -1,4 +1,8 @@
 #!/usr/bin/python
+"""
+Microsoft Graph MCP Server implementation.
+"""
+
 import warnings
 
 from fastmcp import Context, FastMCP
@@ -37,7 +41,6 @@ __version__ = "0.15.0"
 logger = get_logger(name="microsoft-agent")
 logger.setLevel(logging.INFO)
 
-
 def register_auth_tools(mcp: FastMCP):
     @mcp.tool(tags={"auth"})
     async def microsoft_auth(
@@ -74,7 +77,6 @@ def register_auth_tools(mcp: FastMCP):
             return client.list_accounts(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_meta_tools(mcp: FastMCP):
     @mcp.tool(tags={"meta"})
     async def microsoft_meta(
@@ -104,7 +106,6 @@ def register_meta_tools(mcp: FastMCP):
         if action == "searches":
             return client.searches(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_mail_tools(mcp: FastMCP):
     @mcp.tool(tags={"mail"})
@@ -187,7 +188,6 @@ def register_mail_tools(mcp: FastMCP):
         if action == "reply_to_chat_message":
             return client.reply_to_chat_message(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_files_tools(mcp: FastMCP):
     @mcp.tool(tags={"files"})
@@ -287,7 +287,6 @@ def register_files_tools(mcp: FastMCP):
             return client.get_excel_table(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_calendar_tools(mcp: FastMCP):
     @mcp.tool(tags={"calendar"})
     async def microsoft_calendar(
@@ -342,7 +341,6 @@ def register_calendar_tools(mcp: FastMCP):
             return client.find_meeting_times(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_notes_tools(mcp: FastMCP):
     @mcp.tool(tags={"notes"})
     async def microsoft_notes(
@@ -374,7 +372,6 @@ def register_notes_tools(mcp: FastMCP):
         if action == "create_onenote_page":
             return client.create_onenote_page(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_tasks_tools(mcp: FastMCP):
     @mcp.tool(tags={"tasks"})
@@ -422,7 +419,6 @@ def register_tasks_tools(mcp: FastMCP):
             return client.update_planner_task_details(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_contacts_tools(mcp: FastMCP):
     @mcp.tool(tags={"contacts"})
     async def microsoft_contacts(
@@ -459,7 +455,6 @@ def register_contacts_tools(mcp: FastMCP):
             return client.delete_outlook_contact(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_user_tools(mcp: FastMCP):
     @mcp.tool(tags={"user"})
     async def microsoft_user(
@@ -492,7 +487,6 @@ def register_user_tools(mcp: FastMCP):
             return client.get_me(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_chat_tools(mcp: FastMCP):
     @mcp.tool(tags={"chat"})
     async def microsoft_chat(
@@ -522,7 +516,6 @@ def register_chat_tools(mcp: FastMCP):
         if action == "get_chat":
             return client.get_chat(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_teams_tools(mcp: FastMCP):
     @mcp.tool(tags={"teams"})
@@ -555,7 +548,6 @@ def register_teams_tools(mcp: FastMCP):
         if action == "get_team_channel":
             return client.get_team_channel(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_sites_tools(mcp: FastMCP):
     @mcp.tool(tags={"sites"})
@@ -593,12 +585,11 @@ def register_sites_tools(mcp: FastMCP):
             return client.get_sharepoint_sites_delta(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_search_tools(mcp: FastMCP):
     @mcp.tool(tags={"search"})
     async def microsoft_search(
         action: str = Field(
-            description="Action to perform. Must be one of: 'search_query'"
+            description="Action to perform. Must be one of: 'search_query', 'search_tools'"
         ),
         params_json: str = Field(
             default="{}", description="JSON string of parameters to pass to the action."
@@ -622,8 +613,9 @@ def register_search_tools(mcp: FastMCP):
 
         if action == "search_query":
             return client.search_query(**kwargs)
+        if action == "search_tools":
+            return client.search_tools(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_groups_tools(mcp: FastMCP):
     @mcp.tool(tags={"groups"})
@@ -675,7 +667,6 @@ def register_groups_tools(mcp: FastMCP):
             return client.list_group_drives(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_admin_tools(mcp: FastMCP):
     @mcp.tool(tags={"admin"})
     async def microsoft_admin(
@@ -724,7 +715,6 @@ def register_admin_tools(mcp: FastMCP):
             return client.get_delegated_admin_relationship(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_organization_tools(mcp: FastMCP):
     @mcp.tool(tags={"organization"})
     async def microsoft_organization(
@@ -762,7 +752,6 @@ def register_organization_tools(mcp: FastMCP):
         if action == "update_org_branding":
             return client.update_org_branding(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_domains_tools(mcp: FastMCP):
     @mcp.tool(tags={"domains"})
@@ -804,7 +793,6 @@ def register_domains_tools(mcp: FastMCP):
             return client.list_domain_service_configuration_records(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_subscriptions_tools(mcp: FastMCP):
     @mcp.tool(tags={"subscriptions"})
     async def microsoft_subscriptions(
@@ -842,7 +830,6 @@ def register_subscriptions_tools(mcp: FastMCP):
         if action == "delete_subscription":
             return client.delete_subscription(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_communications_tools(mcp: FastMCP):
     @mcp.tool(tags={"communications"})
@@ -892,7 +879,6 @@ def register_communications_tools(mcp: FastMCP):
             return client.get_my_presence(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_identity_tools(mcp: FastMCP):
     @mcp.tool(tags={"identity"})
     async def microsoft_identity(
@@ -940,7 +926,6 @@ def register_identity_tools(mcp: FastMCP):
         if action == "list_lifecycle_workflows":
             return client.list_lifecycle_workflows(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_security_tools(mcp: FastMCP):
     @mcp.tool(tags={"security"})
@@ -1004,7 +989,6 @@ def register_security_tools(mcp: FastMCP):
             return client.get_sensitivity_label(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_audit_tools(mcp: FastMCP):
     @mcp.tool(tags={"audit"})
     async def microsoft_audit(
@@ -1042,7 +1026,6 @@ def register_audit_tools(mcp: FastMCP):
         if action == "list_provisioning_logs":
             return client.list_provisioning_logs(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_reports_tools(mcp: FastMCP):
     @mcp.tool(tags={"reports"})
@@ -1083,7 +1066,6 @@ def register_reports_tools(mcp: FastMCP):
         if action == "get_onedrive_usage_report":
             return client.get_onedrive_usage_report(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_applications_tools(mcp: FastMCP):
     @mcp.tool(tags={"applications"})
@@ -1137,7 +1119,6 @@ def register_applications_tools(mcp: FastMCP):
             return client.delete_service_principal(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_directory_tools(mcp: FastMCP):
     @mcp.tool(tags={"directory"})
     async def microsoft_directory(
@@ -1190,7 +1171,6 @@ def register_directory_tools(mcp: FastMCP):
             return client.create_role_assignment(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_policies_tools(mcp: FastMCP):
     @mcp.tool(tags={"policies"})
     async def microsoft_policies(
@@ -1228,7 +1208,6 @@ def register_policies_tools(mcp: FastMCP):
         if action == "get_admin_consent_policy":
             return client.get_admin_consent_policy(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_devices_tools(mcp: FastMCP):
     @mcp.tool(tags={"devices"})
@@ -1276,7 +1255,6 @@ def register_devices_tools(mcp: FastMCP):
             return client.retire_managed_device(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_education_tools(mcp: FastMCP):
     @mcp.tool(tags={"education"})
     async def microsoft_education(
@@ -1317,7 +1295,6 @@ def register_education_tools(mcp: FastMCP):
             return client.list_education_assignments(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_agreements_tools(mcp: FastMCP):
     @mcp.tool(tags={"agreements"})
     async def microsoft_agreements(
@@ -1354,7 +1331,6 @@ def register_agreements_tools(mcp: FastMCP):
             return client.delete_agreement(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_places_tools(mcp: FastMCP):
     @mcp.tool(tags={"places"})
     async def microsoft_places(
@@ -1390,7 +1366,6 @@ def register_places_tools(mcp: FastMCP):
         if action == "update_place":
             return client.update_place(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_print_tools(mcp: FastMCP):
     @mcp.tool(tags={"print"})
@@ -1430,7 +1405,6 @@ def register_print_tools(mcp: FastMCP):
             return client.list_print_shares(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_privacy_tools(mcp: FastMCP):
     @mcp.tool(tags={"privacy"})
     async def microsoft_privacy(
@@ -1464,7 +1438,6 @@ def register_privacy_tools(mcp: FastMCP):
         if action == "create_subject_rights_request":
             return client.create_subject_rights_request(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_solutions_tools(mcp: FastMCP):
     @mcp.tool(tags={"solutions"})
@@ -1504,7 +1477,6 @@ def register_solutions_tools(mcp: FastMCP):
             return client.list_virtual_events(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_storage_tools(mcp: FastMCP):
     @mcp.tool(tags={"storage"})
     async def microsoft_storage(
@@ -1539,7 +1511,6 @@ def register_storage_tools(mcp: FastMCP):
             return client.create_file_storage_container(**kwargs)
         raise ValueError(f"Unknown action: {action}")
 
-
 def register_employee_experience_tools(mcp: FastMCP):
     @mcp.tool(tags={"employee_experience"})
     async def microsoft_employee_experience(
@@ -1573,7 +1544,6 @@ def register_employee_experience_tools(mcp: FastMCP):
         if action == "list_learning_course_activities":
             return client.list_learning_course_activities(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def register_connections_tools(mcp: FastMCP):
     @mcp.tool(tags={"connections"})
@@ -1610,7 +1580,6 @@ def register_connections_tools(mcp: FastMCP):
         if action == "delete_external_connection":
             return client.delete_external_connection(**kwargs)
         raise ValueError(f"Unknown action: {action}")
-
 
 def get_mcp_instance() -> tuple[Any, ...]:
     """Initialize and return the MCP instance."""
@@ -1740,7 +1709,6 @@ def get_mcp_instance() -> tuple[Any, ...]:
         mcp.add_middleware(mw)
     return mcp, args, middlewares
 
-
 def mcp_server() -> None:
     mcp, args, middlewares = get_mcp_instance()
     print(f"microsoft-agent MCP v{__version__}", file=sys.stderr)
@@ -1757,7 +1725,6 @@ def mcp_server() -> None:
     else:
         logger.error("Invalid transport", extra={"transport": args.transport})
         sys.exit(1)
-
 
 if __name__ == "__main__":
     mcp_server()
