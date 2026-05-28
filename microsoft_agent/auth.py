@@ -37,26 +37,30 @@ SERVICE_NAME = "microsoft-agent-mcp"
 TOKEN_CACHE_ACCOUNT = "msal_token_cache"  # nosec B105
 SELECTED_ACCOUNT_KEY = "selected_account"
 
-# XDG Compliance: use XDG_DATA_HOME/microsoft-agent, migrate from ~/.microsoft-agent
+from agent_utilities.core import paths
+
+# XDG Compliance: centralize to agent-utilities namespace, migrate from old locations
 _OLD_FALLBACK_DIR = Path.home() / ".microsoft-agent"
+_OLD_XDG_DIR = Path.home() / ".local" / "share" / "microsoft-agent"
 _XDG_DATA_HOME = os.environ.get("XDG_DATA_HOME")
 if _XDG_DATA_HOME:
-    FALLBACK_DIR = Path(_XDG_DATA_HOME) / "microsoft-agent"
-else:
-    FALLBACK_DIR = Path.home() / ".local" / "share" / "microsoft-agent"
+    _OLD_XDG_DIR = Path(_XDG_DATA_HOME) / "microsoft-agent"
 
-# Migrate old config directory if it exists and has cache files
-if _OLD_FALLBACK_DIR.exists():
-    try:
-        FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
-        for old_file in _OLD_FALLBACK_DIR.iterdir():
-            new_file = FALLBACK_DIR / old_file.name
-            if old_file.is_file() and not new_file.exists():
-                new_file.write_text(
-                    old_file.read_text(encoding="utf-8"), encoding="utf-8"
-                )
-    except Exception as e:
-        logger.warning(f"Failed to migrate old fallback directory: {e}")
+FALLBACK_DIR = paths.data_dir() / "microsoft-agent"
+
+# Migrate old config directories if they exist and have cache files
+for old_dir in (_OLD_FALLBACK_DIR, _OLD_XDG_DIR):
+    if old_dir.exists():
+        try:
+            FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
+            for old_file in old_dir.iterdir():
+                new_file = FALLBACK_DIR / old_file.name
+                if old_file.is_file() and not new_file.exists():
+                    new_file.write_text(
+                        old_file.read_text(encoding="utf-8"), encoding="utf-8"
+                    )
+        except Exception as e:
+            logger.warning(f"Failed to migrate old directory {old_dir}: {e}")
 
 FALLBACK_PATH = FALLBACK_DIR / ".token_cache.json"
 SELECTED_ACCOUNT_PATH = FALLBACK_DIR / ".selected_account.json"
