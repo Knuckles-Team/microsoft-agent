@@ -57,7 +57,7 @@ RUN apt-get update \
      && curl -sS https://starship.rs/install.sh | sh -s -- --yes \
     && mkdir -p /root/.config \
     && echo 'eval "$(starship init bash)"' >> /root/.bashrc \
-    && uv pip install --system --upgrade --verbose --no-cache --break-system-packages --prerelease=allow microsoft-agent[all]>=0.23.0
+    && uv pip install --system --upgrade --verbose --no-cache --break-system-packages --prerelease=allow microsoft-agent[all]>=0.24.0
 
 COPY docker/starship.toml /root/.config/starship.toml
 
