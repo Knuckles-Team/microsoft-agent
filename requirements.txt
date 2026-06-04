@@ -1,4 +1,4 @@
-agent-utilities>=0.40.0
+agent-utilities>=0.41.0
 msal>=1.31.0
 keyring>=25.1.0
 msgraph-sdk>=1.54.0
