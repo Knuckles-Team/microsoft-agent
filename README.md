@@ -23,6 +23,10 @@
 
 *Version: 0.30.0*
 
+> **Documentation** — Installation, deployment, usage across the API, CLI, MCP, and
+> A2A interfaces, and guidance for configuring the Microsoft Graph connection are
+> maintained in the [official documentation](https://knuckles-team.github.io/microsoft-agent/).
+
 ## Table of Contents
 - [Overview](#overview)
 - [Installation](#installation)
@@ -31,7 +35,7 @@
 - [A2A Agent Architecture](#a2a-agent)
 - [Security & Governance](#security--governance)
 - [Docker Deployment](#docker)
-- [Documentation & Guides](#documentation--guides)
+- [Documentation](#documentation)
 
 ## Overview
 
@@ -352,10 +356,21 @@ docker run -d \
   knucklessg1/microsoft-agent:latest
 ```
 
-## Documentation & Guides
+## Documentation
 
-For more detailed technical documentation and deployment guides, please check out our [/docs](file:///home/apps/workspace/agent-packages/agents/microsoft-agent/docs) directory:
-- [Overview Guide](file:///home/apps/workspace/agent-packages/agents/microsoft-agent/docs/overview.md) - High-level conceptual registry and ecosystem mapping.
+The complete documentation is published as the
+[official documentation site](https://knuckles-team.github.io/microsoft-agent/) and is
+the recommended reference for installation, deployment, and day-to-day operation.
+
+| Page | Contents |
+|---|---|
+| [Installation](https://knuckles-team.github.io/microsoft-agent/installation/) | pip, source, extras, prebuilt Docker image |
+| [Deployment](https://knuckles-team.github.io/microsoft-agent/deployment/) | run the MCP and A2A servers, Compose, Caddy + Technitium, env config |
+| [Usage](https://knuckles-team.github.io/microsoft-agent/usage/) | the MCP tools, the `MicrosoftGraphApi` client, the CLI servers |
+| [Overview](https://knuckles-team.github.io/microsoft-agent/overview/) | capabilities, tool surface, agent architecture |
+| [Concepts](https://knuckles-team.github.io/microsoft-agent/concepts/) | concept registry (`CONCEPT:MSFT-*`) |
+
+`AGENTS.md` is the canonical contributor/agent guidance.
 
 ## Repository Owners
 
