@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,7 +38,7 @@ def register_notes_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "get_onenote_page_content":
-            return client.get_onenote_page_content(**kwargs)
+            return await run_blocking(client.get_onenote_page_content, **kwargs)
         if action == "create_onenote_page":
-            return client.create_onenote_page(**kwargs)
+            return await run_blocking(client.create_onenote_page, **kwargs)
         raise ValueError(f"Unknown action: {action}")

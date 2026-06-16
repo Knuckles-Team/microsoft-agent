@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,23 +38,23 @@ def register_identity_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "create_invitation":
-            return client.create_invitation(**kwargs)
+            return await run_blocking(client.create_invitation, **kwargs)
         if action == "list_conditional_access_policies":
-            return client.list_conditional_access_policies(**kwargs)
+            return await run_blocking(client.list_conditional_access_policies, **kwargs)
         if action == "get_conditional_access_policy":
-            return client.get_conditional_access_policy(**kwargs)
+            return await run_blocking(client.get_conditional_access_policy, **kwargs)
         if action == "create_conditional_access_policy":
-            return client.create_conditional_access_policy(**kwargs)
+            return await run_blocking(client.create_conditional_access_policy, **kwargs)
         if action == "update_conditional_access_policy":
-            return client.update_conditional_access_policy(**kwargs)
+            return await run_blocking(client.update_conditional_access_policy, **kwargs)
         if action == "delete_conditional_access_policy":
-            return client.delete_conditional_access_policy(**kwargs)
+            return await run_blocking(client.delete_conditional_access_policy, **kwargs)
         if action == "list_access_reviews":
-            return client.list_access_reviews(**kwargs)
+            return await run_blocking(client.list_access_reviews, **kwargs)
         if action == "get_access_review":
-            return client.get_access_review(**kwargs)
+            return await run_blocking(client.get_access_review, **kwargs)
         if action == "list_entitlement_access_packages":
-            return client.list_entitlement_access_packages(**kwargs)
+            return await run_blocking(client.list_entitlement_access_packages, **kwargs)
         if action == "list_lifecycle_workflows":
-            return client.list_lifecycle_workflows(**kwargs)
+            return await run_blocking(client.list_lifecycle_workflows, **kwargs)
         raise ValueError(f"Unknown action: {action}")

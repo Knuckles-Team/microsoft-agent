@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,27 +38,27 @@ def register_directory_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_directory_objects":
-            return client.list_directory_objects(**kwargs)
+            return await run_blocking(client.list_directory_objects, **kwargs)
         if action == "get_directory_object":
-            return client.get_directory_object(**kwargs)
+            return await run_blocking(client.get_directory_object, **kwargs)
         if action == "list_directory_roles":
-            return client.list_directory_roles(**kwargs)
+            return await run_blocking(client.list_directory_roles, **kwargs)
         if action == "get_directory_role":
-            return client.get_directory_role(**kwargs)
+            return await run_blocking(client.get_directory_role, **kwargs)
         if action == "list_directory_role_templates":
-            return client.list_directory_role_templates(**kwargs)
+            return await run_blocking(client.list_directory_role_templates, **kwargs)
         if action == "list_deleted_items":
-            return client.list_deleted_items(**kwargs)
+            return await run_blocking(client.list_deleted_items, **kwargs)
         if action == "restore_deleted_item":
-            return client.restore_deleted_item(**kwargs)
+            return await run_blocking(client.restore_deleted_item, **kwargs)
         if action == "list_role_definitions":
-            return client.list_role_definitions(**kwargs)
+            return await run_blocking(client.list_role_definitions, **kwargs)
         if action == "get_role_definition":
-            return client.get_role_definition(**kwargs)
+            return await run_blocking(client.get_role_definition, **kwargs)
         if action == "list_role_assignments":
-            return client.list_role_assignments(**kwargs)
+            return await run_blocking(client.list_role_assignments, **kwargs)
         if action == "get_role_assignment":
-            return client.get_role_assignment(**kwargs)
+            return await run_blocking(client.get_role_assignment, **kwargs)
         if action == "create_role_assignment":
-            return client.create_role_assignment(**kwargs)
+            return await run_blocking(client.create_role_assignment, **kwargs)
         raise ValueError(f"Unknown action: {action}")

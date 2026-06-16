@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,11 +38,11 @@ def register_places_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_rooms":
-            return client.list_rooms(**kwargs)
+            return await run_blocking(client.list_rooms, **kwargs)
         if action == "list_room_lists":
-            return client.list_room_lists(**kwargs)
+            return await run_blocking(client.list_room_lists, **kwargs)
         if action == "get_place":
-            return client.get_place(**kwargs)
+            return await run_blocking(client.get_place, **kwargs)
         if action == "update_place":
-            return client.update_place(**kwargs)
+            return await run_blocking(client.update_place, **kwargs)
         raise ValueError(f"Unknown action: {action}")

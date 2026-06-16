@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,13 +38,13 @@ def register_organization_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_organization":
-            return client.list_organization(**kwargs)
+            return await run_blocking(client.list_organization, **kwargs)
         if action == "get_organization":
-            return client.get_organization(**kwargs)
+            return await run_blocking(client.get_organization, **kwargs)
         if action == "update_organization":
-            return client.update_organization(**kwargs)
+            return await run_blocking(client.update_organization, **kwargs)
         if action == "get_org_branding":
-            return client.get_org_branding(**kwargs)
+            return await run_blocking(client.get_org_branding, **kwargs)
         if action == "update_org_branding":
-            return client.update_org_branding(**kwargs)
+            return await run_blocking(client.update_org_branding, **kwargs)
         raise ValueError(f"Unknown action: {action}")

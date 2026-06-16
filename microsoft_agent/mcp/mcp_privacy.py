@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,9 +38,9 @@ def register_privacy_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_subject_rights_requests":
-            return client.list_subject_rights_requests(**kwargs)
+            return await run_blocking(client.list_subject_rights_requests, **kwargs)
         if action == "get_subject_rights_request":
-            return client.get_subject_rights_request(**kwargs)
+            return await run_blocking(client.get_subject_rights_request, **kwargs)
         if action == "create_subject_rights_request":
-            return client.create_subject_rights_request(**kwargs)
+            return await run_blocking(client.create_subject_rights_request, **kwargs)
         raise ValueError(f"Unknown action: {action}")

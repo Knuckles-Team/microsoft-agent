@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,11 +38,11 @@ def register_connections_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_external_connections":
-            return client.list_external_connections(**kwargs)
+            return await run_blocking(client.list_external_connections, **kwargs)
         if action == "get_external_connection":
-            return client.get_external_connection(**kwargs)
+            return await run_blocking(client.get_external_connection, **kwargs)
         if action == "create_external_connection":
-            return client.create_external_connection(**kwargs)
+            return await run_blocking(client.create_external_connection, **kwargs)
         if action == "delete_external_connection":
-            return client.delete_external_connection(**kwargs)
+            return await run_blocking(client.delete_external_connection, **kwargs)
         raise ValueError(f"Unknown action: {action}")

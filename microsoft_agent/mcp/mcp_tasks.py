@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,21 +38,21 @@ def register_tasks_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "get_todo_task":
-            return client.get_todo_task(**kwargs)
+            return await run_blocking(client.get_todo_task, **kwargs)
         if action == "create_todo_task":
-            return client.create_todo_task(**kwargs)
+            return await run_blocking(client.create_todo_task, **kwargs)
         if action == "update_todo_task":
-            return client.update_todo_task(**kwargs)
+            return await run_blocking(client.update_todo_task, **kwargs)
         if action == "delete_todo_task":
-            return client.delete_todo_task(**kwargs)
+            return await run_blocking(client.delete_todo_task, **kwargs)
         if action == "get_planner_plan":
-            return client.get_planner_plan(**kwargs)
+            return await run_blocking(client.get_planner_plan, **kwargs)
         if action == "get_planner_task":
-            return client.get_planner_task(**kwargs)
+            return await run_blocking(client.get_planner_task, **kwargs)
         if action == "create_planner_task":
-            return client.create_planner_task(**kwargs)
+            return await run_blocking(client.create_planner_task, **kwargs)
         if action == "update_planner_task":
-            return client.update_planner_task(**kwargs)
+            return await run_blocking(client.update_planner_task, **kwargs)
         if action == "update_planner_task_details":
-            return client.update_planner_task_details(**kwargs)
+            return await run_blocking(client.update_planner_task_details, **kwargs)
         raise ValueError(f"Unknown action: {action}")

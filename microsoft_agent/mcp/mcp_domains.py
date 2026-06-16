@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,15 +38,17 @@ def register_domains_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_domains":
-            return client.list_domains(**kwargs)
+            return await run_blocking(client.list_domains, **kwargs)
         if action == "get_domain":
-            return client.get_domain(**kwargs)
+            return await run_blocking(client.get_domain, **kwargs)
         if action == "create_domain":
-            return client.create_domain(**kwargs)
+            return await run_blocking(client.create_domain, **kwargs)
         if action == "delete_domain":
-            return client.delete_domain(**kwargs)
+            return await run_blocking(client.delete_domain, **kwargs)
         if action == "verify_domain":
-            return client.verify_domain(**kwargs)
+            return await run_blocking(client.verify_domain, **kwargs)
         if action == "list_domain_service_configuration_records":
-            return client.list_domain_service_configuration_records(**kwargs)
+            return await run_blocking(
+                client.list_domain_service_configuration_records, **kwargs
+            )
         raise ValueError(f"Unknown action: {action}")

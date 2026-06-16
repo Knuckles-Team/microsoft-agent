@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,25 +38,25 @@ def register_groups_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_groups":
-            return client.list_groups(**kwargs)
+            return await run_blocking(client.list_groups, **kwargs)
         if action == "get_group":
-            return client.get_group(**kwargs)
+            return await run_blocking(client.get_group, **kwargs)
         if action == "create_group":
-            return client.create_group(**kwargs)
+            return await run_blocking(client.create_group, **kwargs)
         if action == "update_group":
-            return client.update_group(**kwargs)
+            return await run_blocking(client.update_group, **kwargs)
         if action == "delete_group":
-            return client.delete_group(**kwargs)
+            return await run_blocking(client.delete_group, **kwargs)
         if action == "list_group_members":
-            return client.list_group_members(**kwargs)
+            return await run_blocking(client.list_group_members, **kwargs)
         if action == "add_group_member":
-            return client.add_group_member(**kwargs)
+            return await run_blocking(client.add_group_member, **kwargs)
         if action == "remove_group_member":
-            return client.remove_group_member(**kwargs)
+            return await run_blocking(client.remove_group_member, **kwargs)
         if action == "list_group_owners":
-            return client.list_group_owners(**kwargs)
+            return await run_blocking(client.list_group_owners, **kwargs)
         if action == "list_group_conversations":
-            return client.list_group_conversations(**kwargs)
+            return await run_blocking(client.list_group_conversations, **kwargs)
         if action == "list_group_drives":
-            return client.list_group_drives(**kwargs)
+            return await run_blocking(client.list_group_drives, **kwargs)
         raise ValueError(f"Unknown action: {action}")

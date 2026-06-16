@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,11 +38,11 @@ def register_agreements_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_agreements":
-            return client.list_agreements(**kwargs)
+            return await run_blocking(client.list_agreements, **kwargs)
         if action == "get_agreement":
-            return client.get_agreement(**kwargs)
+            return await run_blocking(client.get_agreement, **kwargs)
         if action == "create_agreement":
-            return client.create_agreement(**kwargs)
+            return await run_blocking(client.create_agreement, **kwargs)
         if action == "delete_agreement":
-            return client.delete_agreement(**kwargs)
+            return await run_blocking(client.delete_agreement, **kwargs)
         raise ValueError(f"Unknown action: {action}")

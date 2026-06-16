@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,15 +38,15 @@ def register_education_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_education_classes":
-            return client.list_education_classes(**kwargs)
+            return await run_blocking(client.list_education_classes, **kwargs)
         if action == "get_education_class":
-            return client.get_education_class(**kwargs)
+            return await run_blocking(client.get_education_class, **kwargs)
         if action == "list_education_schools":
-            return client.list_education_schools(**kwargs)
+            return await run_blocking(client.list_education_schools, **kwargs)
         if action == "get_education_school":
-            return client.get_education_school(**kwargs)
+            return await run_blocking(client.get_education_school, **kwargs)
         if action == "list_education_users":
-            return client.list_education_users(**kwargs)
+            return await run_blocking(client.list_education_users, **kwargs)
         if action == "list_education_assignments":
-            return client.list_education_assignments(**kwargs)
+            return await run_blocking(client.list_education_assignments, **kwargs)
         raise ValueError(f"Unknown action: {action}")

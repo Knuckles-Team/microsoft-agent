@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,13 +38,13 @@ def register_solutions_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_booking_businesses":
-            return client.list_booking_businesses(**kwargs)
+            return await run_blocking(client.list_booking_businesses, **kwargs)
         if action == "get_booking_business":
-            return client.get_booking_business(**kwargs)
+            return await run_blocking(client.get_booking_business, **kwargs)
         if action == "list_booking_appointments":
-            return client.list_booking_appointments(**kwargs)
+            return await run_blocking(client.list_booking_appointments, **kwargs)
         if action == "create_booking_appointment":
-            return client.create_booking_appointment(**kwargs)
+            return await run_blocking(client.create_booking_appointment, **kwargs)
         if action == "list_virtual_events":
-            return client.list_virtual_events(**kwargs)
+            return await run_blocking(client.list_virtual_events, **kwargs)
         raise ValueError(f"Unknown action: {action}")

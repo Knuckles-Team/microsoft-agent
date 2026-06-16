@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,23 +38,23 @@ def register_communications_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_online_meetings":
-            return client.list_online_meetings(**kwargs)
+            return await run_blocking(client.list_online_meetings, **kwargs)
         if action == "get_online_meeting":
-            return client.get_online_meeting(**kwargs)
+            return await run_blocking(client.get_online_meeting, **kwargs)
         if action == "create_online_meeting":
-            return client.create_online_meeting(**kwargs)
+            return await run_blocking(client.create_online_meeting, **kwargs)
         if action == "update_online_meeting":
-            return client.update_online_meeting(**kwargs)
+            return await run_blocking(client.update_online_meeting, **kwargs)
         if action == "delete_online_meeting":
-            return client.delete_online_meeting(**kwargs)
+            return await run_blocking(client.delete_online_meeting, **kwargs)
         if action == "list_call_records":
-            return client.list_call_records(**kwargs)
+            return await run_blocking(client.list_call_records, **kwargs)
         if action == "get_call_record":
-            return client.get_call_record(**kwargs)
+            return await run_blocking(client.get_call_record, **kwargs)
         if action == "list_presences":
-            return client.list_presences(**kwargs)
+            return await run_blocking(client.list_presences, **kwargs)
         if action == "get_presence":
-            return client.get_presence(**kwargs)
+            return await run_blocking(client.get_presence, **kwargs)
         if action == "get_my_presence":
-            return client.get_my_presence(**kwargs)
+            return await run_blocking(client.get_my_presence, **kwargs)
         raise ValueError(f"Unknown action: {action}")

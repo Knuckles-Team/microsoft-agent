@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,13 +38,13 @@ def register_subscriptions_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_subscriptions":
-            return client.list_subscriptions(**kwargs)
+            return await run_blocking(client.list_subscriptions, **kwargs)
         if action == "get_subscription":
-            return client.get_subscription(**kwargs)
+            return await run_blocking(client.get_subscription, **kwargs)
         if action == "create_subscription":
-            return client.create_subscription(**kwargs)
+            return await run_blocking(client.create_subscription, **kwargs)
         if action == "update_subscription":
-            return client.update_subscription(**kwargs)
+            return await run_blocking(client.update_subscription, **kwargs)
         if action == "delete_subscription":
-            return client.delete_subscription(**kwargs)
+            return await run_blocking(client.delete_subscription, **kwargs)
         raise ValueError(f"Unknown action: {action}")
