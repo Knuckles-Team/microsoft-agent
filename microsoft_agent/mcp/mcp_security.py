@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,37 +38,37 @@ def register_security_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_security_alerts":
-            return client.list_security_alerts(**kwargs)
+            return await run_blocking(client.list_security_alerts, **kwargs)
         if action == "get_security_alert":
-            return client.get_security_alert(**kwargs)
+            return await run_blocking(client.get_security_alert, **kwargs)
         if action == "update_security_alert":
-            return client.update_security_alert(**kwargs)
+            return await run_blocking(client.update_security_alert, **kwargs)
         if action == "list_security_incidents":
-            return client.list_security_incidents(**kwargs)
+            return await run_blocking(client.list_security_incidents, **kwargs)
         if action == "get_security_incident":
-            return client.get_security_incident(**kwargs)
+            return await run_blocking(client.get_security_incident, **kwargs)
         if action == "update_security_incident":
-            return client.update_security_incident(**kwargs)
+            return await run_blocking(client.update_security_incident, **kwargs)
         if action == "list_secure_scores":
-            return client.list_secure_scores(**kwargs)
+            return await run_blocking(client.list_secure_scores, **kwargs)
         if action == "list_threat_intelligence_hosts":
-            return client.list_threat_intelligence_hosts(**kwargs)
+            return await run_blocking(client.list_threat_intelligence_hosts, **kwargs)
         if action == "get_threat_intelligence_host":
-            return client.get_threat_intelligence_host(**kwargs)
+            return await run_blocking(client.get_threat_intelligence_host, **kwargs)
         if action == "run_hunting_query":
-            return client.run_hunting_query(**kwargs)
+            return await run_blocking(client.run_hunting_query, **kwargs)
         if action == "list_risk_detections":
-            return client.list_risk_detections(**kwargs)
+            return await run_blocking(client.list_risk_detections, **kwargs)
         if action == "get_risk_detection":
-            return client.get_risk_detection(**kwargs)
+            return await run_blocking(client.get_risk_detection, **kwargs)
         if action == "list_risky_users":
-            return client.list_risky_users(**kwargs)
+            return await run_blocking(client.list_risky_users, **kwargs)
         if action == "get_risky_user":
-            return client.get_risky_user(**kwargs)
+            return await run_blocking(client.get_risky_user, **kwargs)
         if action == "dismiss_risky_user":
-            return client.dismiss_risky_user(**kwargs)
+            return await run_blocking(client.dismiss_risky_user, **kwargs)
         if action == "list_sensitivity_labels":
-            return client.list_sensitivity_labels(**kwargs)
+            return await run_blocking(client.list_sensitivity_labels, **kwargs)
         if action == "get_sensitivity_label":
-            return client.get_sensitivity_label(**kwargs)
+            return await run_blocking(client.get_sensitivity_label, **kwargs)
         raise ValueError(f"Unknown action: {action}")

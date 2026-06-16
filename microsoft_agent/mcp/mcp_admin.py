@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,23 +38,25 @@ def register_admin_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_service_health":
-            return client.list_service_health(**kwargs)
+            return await run_blocking(client.list_service_health, **kwargs)
         if action == "get_service_health":
-            return client.get_service_health(**kwargs)
+            return await run_blocking(client.get_service_health, **kwargs)
         if action == "list_service_health_issues":
-            return client.list_service_health_issues(**kwargs)
+            return await run_blocking(client.list_service_health_issues, **kwargs)
         if action == "get_service_health_issue":
-            return client.get_service_health_issue(**kwargs)
+            return await run_blocking(client.get_service_health_issue, **kwargs)
         if action == "list_service_update_messages":
-            return client.list_service_update_messages(**kwargs)
+            return await run_blocking(client.list_service_update_messages, **kwargs)
         if action == "get_service_update_message":
-            return client.get_service_update_message(**kwargs)
+            return await run_blocking(client.get_service_update_message, **kwargs)
         if action == "get_admin_sharepoint":
-            return client.get_admin_sharepoint(**kwargs)
+            return await run_blocking(client.get_admin_sharepoint, **kwargs)
         if action == "update_admin_sharepoint":
-            return client.update_admin_sharepoint(**kwargs)
+            return await run_blocking(client.update_admin_sharepoint, **kwargs)
         if action == "list_delegated_admin_relationships":
-            return client.list_delegated_admin_relationships(**kwargs)
+            return await run_blocking(
+                client.list_delegated_admin_relationships, **kwargs
+            )
         if action == "get_delegated_admin_relationship":
-            return client.get_delegated_admin_relationship(**kwargs)
+            return await run_blocking(client.get_delegated_admin_relationship, **kwargs)
         raise ValueError(f"Unknown action: {action}")

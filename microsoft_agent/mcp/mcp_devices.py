@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,21 +38,21 @@ def register_devices_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_devices":
-            return client.list_devices(**kwargs)
+            return await run_blocking(client.list_devices, **kwargs)
         if action == "get_device":
-            return client.get_device(**kwargs)
+            return await run_blocking(client.get_device, **kwargs)
         if action == "delete_device":
-            return client.delete_device(**kwargs)
+            return await run_blocking(client.delete_device, **kwargs)
         if action == "list_managed_devices":
-            return client.list_managed_devices(**kwargs)
+            return await run_blocking(client.list_managed_devices, **kwargs)
         if action == "get_managed_device":
-            return client.get_managed_device(**kwargs)
+            return await run_blocking(client.get_managed_device, **kwargs)
         if action == "list_device_compliance_policies":
-            return client.list_device_compliance_policies(**kwargs)
+            return await run_blocking(client.list_device_compliance_policies, **kwargs)
         if action == "list_device_configurations":
-            return client.list_device_configurations(**kwargs)
+            return await run_blocking(client.list_device_configurations, **kwargs)
         if action == "wipe_managed_device":
-            return client.wipe_managed_device(**kwargs)
+            return await run_blocking(client.wipe_managed_device, **kwargs)
         if action == "retire_managed_device":
-            return client.retire_managed_device(**kwargs)
+            return await run_blocking(client.retire_managed_device, **kwargs)
         raise ValueError(f"Unknown action: {action}")

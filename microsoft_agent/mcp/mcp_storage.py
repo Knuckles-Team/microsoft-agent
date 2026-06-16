@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,9 +38,9 @@ def register_storage_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_file_storage_containers":
-            return client.list_file_storage_containers(**kwargs)
+            return await run_blocking(client.list_file_storage_containers, **kwargs)
         if action == "get_file_storage_container":
-            return client.get_file_storage_container(**kwargs)
+            return await run_blocking(client.get_file_storage_container, **kwargs)
         if action == "create_file_storage_container":
-            return client.create_file_storage_container(**kwargs)
+            return await run_blocking(client.create_file_storage_container, **kwargs)
         raise ValueError(f"Unknown action: {action}")

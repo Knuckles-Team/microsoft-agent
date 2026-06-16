@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,13 +38,13 @@ def register_policies_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "get_authorization_policy":
-            return client.get_authorization_policy(**kwargs)
+            return await run_blocking(client.get_authorization_policy, **kwargs)
         if action == "list_token_lifetime_policies":
-            return client.list_token_lifetime_policies(**kwargs)
+            return await run_blocking(client.list_token_lifetime_policies, **kwargs)
         if action == "list_token_issuance_policies":
-            return client.list_token_issuance_policies(**kwargs)
+            return await run_blocking(client.list_token_issuance_policies, **kwargs)
         if action == "list_permission_grant_policies":
-            return client.list_permission_grant_policies(**kwargs)
+            return await run_blocking(client.list_permission_grant_policies, **kwargs)
         if action == "get_admin_consent_policy":
-            return client.get_admin_consent_policy(**kwargs)
+            return await run_blocking(client.get_admin_consent_policy, **kwargs)
         raise ValueError(f"Unknown action: {action}")

@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,15 +38,15 @@ def register_reports_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "get_email_activity_report":
-            return client.get_email_activity_report(**kwargs)
+            return await run_blocking(client.get_email_activity_report, **kwargs)
         if action == "get_mailbox_usage_report":
-            return client.get_mailbox_usage_report(**kwargs)
+            return await run_blocking(client.get_mailbox_usage_report, **kwargs)
         if action == "get_office365_active_users":
-            return client.get_office365_active_users(**kwargs)
+            return await run_blocking(client.get_office365_active_users, **kwargs)
         if action == "get_sharepoint_activity_report":
-            return client.get_sharepoint_activity_report(**kwargs)
+            return await run_blocking(client.get_sharepoint_activity_report, **kwargs)
         if action == "get_teams_user_activity":
-            return client.get_teams_user_activity(**kwargs)
+            return await run_blocking(client.get_teams_user_activity, **kwargs)
         if action == "get_onedrive_usage_report":
-            return client.get_onedrive_usage_report(**kwargs)
+            return await run_blocking(client.get_onedrive_usage_report, **kwargs)
         raise ValueError(f"Unknown action: {action}")

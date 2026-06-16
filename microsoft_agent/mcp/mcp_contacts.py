@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,11 +38,11 @@ def register_contacts_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "get_outlook_contact":
-            return client.get_outlook_contact(**kwargs)
+            return await run_blocking(client.get_outlook_contact, **kwargs)
         if action == "create_outlook_contact":
-            return client.create_outlook_contact(**kwargs)
+            return await run_blocking(client.create_outlook_contact, **kwargs)
         if action == "update_outlook_contact":
-            return client.update_outlook_contact(**kwargs)
+            return await run_blocking(client.update_outlook_contact, **kwargs)
         if action == "delete_outlook_contact":
-            return client.delete_outlook_contact(**kwargs)
+            return await run_blocking(client.delete_outlook_contact, **kwargs)
         raise ValueError(f"Unknown action: {action}")

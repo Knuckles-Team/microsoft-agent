@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,57 +38,59 @@ def register_mail_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_mail_messages":
-            return client.list_mail_messages(**kwargs)
+            return await run_blocking(client.list_mail_messages, **kwargs)
         if action == "list_mail_folders":
-            return client.list_mail_folders(**kwargs)
+            return await run_blocking(client.list_mail_folders, **kwargs)
         if action == "list_mail_folder_messages":
-            return client.list_mail_folder_messages(**kwargs)
+            return await run_blocking(client.list_mail_folder_messages, **kwargs)
         if action == "get_mail_message":
-            return client.get_mail_message(**kwargs)
+            return await run_blocking(client.get_mail_message, **kwargs)
         if action == "send_mail":
-            return client.send_mail(**kwargs)
+            return await run_blocking(client.send_mail, **kwargs)
         if action == "list_shared_mailbox_messages":
-            return client.list_shared_mailbox_messages(**kwargs)
+            return await run_blocking(client.list_shared_mailbox_messages, **kwargs)
         if action == "list_shared_mailbox_folder_messages":
-            return client.list_shared_mailbox_folder_messages(**kwargs)
+            return await run_blocking(
+                client.list_shared_mailbox_folder_messages, **kwargs
+            )
         if action == "get_shared_mailbox_message":
-            return client.get_shared_mailbox_message(**kwargs)
+            return await run_blocking(client.get_shared_mailbox_message, **kwargs)
         if action == "send_shared_mailbox_mail":
-            return client.send_shared_mailbox_mail(**kwargs)
+            return await run_blocking(client.send_shared_mailbox_mail, **kwargs)
         if action == "create_draft_email":
-            return client.create_draft_email(**kwargs)
+            return await run_blocking(client.create_draft_email, **kwargs)
         if action == "delete_mail_message":
-            return client.delete_mail_message(**kwargs)
+            return await run_blocking(client.delete_mail_message, **kwargs)
         if action == "move_mail_message":
-            return client.move_mail_message(**kwargs)
+            return await run_blocking(client.move_mail_message, **kwargs)
         if action == "update_mail_message":
-            return client.update_mail_message(**kwargs)
+            return await run_blocking(client.update_mail_message, **kwargs)
         if action == "add_mail_attachment":
-            return client.add_mail_attachment(**kwargs)
+            return await run_blocking(client.add_mail_attachment, **kwargs)
         if action == "list_mail_attachments":
-            return client.list_mail_attachments(**kwargs)
+            return await run_blocking(client.list_mail_attachments, **kwargs)
         if action == "get_mail_attachment":
-            return client.get_mail_attachment(**kwargs)
+            return await run_blocking(client.get_mail_attachment, **kwargs)
         if action == "delete_mail_attachment":
-            return client.delete_mail_attachment(**kwargs)
+            return await run_blocking(client.delete_mail_attachment, **kwargs)
         if action == "get_root_folder":
-            return client.get_root_folder(**kwargs)
+            return await run_blocking(client.get_root_folder, **kwargs)
         if action == "list_folder_files":
-            return client.list_folder_files(**kwargs)
+            return await run_blocking(client.list_folder_files, **kwargs)
         if action == "list_chat_messages":
-            return client.list_chat_messages(**kwargs)
+            return await run_blocking(client.list_chat_messages, **kwargs)
         if action == "get_chat_message":
-            return client.get_chat_message(**kwargs)
+            return await run_blocking(client.get_chat_message, **kwargs)
         if action == "send_chat_message":
-            return client.send_chat_message(**kwargs)
+            return await run_blocking(client.send_chat_message, **kwargs)
         if action == "list_channel_messages":
-            return client.list_channel_messages(**kwargs)
+            return await run_blocking(client.list_channel_messages, **kwargs)
         if action == "get_channel_message":
-            return client.get_channel_message(**kwargs)
+            return await run_blocking(client.get_channel_message, **kwargs)
         if action == "send_channel_message":
-            return client.send_channel_message(**kwargs)
+            return await run_blocking(client.send_channel_message, **kwargs)
         if action == "list_chat_message_replies":
-            return client.list_chat_message_replies(**kwargs)
+            return await run_blocking(client.list_chat_message_replies, **kwargs)
         if action == "reply_to_chat_message":
-            return client.reply_to_chat_message(**kwargs)
+            return await run_blocking(client.reply_to_chat_message, **kwargs)
         raise ValueError(f"Unknown action: {action}")

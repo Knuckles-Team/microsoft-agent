@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,13 +38,13 @@ def register_print_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_printers":
-            return client.list_printers(**kwargs)
+            return await run_blocking(client.list_printers, **kwargs)
         if action == "get_printer":
-            return client.get_printer(**kwargs)
+            return await run_blocking(client.get_printer, **kwargs)
         if action == "list_print_jobs":
-            return client.list_print_jobs(**kwargs)
+            return await run_blocking(client.list_print_jobs, **kwargs)
         if action == "create_print_job":
-            return client.create_print_job(**kwargs)
+            return await run_blocking(client.create_print_job, **kwargs)
         if action == "list_print_shares":
-            return client.list_print_shares(**kwargs)
+            return await run_blocking(client.list_print_shares, **kwargs)
         raise ValueError(f"Unknown action: {action}")

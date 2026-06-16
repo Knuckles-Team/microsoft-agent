@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,73 +38,73 @@ def register_files_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_users":
-            return client.list_users(**kwargs)
+            return await run_blocking(client.list_users, **kwargs)
         if action == "list_drives":
-            return client.list_drives(**kwargs)
+            return await run_blocking(client.list_drives, **kwargs)
         if action == "get_drive_root_item":
-            return client.get_drive_root_item(**kwargs)
+            return await run_blocking(client.get_drive_root_item, **kwargs)
         if action == "download_onedrive_file_content":
-            return client.download_onedrive_file_content(**kwargs)
+            return await run_blocking(client.download_onedrive_file_content, **kwargs)
         if action == "delete_onedrive_file":
-            return client.delete_onedrive_file(**kwargs)
+            return await run_blocking(client.delete_onedrive_file, **kwargs)
         if action == "upload_file_content":
-            return client.upload_file_content(**kwargs)
+            return await run_blocking(client.upload_file_content, **kwargs)
         if action == "create_excel_chart":
-            return client.create_excel_chart(**kwargs)
+            return await run_blocking(client.create_excel_chart, **kwargs)
         if action == "format_excel_range":
-            return client.format_excel_range(**kwargs)
+            return await run_blocking(client.format_excel_range, **kwargs)
         if action == "sort_excel_range":
-            return client.sort_excel_range(**kwargs)
+            return await run_blocking(client.sort_excel_range, **kwargs)
         if action == "get_excel_range":
-            return client.get_excel_range(**kwargs)
+            return await run_blocking(client.get_excel_range, **kwargs)
         if action == "list_excel_worksheets":
-            return client.list_excel_worksheets(**kwargs)
+            return await run_blocking(client.list_excel_worksheets, **kwargs)
         if action == "list_excel_tables":
-            return client.list_excel_tables(**kwargs)
+            return await run_blocking(client.list_excel_tables, **kwargs)
         if action == "get_excel_workbook":
-            return client.get_excel_workbook(**kwargs)
+            return await run_blocking(client.get_excel_workbook, **kwargs)
         if action == "list_onenote_notebooks":
-            return client.list_onenote_notebooks(**kwargs)
+            return await run_blocking(client.list_onenote_notebooks, **kwargs)
         if action == "list_onenote_notebook_sections":
-            return client.list_onenote_notebook_sections(**kwargs)
+            return await run_blocking(client.list_onenote_notebook_sections, **kwargs)
         if action == "list_onenote_section_pages":
-            return client.list_onenote_section_pages(**kwargs)
+            return await run_blocking(client.list_onenote_section_pages, **kwargs)
         if action == "list_todo_task_lists":
-            return client.list_todo_task_lists(**kwargs)
+            return await run_blocking(client.list_todo_task_lists, **kwargs)
         if action == "list_todo_tasks":
-            return client.list_todo_tasks(**kwargs)
+            return await run_blocking(client.list_todo_tasks, **kwargs)
         if action == "list_planner_tasks":
-            return client.list_planner_tasks(**kwargs)
+            return await run_blocking(client.list_planner_tasks, **kwargs)
         if action == "list_plan_tasks":
-            return client.list_plan_tasks(**kwargs)
+            return await run_blocking(client.list_plan_tasks, **kwargs)
         if action == "list_outlook_contacts":
-            return client.list_outlook_contacts(**kwargs)
+            return await run_blocking(client.list_outlook_contacts, **kwargs)
         if action == "list_chats":
-            return client.list_chats(**kwargs)
+            return await run_blocking(client.list_chats, **kwargs)
         if action == "get_excel_worksheet":
-            return client.get_excel_worksheet(**kwargs)
+            return await run_blocking(client.get_excel_worksheet, **kwargs)
         if action == "list_joined_teams":
-            return client.list_joined_teams(**kwargs)
+            return await run_blocking(client.list_joined_teams, **kwargs)
         if action == "list_team_channels":
-            return client.list_team_channels(**kwargs)
+            return await run_blocking(client.list_team_channels, **kwargs)
         if action == "list_team_members":
-            return client.list_team_members(**kwargs)
+            return await run_blocking(client.list_team_members, **kwargs)
         if action == "list_site_drives":
-            return client.list_site_drives(**kwargs)
+            return await run_blocking(client.list_site_drives, **kwargs)
         if action == "get_site_drive_by_id":
-            return client.get_site_drive_by_id(**kwargs)
+            return await run_blocking(client.get_site_drive_by_id, **kwargs)
         if action == "list_site_items":
-            return client.list_site_items(**kwargs)
+            return await run_blocking(client.list_site_items, **kwargs)
         if action == "get_site_item":
-            return client.get_site_item(**kwargs)
+            return await run_blocking(client.get_site_item, **kwargs)
         if action == "list_site_lists":
-            return client.list_site_lists(**kwargs)
+            return await run_blocking(client.list_site_lists, **kwargs)
         if action == "get_site_list":
-            return client.get_site_list(**kwargs)
+            return await run_blocking(client.get_site_list, **kwargs)
         if action == "list_sharepoint_site_list_items":
-            return client.list_sharepoint_site_list_items(**kwargs)
+            return await run_blocking(client.list_sharepoint_site_list_items, **kwargs)
         if action == "get_sharepoint_site_list_item":
-            return client.get_sharepoint_site_list_item(**kwargs)
+            return await run_blocking(client.get_sharepoint_site_list_item, **kwargs)
         if action == "get_excel_table":
-            return client.get_excel_table(**kwargs)
+            return await run_blocking(client.get_excel_table, **kwargs)
         raise ValueError(f"Unknown action: {action}")

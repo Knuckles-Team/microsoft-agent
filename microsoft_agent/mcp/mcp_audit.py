@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,13 +38,13 @@ def register_audit_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "list_directory_audits":
-            return client.list_directory_audits(**kwargs)
+            return await run_blocking(client.list_directory_audits, **kwargs)
         if action == "get_directory_audit":
-            return client.get_directory_audit(**kwargs)
+            return await run_blocking(client.get_directory_audit, **kwargs)
         if action == "list_sign_in_logs":
-            return client.list_sign_in_logs(**kwargs)
+            return await run_blocking(client.list_sign_in_logs, **kwargs)
         if action == "get_sign_in_log":
-            return client.get_sign_in_log(**kwargs)
+            return await run_blocking(client.get_sign_in_log, **kwargs)
         if action == "list_provisioning_logs":
-            return client.list_provisioning_logs(**kwargs)
+            return await run_blocking(client.list_provisioning_logs, **kwargs)
         raise ValueError(f"Unknown action: {action}")

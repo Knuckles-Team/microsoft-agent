@@ -3,6 +3,7 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp_utilities import run_blocking
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
@@ -37,7 +38,7 @@ def register_user_tools(mcp: FastMCP):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         if action == "get_current_user":
-            return client.get_current_user(**kwargs)
+            return await run_blocking(client.get_current_user, **kwargs)
         if action == "get_me":
-            return client.get_me(**kwargs)
+            return await run_blocking(client.get_me, **kwargs)
         raise ValueError(f"Unknown action: {action}")
