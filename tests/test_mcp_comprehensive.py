@@ -88,8 +88,8 @@ async def test_all_mcp_tools_and_actions():
         )
         assert "error" in err_res
 
-        # Test unknown action
-        with pytest.raises(ValueError, match="Unknown action:"):
+        # Test unknown action (shared resolve_action raises a rich did-you-mean error)
+        with pytest.raises(ValueError, match="Unknown action"):
             await tool.fn(
                 action="invalid_unknown_action",
                 params_json="{}",

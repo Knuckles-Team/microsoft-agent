@@ -29,7 +29,7 @@ import sys
 from typing import Any
 
 from agent_utilities.base_utilities import to_boolean
-from agent_utilities.mcp_utilities import create_mcp_server
+from agent_utilities.mcp_utilities import create_mcp_server, resolve_action
 from dotenv import find_dotenv, load_dotenv
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -40,6 +40,319 @@ __version__ = "0.34.0"
 
 logger = get_logger(name="microsoft-agent")
 logger.setLevel(logging.INFO)
+
+_AUTH_ACTIONS = ("login", "logout", "verify_login", "list_accounts")
+_META_ACTIONS = ("searches",)
+_MAIL_ACTIONS = (
+    "list_mail_messages",
+    "list_mail_folders",
+    "list_mail_folder_messages",
+    "get_mail_message",
+    "send_mail",
+    "list_shared_mailbox_messages",
+    "list_shared_mailbox_folder_messages",
+    "get_shared_mailbox_message",
+    "send_shared_mailbox_mail",
+    "create_draft_email",
+    "delete_mail_message",
+    "move_mail_message",
+    "update_mail_message",
+    "add_mail_attachment",
+    "list_mail_attachments",
+    "get_mail_attachment",
+    "delete_mail_attachment",
+    "get_root_folder",
+    "list_folder_files",
+    "list_chat_messages",
+    "get_chat_message",
+    "send_chat_message",
+    "list_channel_messages",
+    "get_channel_message",
+    "send_channel_message",
+    "list_chat_message_replies",
+    "reply_to_chat_message",
+)
+_FILES_ACTIONS = (
+    "list_users",
+    "list_drives",
+    "get_drive_root_item",
+    "download_onedrive_file_content",
+    "delete_onedrive_file",
+    "upload_file_content",
+    "create_excel_chart",
+    "format_excel_range",
+    "sort_excel_range",
+    "get_excel_range",
+    "list_excel_worksheets",
+    "list_excel_tables",
+    "get_excel_workbook",
+    "list_onenote_notebooks",
+    "list_onenote_notebook_sections",
+    "list_onenote_section_pages",
+    "list_todo_task_lists",
+    "list_todo_tasks",
+    "list_planner_tasks",
+    "list_plan_tasks",
+    "list_outlook_contacts",
+    "list_chats",
+    "get_excel_worksheet",
+    "list_joined_teams",
+    "list_team_channels",
+    "list_team_members",
+    "list_site_drives",
+    "get_site_drive_by_id",
+    "list_site_items",
+    "get_site_item",
+    "list_site_lists",
+    "get_site_list",
+    "list_sharepoint_site_list_items",
+    "get_sharepoint_site_list_item",
+    "get_excel_table",
+)
+_CALENDAR_ACTIONS = (
+    "list_calendar_events",
+    "get_calendar_event",
+    "create_calendar_event",
+    "update_calendar_event",
+    "delete_calendar_event",
+    "list_specific_calendar_events",
+    "get_specific_calendar_event",
+    "create_specific_calendar_event",
+    "update_specific_calendar_event",
+    "delete_specific_calendar_event",
+    "get_calendar_view",
+    "list_calendars",
+    "find_meeting_times",
+)
+_NOTES_ACTIONS = ("get_onenote_page_content", "create_onenote_page")
+_TASKS_ACTIONS = (
+    "get_todo_task",
+    "create_todo_task",
+    "update_todo_task",
+    "delete_todo_task",
+    "get_planner_plan",
+    "get_planner_task",
+    "create_planner_task",
+    "update_planner_task",
+    "update_planner_task_details",
+)
+_CONTACTS_ACTIONS = (
+    "get_outlook_contact",
+    "create_outlook_contact",
+    "update_outlook_contact",
+    "delete_outlook_contact",
+)
+_USER_ACTIONS = ("get_current_user", "get_me")
+_CHAT_ACTIONS = ("get_chat",)
+_TEAMS_ACTIONS = ("get_team", "get_team_channel")
+_SITES_ACTIONS = (
+    "list_sites",
+    "get_site",
+    "get_sharepoint_site_by_path",
+    "get_sharepoint_sites_delta",
+)
+_SEARCH_ACTIONS = ("search_query", "search_tools")
+_GROUPS_ACTIONS = (
+    "list_groups",
+    "get_group",
+    "create_group",
+    "update_group",
+    "delete_group",
+    "list_group_members",
+    "add_group_member",
+    "remove_group_member",
+    "list_group_owners",
+    "list_group_conversations",
+    "list_group_drives",
+)
+_ADMIN_ACTIONS = (
+    "list_service_health",
+    "get_service_health",
+    "list_service_health_issues",
+    "get_service_health_issue",
+    "list_service_update_messages",
+    "get_service_update_message",
+    "get_admin_sharepoint",
+    "update_admin_sharepoint",
+    "list_delegated_admin_relationships",
+    "get_delegated_admin_relationship",
+)
+_ORGANIZATION_ACTIONS = (
+    "list_organization",
+    "get_organization",
+    "update_organization",
+    "get_org_branding",
+    "update_org_branding",
+)
+_DOMAINS_ACTIONS = (
+    "list_domains",
+    "get_domain",
+    "create_domain",
+    "delete_domain",
+    "verify_domain",
+    "list_domain_service_configuration_records",
+)
+_SUBSCRIPTIONS_ACTIONS = (
+    "list_subscriptions",
+    "get_subscription",
+    "create_subscription",
+    "update_subscription",
+    "delete_subscription",
+)
+_COMMUNICATIONS_ACTIONS = (
+    "list_online_meetings",
+    "get_online_meeting",
+    "create_online_meeting",
+    "update_online_meeting",
+    "delete_online_meeting",
+    "list_call_records",
+    "get_call_record",
+    "list_presences",
+    "get_presence",
+    "get_my_presence",
+)
+_IDENTITY_ACTIONS = (
+    "create_invitation",
+    "list_conditional_access_policies",
+    "get_conditional_access_policy",
+    "create_conditional_access_policy",
+    "update_conditional_access_policy",
+    "delete_conditional_access_policy",
+    "list_access_reviews",
+    "get_access_review",
+    "list_entitlement_access_packages",
+    "list_lifecycle_workflows",
+)
+_SECURITY_ACTIONS = (
+    "list_security_alerts",
+    "get_security_alert",
+    "update_security_alert",
+    "list_security_incidents",
+    "get_security_incident",
+    "update_security_incident",
+    "list_secure_scores",
+    "list_threat_intelligence_hosts",
+    "get_threat_intelligence_host",
+    "run_hunting_query",
+    "list_risk_detections",
+    "get_risk_detection",
+    "list_risky_users",
+    "get_risky_user",
+    "dismiss_risky_user",
+    "list_sensitivity_labels",
+    "get_sensitivity_label",
+)
+_AUDIT_ACTIONS = (
+    "list_directory_audits",
+    "get_directory_audit",
+    "list_sign_in_logs",
+    "get_sign_in_log",
+    "list_provisioning_logs",
+)
+_REPORTS_ACTIONS = (
+    "get_email_activity_report",
+    "get_mailbox_usage_report",
+    "get_office365_active_users",
+    "get_sharepoint_activity_report",
+    "get_teams_user_activity",
+    "get_onedrive_usage_report",
+)
+_APPLICATIONS_ACTIONS = (
+    "list_applications",
+    "get_application",
+    "create_application",
+    "update_application",
+    "delete_application",
+    "add_application_password",
+    "remove_application_password",
+    "list_service_principals",
+    "get_service_principal",
+    "create_service_principal",
+    "update_service_principal",
+    "delete_service_principal",
+)
+_DIRECTORY_ACTIONS = (
+    "list_directory_objects",
+    "get_directory_object",
+    "list_directory_roles",
+    "get_directory_role",
+    "list_directory_role_templates",
+    "list_deleted_items",
+    "restore_deleted_item",
+    "list_role_definitions",
+    "get_role_definition",
+    "list_role_assignments",
+    "get_role_assignment",
+    "create_role_assignment",
+)
+_POLICIES_ACTIONS = (
+    "get_authorization_policy",
+    "list_token_lifetime_policies",
+    "list_token_issuance_policies",
+    "list_permission_grant_policies",
+    "get_admin_consent_policy",
+)
+_DEVICES_ACTIONS = (
+    "list_devices",
+    "get_device",
+    "delete_device",
+    "list_managed_devices",
+    "get_managed_device",
+    "list_device_compliance_policies",
+    "list_device_configurations",
+    "wipe_managed_device",
+    "retire_managed_device",
+)
+_EDUCATION_ACTIONS = (
+    "list_education_classes",
+    "get_education_class",
+    "list_education_schools",
+    "get_education_school",
+    "list_education_users",
+    "list_education_assignments",
+)
+_AGREEMENTS_ACTIONS = (
+    "list_agreements",
+    "get_agreement",
+    "create_agreement",
+    "delete_agreement",
+)
+_PLACES_ACTIONS = ("list_rooms", "list_room_lists", "get_place", "update_place")
+_PRINT_ACTIONS = (
+    "list_printers",
+    "get_printer",
+    "list_print_jobs",
+    "create_print_job",
+    "list_print_shares",
+)
+_PRIVACY_ACTIONS = (
+    "list_subject_rights_requests",
+    "get_subject_rights_request",
+    "create_subject_rights_request",
+)
+_SOLUTIONS_ACTIONS = (
+    "list_booking_businesses",
+    "get_booking_business",
+    "list_booking_appointments",
+    "create_booking_appointment",
+    "list_virtual_events",
+)
+_STORAGE_ACTIONS = (
+    "list_file_storage_containers",
+    "get_file_storage_container",
+    "create_file_storage_container",
+)
+_EMPLOYEE_EXPERIENCE_ACTIONS = (
+    "list_learning_providers",
+    "get_learning_provider",
+    "list_learning_course_activities",
+)
+_CONNECTIONS_ACTIONS = (
+    "list_external_connections",
+    "get_external_connection",
+    "create_external_connection",
+    "delete_external_connection",
+)
 
 
 def register_auth_tools(mcp: FastMCP):
@@ -67,6 +380,11 @@ def register_auth_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _AUTH_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "login":
             return client.login(**kwargs)
@@ -105,6 +423,11 @@ def register_meta_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _META_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "searches":
             return client.searches(**kwargs)
         raise ValueError(f"Unknown action: {action}")
@@ -135,6 +458,11 @@ def register_mail_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _MAIL_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_mail_messages":
             return client.list_mail_messages(**kwargs)
@@ -218,6 +546,11 @@ def register_files_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _FILES_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_users":
             return client.list_users(**kwargs)
@@ -318,6 +651,11 @@ def register_calendar_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _CALENDAR_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_calendar_events":
             return client.list_calendar_events(**kwargs)
         if action == "get_calendar_event":
@@ -373,6 +711,11 @@ def register_notes_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _NOTES_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "get_onenote_page_content":
             return client.get_onenote_page_content(**kwargs)
         if action == "create_onenote_page":
@@ -405,6 +748,11 @@ def register_tasks_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _TASKS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "get_todo_task":
             return client.get_todo_task(**kwargs)
@@ -453,6 +801,11 @@ def register_contacts_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _CONTACTS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "get_outlook_contact":
             return client.get_outlook_contact(**kwargs)
         if action == "create_outlook_contact":
@@ -490,6 +843,11 @@ def register_user_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _USER_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "get_current_user":
             return client.get_current_user(**kwargs)
         if action == "get_me":
@@ -523,6 +881,11 @@ def register_chat_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _CHAT_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "get_chat":
             return client.get_chat(**kwargs)
         raise ValueError(f"Unknown action: {action}")
@@ -553,6 +916,11 @@ def register_teams_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _TEAMS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "get_team":
             return client.get_team(**kwargs)
@@ -586,6 +954,11 @@ def register_sites_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _SITES_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_sites":
             return client.list_sites(**kwargs)
@@ -624,6 +997,11 @@ def register_search_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _SEARCH_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "search_query":
             return client.search_query(**kwargs)
         if action == "search_tools":
@@ -656,6 +1034,11 @@ def register_groups_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _GROUPS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_groups":
             return client.list_groups(**kwargs)
@@ -708,6 +1091,11 @@ def register_admin_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _ADMIN_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_service_health":
             return client.list_service_health(**kwargs)
         if action == "get_service_health":
@@ -757,6 +1145,13 @@ def register_organization_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(
+            action, _ORGANIZATION_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_organization":
             return client.list_organization(**kwargs)
         if action == "get_organization":
@@ -795,6 +1190,11 @@ def register_domains_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _DOMAINS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_domains":
             return client.list_domains(**kwargs)
@@ -837,6 +1237,13 @@ def register_subscriptions_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(
+            action, _SUBSCRIPTIONS_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_subscriptions":
             return client.list_subscriptions(**kwargs)
         if action == "get_subscription":
@@ -875,6 +1282,13 @@ def register_communications_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(
+            action, _COMMUNICATIONS_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_online_meetings":
             return client.list_online_meetings(**kwargs)
@@ -925,6 +1339,11 @@ def register_identity_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _IDENTITY_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "create_invitation":
             return client.create_invitation(**kwargs)
         if action == "list_conditional_access_policies":
@@ -973,6 +1392,11 @@ def register_security_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _SECURITY_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_security_alerts":
             return client.list_security_alerts(**kwargs)
@@ -1037,6 +1461,11 @@ def register_audit_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _AUDIT_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_directory_audits":
             return client.list_directory_audits(**kwargs)
         if action == "get_directory_audit":
@@ -1075,6 +1504,11 @@ def register_reports_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _REPORTS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "get_email_activity_report":
             return client.get_email_activity_report(**kwargs)
@@ -1116,6 +1550,13 @@ def register_applications_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(
+            action, _APPLICATIONS_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_applications":
             return client.list_applications(**kwargs)
@@ -1170,6 +1611,11 @@ def register_directory_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _DIRECTORY_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_directory_objects":
             return client.list_directory_objects(**kwargs)
         if action == "get_directory_object":
@@ -1223,6 +1669,11 @@ def register_policies_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _POLICIES_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "get_authorization_policy":
             return client.get_authorization_policy(**kwargs)
         if action == "list_token_lifetime_policies":
@@ -1261,6 +1712,11 @@ def register_devices_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _DEVICES_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_devices":
             return client.list_devices(**kwargs)
@@ -1309,6 +1765,11 @@ def register_education_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _EDUCATION_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_education_classes":
             return client.list_education_classes(**kwargs)
         if action == "get_education_class":
@@ -1350,6 +1811,13 @@ def register_agreements_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(
+            action, _AGREEMENTS_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_agreements":
             return client.list_agreements(**kwargs)
         if action == "get_agreement":
@@ -1387,6 +1855,11 @@ def register_places_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _PLACES_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_rooms":
             return client.list_rooms(**kwargs)
         if action == "list_room_lists":
@@ -1423,6 +1896,11 @@ def register_print_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _PRINT_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_printers":
             return client.list_printers(**kwargs)
@@ -1463,6 +1941,11 @@ def register_privacy_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _PRIVACY_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_subject_rights_requests":
             return client.list_subject_rights_requests(**kwargs)
         if action == "get_subject_rights_request":
@@ -1497,6 +1980,11 @@ def register_solutions_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(action, _SOLUTIONS_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_booking_businesses":
             return client.list_booking_businesses(**kwargs)
@@ -1537,6 +2025,11 @@ def register_storage_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(action, _STORAGE_ACTIONS, service="microsoft-agent")
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_file_storage_containers":
             return client.list_file_storage_containers(**kwargs)
         if action == "get_file_storage_container":
@@ -1572,6 +2065,13 @@ def register_employee_experience_tools(mcp: FastMCP):
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(
+            action, _EMPLOYEE_EXPERIENCE_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_learning_providers":
             return client.list_learning_providers(**kwargs)
         if action == "get_learning_provider":
@@ -1606,6 +2106,13 @@ def register_connections_tools(mcp: FastMCP):
             return {"error": f"Invalid params_json: {e}"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        resolved = resolve_action(
+            action, _CONNECTIONS_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
 
         if action == "list_external_connections":
             return client.list_external_connections(**kwargs)
