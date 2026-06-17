@@ -40,7 +40,7 @@ from starlette.responses import JSONResponse
 
 from microsoft_agent.auth import get_client
 
-__version__ = "0.34.0"
+__version__ = "0.35.0"
 
 logger = get_logger(name="microsoft-agent")
 logger.setLevel(logging.INFO)

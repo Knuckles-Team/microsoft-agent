@@ -21,7 +21,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
 
-*Version: 0.34.0*
+*Version: 0.35.0*
 
 > **Documentation** — Installation, deployment, usage across the API, CLI, MCP, and
 > A2A interfaces, and guidance for configuring the Microsoft Graph connection are
