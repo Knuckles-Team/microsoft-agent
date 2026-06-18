@@ -469,3 +469,25 @@ Documentation:
 | **Storage** | `STORAGE_TOOL` | `True` | Manage microsoft storage operations. Action-routed methods: `create_file_storage_container`, `get_file_storage_container`, `list_file_storage_containers`. |
 | **Employee Experience** | `EMPLOYEE_EXPERIENCE_TOOL` | `True` | Manage microsoft employee experience operations. Action-routed methods: `get_learning_provider`, `list_learning_course_activities`, `list_learning_providers`. |
 | **Connections** | `CONNECTIONS_TOOL` | `True` | Manage microsoft connections operations. Action-routed methods: `create_external_connection`, `delete_external_connection`, `get_external_connection`, `list_external_connections`. |
+
+
+<!-- BEGIN agent-os-genesis-deploy (generated; do not edit between markers) -->
+
+## Deploy with `agent-os-genesis`
+
+This package can be provisioned for you — skill-guided — by the **`agent-os-genesis`**
+universal skill (its *single-package deploy mode*): it picks your install method, seeds
+secrets to OpenBao/Vault (or `.env`), trusts your enterprise CA, registers the MCP
+server, and verifies it — the same machinery that stands up the whole Agent OS, narrowed
+to just this package. Ask your agent to **"deploy `microsoft-agent` with agent-os-genesis"**.
+
+| Install mode | Command |
+|------|---------|
+| Bare-metal, prod (PyPI) | `uvx microsoft-mcp` · or `uv tool install microsoft-agent` |
+| Bare-metal, dev (editable) | `uv pip install -e ".[all]"` · or `pip install -e ".[all]"` |
+| Container, prod | deploy `knucklessg1/microsoft-agent:latest` via docker-compose / swarm / podman / podman-compose / kubernetes |
+| Container, dev (editable) | deploy `docker/compose.dev.yml` (source-mounted at `/src`; edits live on restart) |
+
+Secrets are read-existing + seeded via `vault_sync` — you are only prompted for what's missing.
+
+<!-- END agent-os-genesis-deploy -->
