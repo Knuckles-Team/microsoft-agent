@@ -110,44 +110,51 @@ The following environment variables configure the behavior of the Microsoft Agen
 
 This server utilizes dynamic Action-Routed tools to optimize token overhead and maximize IDE compatibility.
 
-| Tool Name | Description |
-|-----------|-------------|
-| `msgraph_admin` | Consolidated Action-Routed tool for admin. Methods: list_service_health, get_service_health, list_service_health_issues, get_service_health_issue, list_service_update_messages, get_service_update_message, get_admin_sharepoint, update_admin_sharepoint, list_delegated_admin_relationships, get_delegated_admin_relationship |
-| `msgraph_agreements` | Consolidated Action-Routed tool for agreements. Methods: list_agreements, get_agreement, create_agreement, delete_agreement |
-| `msgraph_applications` | Consolidated Action-Routed tool for applications. Methods: list_applications, get_application, create_application, update_application, delete_application, add_application_password, remove_application_password, list_service_principals, get_service_principal, create_service_principal, update_service_principal, delete_service_principal |
-| `msgraph_audit` | Consolidated Action-Routed tool for audit. Methods: list_directory_audits, get_directory_audit, list_sign_in_logs, get_sign_in_log, list_provisioning_logs |
-| `msgraph_auth` | Consolidated Action-Routed tool for auth. Methods: login, logout, verify_login, list_accounts |
-| `msgraph_calendar` | Consolidated Action-Routed tool for calendar. Methods: list_calendar_events, get_calendar_event, create_calendar_event, update_calendar_event, delete_calendar_event, list_specific_calendar_events, get_specific_calendar_event, create_specific_calendar_event, update_specific_calendar_event, delete_specific_calendar_event, get_calendar_view, list_calendars, find_meeting_times |
-| `msgraph_chat` | Consolidated Action-Routed tool for chat. Methods: get_chat |
-| `msgraph_communications` | Consolidated Action-Routed tool for communications. Methods: list_online_meetings, get_online_meeting, create_online_meeting, update_online_meeting, delete_online_meeting, list_call_records, get_call_record, list_presences, get_presence, get_my_presence |
-| `msgraph_connections` | Consolidated Action-Routed tool for connections. Methods: list_external_connections, get_external_connection, create_external_connection, delete_external_connection |
-| `msgraph_contacts` | Consolidated Action-Routed tool for contacts. Methods: get_outlook_contact, create_outlook_contact, update_outlook_contact, delete_outlook_contact |
-| `msgraph_devices` | Consolidated Action-Routed tool for devices. Methods: list_devices, get_device, delete_device, list_managed_devices, get_managed_device, list_device_compliance_policies, list_device_configurations, wipe_managed_device, retire_managed_device |
-| `msgraph_directory` | Consolidated Action-Routed tool for directory. Methods: list_directory_objects, get_directory_object, list_directory_roles, get_directory_role, list_directory_role_templates, list_deleted_items, restore_deleted_item, list_role_definitions, get_role_definition, list_role_assignments, get_role_assignment, create_role_assignment |
-| `msgraph_domains` | Consolidated Action-Routed tool for domains. Methods: list_domains, get_domain, create_domain, delete_domain, verify_domain, list_domain_service_configuration_records |
-| `msgraph_education` | Consolidated Action-Routed tool for education. Methods: list_education_classes, get_education_class, list_education_schools, get_education_school, list_education_users, list_education_assignments |
-| `msgraph_employee_experience` | Consolidated Action-Routed tool for employee_experience. Methods: list_learning_providers, get_learning_provider, list_learning_course_activities |
-| `msgraph_files` | Consolidated Action-Routed tool for files. Methods: list_users, list_drives, get_drive_root_item, download_onedrive_file_content, delete_onedrive_file, upload_file_content, create_excel_chart, format_excel_range, sort_excel_range, get_excel_range, list_excel_worksheets, list_excel_tables, get_excel_workbook, list_onenote_notebooks, list_onenote_notebook_sections, list_onenote_section_pages, list_todo_task_lists, list_todo_tasks, list_planner_tasks, list_plan_tasks, list_outlook_contacts, list_chats, get_excel_worksheet, list_joined_teams, list_team_channels, list_team_members, list_site_drives, get_site_drive_by_id, list_site_items, get_site_item, list_site_lists, get_site_list, list_sharepoint_site_list_items, get_sharepoint_site_list_item, get_excel_table |
-| `msgraph_groups` | Consolidated Action-Routed tool for groups. Methods: list_groups, get_group, create_group, update_group, delete_group, list_group_members, add_group_member, remove_group_member, list_group_owners, list_group_conversations, list_group_drives |
-| `msgraph_identity` | Consolidated Action-Routed tool for identity. Methods: create_invitation, list_conditional_access_policies, get_conditional_access_policy, create_conditional_access_policy, update_conditional_access_policy, delete_conditional_access_policy, list_access_reviews, get_access_review, list_entitlement_access_packages, list_lifecycle_workflows |
-| `msgraph_mail` | Consolidated Action-Routed tool for mail. Methods: list_mail_messages, list_mail_folders, list_mail_folder_messages, get_mail_message, send_mail, list_shared_mailbox_messages, list_shared_mailbox_folder_messages, get_shared_mailbox_message, send_shared_mailbox_mail, create_draft_email, delete_mail_message, move_mail_message, update_mail_message, add_mail_attachment, list_mail_attachments, get_mail_attachment, delete_mail_attachment, get_root_folder, list_folder_files, list_chat_messages, get_chat_message, send_chat_message, list_channel_messages, get_channel_message, send_channel_message, list_chat_message_replies, reply_to_chat_message |
-| `msgraph_meta` | Consolidated Action-Routed tool for meta. Methods: searches |
-| `msgraph_notes` | Consolidated Action-Routed tool for notes. Methods: get_onenote_page_content, create_onenote_page |
-| `msgraph_organization` | Consolidated Action-Routed tool for organization. Methods: list_organization, get_organization, update_organization, get_org_branding, update_org_branding |
-| `msgraph_places` | Consolidated Action-Routed tool for places. Methods: list_rooms, list_room_lists, get_place, update_place |
-| `msgraph_policies` | Consolidated Action-Routed tool for policies. Methods: get_authorization_policy, list_token_lifetime_policies, list_token_issuance_policies, list_permission_grant_policies, get_admin_consent_policy |
-| `msgraph_print` | Consolidated Action-Routed tool for print. Methods: list_printers, get_printer, list_print_jobs, create_print_job, list_print_shares |
-| `msgraph_privacy` | Consolidated Action-Routed tool for privacy. Methods: list_subject_rights_requests, get_subject_rights_request, create_subject_rights_request |
-| `msgraph_reports` | Consolidated Action-Routed tool for reports. Methods: get_email_activity_report, get_mailbox_usage_report, get_office365_active_users, get_sharepoint_activity_report, get_teams_user_activity, get_onedrive_usage_report |
-| `msgraph_search` | Consolidated Action-Routed tool for search. Methods: search_query |
-| `msgraph_security` | Consolidated Action-Routed tool for security. Methods: list_security_alerts, get_security_alert, update_security_alert, list_security_incidents, get_security_incident, update_security_incident, list_secure_scores, list_threat_intelligence_hosts, get_threat_intelligence_host, run_hunting_query, list_risk_detections, get_risk_detection, list_risky_users, get_risky_user, dismiss_risky_user, list_sensitivity_labels, get_sensitivity_label |
-| `msgraph_sites` | Consolidated Action-Routed tool for sites. Methods: list_sites, get_site, get_sharepoint_site_by_path, get_sharepoint_sites_delta |
-| `msgraph_solutions` | Consolidated Action-Routed tool for solutions. Methods: list_booking_businesses, get_booking_business, list_booking_appointments, create_booking_appointment, list_virtual_events |
-| `msgraph_storage` | Consolidated Action-Routed tool for storage. Methods: list_file_storage_containers, get_file_storage_container, create_file_storage_container |
-| `msgraph_subscriptions` | Consolidated Action-Routed tool for subscriptions. Methods: list_subscriptions, get_subscription, create_subscription, update_subscription, delete_subscription |
-| `msgraph_tasks` | Consolidated Action-Routed tool for tasks. Methods: get_todo_task, create_todo_task, update_todo_task, delete_todo_task, get_planner_plan, get_planner_task, create_planner_task, update_planner_task, update_planner_task_details |
-| `msgraph_teams` | Consolidated Action-Routed tool for teams. Methods: get_team, get_team_channel |
-| `msgraph_user` | Consolidated Action-Routed tool for user. Methods: get_current_user, get_me |
+<!-- This table is auto-generated by `python -m agent_utilities.mcp.readme_tools` — do not edit by hand. -->
+
+<!-- MCP-TOOLS-TABLE:START -->
+
+| MCP Tool | Toggle Env Var | Description |
+|----------|----------------|-------------|
+| `microsoft_admin` | `ADMINTOOL` | Manage microsoft admin operations. |
+| `microsoft_agreements` | `AGREEMENTSTOOL` | Manage microsoft agreements operations. |
+| `microsoft_applications` | `APPLICATIONSTOOL` | Manage microsoft applications operations. |
+| `microsoft_audit` | `AUDITTOOL` | Manage microsoft audit operations. |
+| `microsoft_auth` | `AUTHTOOL` | Manage microsoft auth operations. |
+| `microsoft_calendar` | `CALENDARTOOL` | Manage microsoft calendar operations. |
+| `microsoft_chat` | `CHATTOOL` | Manage microsoft chat operations. |
+| `microsoft_communications` | `COMMUNICATIONSTOOL` | Manage microsoft communications operations. |
+| `microsoft_connections` | `CONNECTIONSTOOL` | Manage microsoft connections operations. |
+| `microsoft_contacts` | `CONTACTSTOOL` | Manage microsoft contacts operations. |
+| `microsoft_devices` | `DEVICESTOOL` | Manage microsoft devices operations. |
+| `microsoft_directory` | `DIRECTORYTOOL` | Manage microsoft directory operations. |
+| `microsoft_domains` | `DOMAINSTOOL` | Manage microsoft domains operations. |
+| `microsoft_education` | `EDUCATIONTOOL` | Manage microsoft education operations. |
+| `microsoft_employee_experience` | `EMPLOYEE_EXPERIENCETOOL` | Manage microsoft employee experience operations. |
+| `microsoft_files` | `FILESTOOL` | Manage microsoft files operations. |
+| `microsoft_groups` | `GROUPSTOOL` | Manage microsoft groups operations. |
+| `microsoft_identity` | `IDENTITYTOOL` | Manage microsoft identity operations. |
+| `microsoft_mail` | `MAILTOOL` | Manage microsoft mail operations. |
+| `microsoft_meta` | `METATOOL` | Manage microsoft meta operations. |
+| `microsoft_notes` | `NOTESTOOL` | Manage microsoft notes operations. |
+| `microsoft_organization` | `ORGANIZATIONTOOL` | Manage microsoft organization operations. |
+| `microsoft_places` | `PLACESTOOL` | Manage microsoft places operations. |
+| `microsoft_policies` | `POLICIESTOOL` | Manage microsoft policies operations. |
+| `microsoft_print` | `PRINTTOOL` | Manage microsoft print operations. |
+| `microsoft_privacy` | `PRIVACYTOOL` | Manage microsoft privacy operations. |
+| `microsoft_reports` | `REPORTSTOOL` | Manage microsoft reports operations. |
+| `microsoft_search` | `SEARCHTOOL` | Manage microsoft search operations. |
+| `microsoft_security` | `SECURITYTOOL` | Manage microsoft security operations. |
+| `microsoft_sites` | `SITESTOOL` | Manage microsoft sites operations. |
+| `microsoft_solutions` | `SOLUTIONSTOOL` | Manage microsoft solutions operations. |
+| `microsoft_storage` | `STORAGETOOL` | Manage microsoft storage operations. |
+| `microsoft_subscriptions` | `SUBSCRIPTIONSTOOL` | Manage microsoft subscriptions operations. |
+| `microsoft_tasks` | `TASKSTOOL` | Manage microsoft tasks operations. |
+| `microsoft_teams` | `TEAMSTOOL` | Manage microsoft teams operations. |
+| `microsoft_user` | `USERTOOL` | Manage microsoft user operations. |
+
+_36 action-routed tools (default `MCP_TOOL_MODE=condensed`). Each is enabled unless its toggle is set false; set `MCP_TOOL_MODE=verbose` (or `both`) for the 1:1 per-operation surface. Auto-generated — do not edit._
+<!-- MCP-TOOLS-TABLE:END -->
 
 
 ---
