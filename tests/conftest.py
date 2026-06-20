@@ -8,8 +8,9 @@ import atexit
 # Globally disable atexit hook registration during tests to prevent real keyring calls during exit
 atexit.register = lambda fn, *args, **kwargs: fn
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 
 @pytest.fixture(autouse=True, scope="session")

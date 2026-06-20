@@ -24,20 +24,20 @@ warnings.filterwarnings("ignore", message=".*urllib3.*or chardet.*")
 warnings.filterwarnings("ignore", message=".*urllib3.*or charset_normalizer.*")
 
 import logging
-import os
 import sys
 from typing import Any
 
-from agent_utilities.base_utilities import to_boolean
 from agent_utilities.mcp_utilities import (
     create_mcp_server,
     load_config,
+    register_tool_surface,
     resolve_action,
     run_blocking,
 )
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from microsoft_agent.api_client import MicrosoftGraphApi
 from microsoft_agent.auth import get_client
 
 __version__ = "0.35.0"
@@ -2148,116 +2148,13 @@ def get_mcp_instance() -> tuple[Any, ...]:
     async def health_check(request: Request) -> JSONResponse:
         return JSONResponse({"status": "OK"})
 
-    DEFAULT_AUTHTOOL = to_boolean(os.getenv("AUTHTOOL", "True"))
-    if DEFAULT_AUTHTOOL:
-        register_auth_tools(mcp)
-    DEFAULT_METATOOL = to_boolean(os.getenv("METATOOL", "True"))
-    if DEFAULT_METATOOL:
-        register_meta_tools(mcp)
-    DEFAULT_MAILTOOL = to_boolean(os.getenv("MAILTOOL", "True"))
-    if DEFAULT_MAILTOOL:
-        register_mail_tools(mcp)
-    DEFAULT_FILESTOOL = to_boolean(os.getenv("FILESTOOL", "True"))
-    if DEFAULT_FILESTOOL:
-        register_files_tools(mcp)
-    DEFAULT_CALENDARTOOL = to_boolean(os.getenv("CALENDARTOOL", "True"))
-    if DEFAULT_CALENDARTOOL:
-        register_calendar_tools(mcp)
-    DEFAULT_NOTESTOOL = to_boolean(os.getenv("NOTESTOOL", "True"))
-    if DEFAULT_NOTESTOOL:
-        register_notes_tools(mcp)
-    DEFAULT_TASKSTOOL = to_boolean(os.getenv("TASKSTOOL", "True"))
-    if DEFAULT_TASKSTOOL:
-        register_tasks_tools(mcp)
-    DEFAULT_CONTACTSTOOL = to_boolean(os.getenv("CONTACTSTOOL", "True"))
-    if DEFAULT_CONTACTSTOOL:
-        register_contacts_tools(mcp)
-    DEFAULT_USERTOOL = to_boolean(os.getenv("USERTOOL", "True"))
-    if DEFAULT_USERTOOL:
-        register_user_tools(mcp)
-    DEFAULT_CHATTOOL = to_boolean(os.getenv("CHATTOOL", "True"))
-    if DEFAULT_CHATTOOL:
-        register_chat_tools(mcp)
-    DEFAULT_TEAMSTOOL = to_boolean(os.getenv("TEAMSTOOL", "True"))
-    if DEFAULT_TEAMSTOOL:
-        register_teams_tools(mcp)
-    DEFAULT_SITESTOOL = to_boolean(os.getenv("SITESTOOL", "True"))
-    if DEFAULT_SITESTOOL:
-        register_sites_tools(mcp)
-    DEFAULT_SEARCHTOOL = to_boolean(os.getenv("SEARCHTOOL", "True"))
-    if DEFAULT_SEARCHTOOL:
-        register_search_tools(mcp)
-    DEFAULT_GROUPSTOOL = to_boolean(os.getenv("GROUPSTOOL", "True"))
-    if DEFAULT_GROUPSTOOL:
-        register_groups_tools(mcp)
-    DEFAULT_ADMINTOOL = to_boolean(os.getenv("ADMINTOOL", "True"))
-    if DEFAULT_ADMINTOOL:
-        register_admin_tools(mcp)
-    DEFAULT_ORGANIZATIONTOOL = to_boolean(os.getenv("ORGANIZATIONTOOL", "True"))
-    if DEFAULT_ORGANIZATIONTOOL:
-        register_organization_tools(mcp)
-    DEFAULT_DOMAINSTOOL = to_boolean(os.getenv("DOMAINSTOOL", "True"))
-    if DEFAULT_DOMAINSTOOL:
-        register_domains_tools(mcp)
-    DEFAULT_SUBSCRIPTIONSTOOL = to_boolean(os.getenv("SUBSCRIPTIONSTOOL", "True"))
-    if DEFAULT_SUBSCRIPTIONSTOOL:
-        register_subscriptions_tools(mcp)
-    DEFAULT_COMMUNICATIONSTOOL = to_boolean(os.getenv("COMMUNICATIONSTOOL", "True"))
-    if DEFAULT_COMMUNICATIONSTOOL:
-        register_communications_tools(mcp)
-    DEFAULT_IDENTITYTOOL = to_boolean(os.getenv("IDENTITYTOOL", "True"))
-    if DEFAULT_IDENTITYTOOL:
-        register_identity_tools(mcp)
-    DEFAULT_SECURITYTOOL = to_boolean(os.getenv("SECURITYTOOL", "True"))
-    if DEFAULT_SECURITYTOOL:
-        register_security_tools(mcp)
-    DEFAULT_AUDITTOOL = to_boolean(os.getenv("AUDITTOOL", "True"))
-    if DEFAULT_AUDITTOOL:
-        register_audit_tools(mcp)
-    DEFAULT_REPORTSTOOL = to_boolean(os.getenv("REPORTSTOOL", "True"))
-    if DEFAULT_REPORTSTOOL:
-        register_reports_tools(mcp)
-    DEFAULT_APPLICATIONSTOOL = to_boolean(os.getenv("APPLICATIONSTOOL", "True"))
-    if DEFAULT_APPLICATIONSTOOL:
-        register_applications_tools(mcp)
-    DEFAULT_DIRECTORYTOOL = to_boolean(os.getenv("DIRECTORYTOOL", "True"))
-    if DEFAULT_DIRECTORYTOOL:
-        register_directory_tools(mcp)
-    DEFAULT_POLICIESTOOL = to_boolean(os.getenv("POLICIESTOOL", "True"))
-    if DEFAULT_POLICIESTOOL:
-        register_policies_tools(mcp)
-    DEFAULT_DEVICESTOOL = to_boolean(os.getenv("DEVICESTOOL", "True"))
-    if DEFAULT_DEVICESTOOL:
-        register_devices_tools(mcp)
-    DEFAULT_EDUCATIONTOOL = to_boolean(os.getenv("EDUCATIONTOOL", "True"))
-    if DEFAULT_EDUCATIONTOOL:
-        register_education_tools(mcp)
-    DEFAULT_AGREEMENTSTOOL = to_boolean(os.getenv("AGREEMENTSTOOL", "True"))
-    if DEFAULT_AGREEMENTSTOOL:
-        register_agreements_tools(mcp)
-    DEFAULT_PLACESTOOL = to_boolean(os.getenv("PLACESTOOL", "True"))
-    if DEFAULT_PLACESTOOL:
-        register_places_tools(mcp)
-    DEFAULT_PRINTTOOL = to_boolean(os.getenv("PRINTTOOL", "True"))
-    if DEFAULT_PRINTTOOL:
-        register_print_tools(mcp)
-    DEFAULT_PRIVACYTOOL = to_boolean(os.getenv("PRIVACYTOOL", "True"))
-    if DEFAULT_PRIVACYTOOL:
-        register_privacy_tools(mcp)
-    DEFAULT_SOLUTIONSTOOL = to_boolean(os.getenv("SOLUTIONSTOOL", "True"))
-    if DEFAULT_SOLUTIONSTOOL:
-        register_solutions_tools(mcp)
-    DEFAULT_STORAGETOOL = to_boolean(os.getenv("STORAGETOOL", "True"))
-    if DEFAULT_STORAGETOOL:
-        register_storage_tools(mcp)
-    DEFAULT_EMPLOYEE_EXPERIENCETOOL = to_boolean(
-        os.getenv("EMPLOYEE_EXPERIENCETOOL", "True")
+    register_tool_surface(
+        mcp,
+        client_cls=MicrosoftGraphApi,
+        get_client=get_client,
+        service="microsoft-agent",
+        tools_module=sys.modules[__name__],
     )
-    if DEFAULT_EMPLOYEE_EXPERIENCETOOL:
-        register_employee_experience_tools(mcp)
-    DEFAULT_CONNECTIONSTOOL = to_boolean(os.getenv("CONNECTIONSTOOL", "True"))
-    if DEFAULT_CONNECTIONSTOOL:
-        register_connections_tools(mcp)
 
     for mw in middlewares:
         mcp.add_middleware(mw)

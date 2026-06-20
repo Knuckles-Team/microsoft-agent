@@ -1,13 +1,10 @@
-import os
-import sys
-import json
 import time
-import pytest
-from pathlib import Path
 from unittest.mock import MagicMock, patch
+
+import pytest
+from agent_utilities.exceptions import AuthError, UnauthorizedError
 from azure.core.credentials import AccessToken
 
-from agent_utilities.exceptions import AuthError, UnauthorizedError
 import microsoft_agent.auth as auth_mod
 from microsoft_agent.auth import AuthManager, get_client
 from microsoft_agent.credential_adapter import AuthManagerCredential
@@ -125,7 +122,7 @@ def test_load_token_cache_file_read_error(mock_fallback_paths, mock_keyring, moc
 
     try:
         with patch("builtins.open", side_effect=OSError("Read error")):
-            auth = AuthManager("client_id", "authority", ["User.Read"])
+            AuthManager("client_id", "authority", ["User.Read"])
             # Should catch OSError in load_token_cache and not raise
     finally:
         auth_mod.SERVICE_NAME = original_service

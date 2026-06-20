@@ -1,6 +1,8 @@
 import sys
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from microsoft_agent.agent_server import agent_server
 
 

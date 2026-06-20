@@ -1,11 +1,9 @@
-import os
+from unittest.mock import MagicMock, mock_open, patch
+
 import pytest
-import json
-import time
-from pathlib import Path
-from unittest.mock import MagicMock, patch, mock_open
+from agent_utilities.exceptions import AuthError
 from keyring.errors import KeyringError
-from agent_utilities.exceptions import AuthError, UnauthorizedError
+
 from microsoft_agent.auth import AuthManager, get_client
 
 
@@ -14,7 +12,7 @@ def mock_msal():
     with (
         patch("msal.PublicClientApplication") as mock_app_cls,
         patch("msal.SerializableTokenCache") as mock_cache_cls,
-        patch("atexit.register") as mock_atexit,
+        patch("atexit.register"),
     ):
         mock_app = MagicMock()
         mock_cache = MagicMock()
@@ -289,7 +287,7 @@ async def test_get_client_flows(
     mock_auth_instance = MagicMock()
     mock_auth_manager_cls.return_value = mock_auth_instance
 
-    client = await get_client()
+    await get_client()
     mock_api_cls.assert_called_once_with(mock_auth_instance)
     assert mock_auth_instance.access_token == "del_token"
 
@@ -302,7 +300,7 @@ async def test_get_client_flows(
     mock_get_delegated_token.side_effect = Exception("delegation failed")
     mock_auth_instance.get_token.return_value = "silent_token"
 
-    client = await get_client()
+    await get_client()
     mock_api_cls.assert_called_once_with(mock_auth_instance)
 
     # Reset
@@ -314,7 +312,7 @@ async def test_get_client_flows(
     mock_auth_instance.get_token.return_value = None
     mock_get_user_token.return_value = "mcp_user_token"
 
-    client = await get_client()
+    await get_client()
     assert mock_auth_instance.access_token == "mcp_user_token"
     mock_api_cls.assert_called_once_with(mock_auth_instance)
 

@@ -1,7 +1,8 @@
-import pytest
 import time
 from unittest.mock import MagicMock
-from azure.core.credentials import AccessToken
+
+import pytest
+
 from microsoft_agent.credential_adapter import AuthManagerCredential
 
 

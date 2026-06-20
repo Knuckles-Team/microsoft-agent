@@ -19,12 +19,12 @@ CONCEPT:ECO-4.1
 import atexit
 import json
 import logging
-import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import keyring
 import msal
+from agent_utilities.core.config import setting
 from agent_utilities.exceptions import AuthError, UnauthorizedError
 from keyring.errors import KeyringError
 
@@ -42,7 +42,7 @@ from agent_utilities.core import paths
 # XDG Compliance: centralize to agent-utilities namespace, migrate from old locations
 _OLD_FALLBACK_DIR = Path.home() / ".microsoft-agent"
 _OLD_XDG_DIR = Path.home() / ".local" / "share" / "microsoft-agent"
-_XDG_DATA_HOME = os.environ.get("XDG_DATA_HOME")
+_XDG_DATA_HOME = setting("XDG_DATA_HOME", None)
 if _XDG_DATA_HOME:
     _OLD_XDG_DIR = Path(_XDG_DATA_HOME) / "microsoft-agent"
 
@@ -301,7 +301,7 @@ async def get_client():
         is_delegation_enabled,
     )
 
-    CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
+    CLIENT_ID = setting("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
     AUTHORITY = "https://login.microsoftonline.com/common"
     SCOPES = [
         "User.Read",
@@ -314,8 +314,8 @@ async def get_client():
     if is_delegation_enabled():
         try:
             delegated_token = get_delegated_token(
-                audience=os.environ.get("AUDIENCE", "https://graph.microsoft.com"),
-                scopes=os.environ.get("DELEGATED_SCOPES", " ".join(SCOPES)),
+                audience=setting("AUDIENCE", "https://graph.microsoft.com"),
+                scopes=setting("DELEGATED_SCOPES", " ".join(SCOPES)),
             )
             identity = get_user_identity()
             logger.info(

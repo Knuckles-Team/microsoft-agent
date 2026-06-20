@@ -1,16 +1,17 @@
-import os
-import sys
 import ast
 import json
-import pytest
+import os
+import sys
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from microsoft_agent.mcp_server import get_mcp_instance, mcp_server
 
 
 def get_actions_from_mcp(filepath):
     """Parse mcp_server.py using AST to find all actions defined in tool functions."""
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=filepath)
 
     actions = {}
