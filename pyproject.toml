@@ -28,10 +28,10 @@ microsoft-mcp = "microsoft_agent.mcp_server:mcp_server"
 microsoft-agent = "microsoft_agent.agent_server:agent_server"
 
 [project.entry-points."agent_utilities.skill_providers"]
-modular-contrib = "microsoft_agent.skills"
+microsoft-agent = "microsoft_agent.skills"
 
 [project.entry-points."agent_utilities.prompt_providers"]
-modular-contrib = "microsoft_agent.prompts"
+microsoft-agent = "microsoft_agent.prompts"
 
 [tool.setuptools]
 include-package-data = true
