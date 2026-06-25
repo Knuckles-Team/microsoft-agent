@@ -102,6 +102,97 @@ The slim `[mcp]` server does **not** require the database.
 
 ## Environment Variables
 
+<!-- ENV-VARS-TABLE:START -->
+
+#### Package environment variables
+
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `MICROSOFT_HOST` | `https://graph.microsoft.com` | Microsoft Graph Authentication Options |
+| `MICROSOFT_CLIENT_ID` | `your_microsoft_client_id_here` |  |
+| `MICROSOFT_CLIENT_SECRET` | `your_microsoft_client_secret_here` |  |
+| `MICROSOFT_SCOPE` | `https://graph.microsoft.com/.default` |  |
+| `MICROSOFT_GRANT_TYPE` | `client_credentials` |  |
+| `MICROSOFT_TOKEN` | `your_user_bearer_token_here` | If using direct user access tokens instead of MSAL / client credentials: |
+| `AUTH_TYPE` | `oidc` | OIDC / JWT Verification Settings (A2A Secure Authentication) |
+| `OIDC_CLIENT_ID` | `your_oidc_client_id_here` |  |
+| `OIDC_CLIENT_SECRET` | `your_oidc_client_secret_here` |  |
+| `OIDC_CONFIG_URL` | `https://your-identity-provider/.well-known/openid-configuration` |  |
+| `OIDC_BASE_URL` | `https://your-identity-provider/` |  |
+| `TOKEN_ISSUER` | `https://your-identity-provider/` |  |
+| `TOKEN_AUDIENCE` | `your_api_audience_here` |  |
+| `TOKEN_JWKS_URI` | `https://your-identity-provider/.well-known/jwks.json` |  |
+| `ALLOWED_CLIENT_REDIRECT_URIS` | `http://localhost:8000/callback` |  |
+| `ENABLE_OTEL` | `false` | Multi-Agent and Observability Options |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` |  |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | `http/protobuf` |  |
+| `LLM_API_KEY` | `your_llm_api_key_here` | LLM Config (for agent-utilities integration) |
+| `LLM_BASE_URL` | `https://api.openai.com/v1` |  |
+| `EUNOMIA_TYPE` | `local` | Eunomia Security Policy Config |
+| `EUNOMIA_POLICY_FILE` | `policy.yaml` |  |
+| `EUNOMIA_REMOTE_URL` | `http://localhost:8080/policy` |  |
+| `ADMINTOOL` | `true` | MCP Tool Enabling Configuration (True/False) |
+| `AGREEMENTSTOOL` | `true` |  |
+| `APPLICATIONSTOOL` | `true` |  |
+| `AUDITTOOL` | `true` |  |
+| `AUTHTOOL` | `true` |  |
+| `CALENDARTOOL` | `true` |  |
+| `CHATTOOL` | `true` |  |
+| `COMMUNICATIONSTOOL` | `true` |  |
+| `CONNECTIONSTOOL` | `true` |  |
+| `CONTACTSTOOL` | `true` |  |
+| `DELEGATED_SCOPES` | `true` |  |
+| `DEVICESTOOL` | `true` |  |
+| `DIRECTORYTOOL` | `true` |  |
+| `DOMAINSTOOL` | `true` |  |
+| `EDUCATIONTOOL` | `true` |  |
+| `EMPLOYEE_EXPERIENCETOOL` | `true` |  |
+| `FILESTOOL` | `true` |  |
+| `GROUPSTOOL` | `true` |  |
+| `IDENTITYTOOL` | `true` |  |
+| `MAILTOOL` | `true` |  |
+| `METATOOL` | `true` |  |
+| `NOTESTOOL` | `true` |  |
+| `ORGANIZATIONTOOL` | `true` |  |
+| `PLACESTOOL` | `true` |  |
+| `POLICIESTOOL` | `true` |  |
+| `PRINTTOOL` | `true` |  |
+| `PRIVACYTOOL` | `true` |  |
+| `REPORTSTOOL` | `true` |  |
+| `SEARCHTOOL` | `true` |  |
+| `SECURITYTOOL` | `true` |  |
+| `SITESTOOL` | `true` |  |
+| `SOLUTIONSTOOL` | `true` |  |
+| `STORAGETOOL` | `true` |  |
+| `SUBSCRIPTIONSTOOL` | `true` |  |
+| `TASKSTOOL` | `true` |  |
+| `TEAMSTOOL` | `true` |  |
+| `USERTOOL` | `true` |  |
+
+#### Inherited agent-utilities variables (apply to every connector)
+
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `TRANSPORT` | `stdio` | MCP transport: `stdio` | `streamable-http` | `sse` |
+| `HOST` | `0.0.0.0` | Bind host (HTTP transports) |
+| `PORT` | `8000` | Bind port (HTTP transports) |
+| `MCP_TOOL_MODE` | `condensed` | Tool surface: `condensed` | `verbose` | `both` |
+| `MCP_ENABLED_TOOLS` | — | Comma-separated tool allow-list |
+| `MCP_DISABLED_TOOLS` | — | Comma-separated tool deny-list |
+| `MCP_ENABLED_TAGS` | — | Comma-separated tag allow-list |
+| `MCP_DISABLED_TAGS` | — | Comma-separated tag deny-list |
+| `MCP_CLIENT_AUTH` | — | Outbound MCP auth (`oidc-client-credentials` for fleet calls) |
+| `DEBUG` | `False` | Verbose logging |
+| `PYTHONUNBUFFERED` | `1` | Unbuffered stdout (recommended in containers) |
+| `MCP_URL` | `http://localhost:8000/mcp` | URL of the MCP server the agent connects to |
+| `PROVIDER` | `openai` | LLM provider for the agent |
+| `MODEL_ID` | `gpt-4o` | Model id for the agent |
+| `ENABLE_WEB_UI` | `True` | Serve the AG-UI web interface |
+
+_60 package + 15 inherited variable(s). Auto-generated from `.env.example` + the shared agent-utilities set — do not edit._
+<!-- ENV-VARS-TABLE:END -->
+
+
 The following environment variables configure the behavior of the Microsoft Agent:
 
 ### Microsoft Graph API & MSAL
