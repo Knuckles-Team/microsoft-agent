@@ -22,11 +22,6 @@ services:
       - "HOST=0.0.0.0"
       - "PORT=8026"
       - "TRANSPORT=streamable-http"
-      - "MICROSOFT_CLIENT_ID=${MICROSOFT_CLIENT_ID}"
-      - "MICROSOFT_CLIENT_SECRET=${MICROSOFT_CLIENT_SECRET}"
-      - "MICROSOFT_TENANT=${MICROSOFT_TENANT}"
-      - "MICROSOFT_SCOPE=${MICROSOFT_SCOPE}"
-      - "MICROSOFT_GRANT_TYPE=${MICROSOFT_GRANT_TYPE}"
     #      - AUTH_TYPE=oidc-proxy # Optional
     #      - OIDC_CONFIG_URL=https://provider.com/.well-known/openid-configuration # Optional
     #      - OIDC_CLIENT_ID=your-client-id # Optional

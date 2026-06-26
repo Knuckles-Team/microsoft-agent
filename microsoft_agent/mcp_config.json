@@ -7,9 +7,7 @@
         "microsoft-mcp"
       ],
       "env": {
-        "MICROSOFT_CLIENT_ID": "${MICROSOFT_CLIENT_ID}",
-        "MICROSOFT_CLIENT_SECRET": "${MICROSOFT_CLIENT_SECRET}",
-        "MICROSOFT_TENANT_ID": "${MICROSOFT_TENANT_ID}",
+        "MCP_TOOL_MODE": "condensed",
         "AUTHTOOL": "${ AUTHTOOL:-True }",
         "GROUPSTOOL": "${ GROUPSTOOL:-True }",
         "AGREEMENTSTOOL": "${ AGREEMENTSTOOL:-True }",
@@ -25,7 +23,6 @@
         "METATOOL": "${ METATOOL:-True }",
         "CHATTOOL": "${ CHATTOOL:-True }",
         "SITESTOOL": "${ SITESTOOL:-True }",
-        "MISCTOOL": "${ MISCTOOL:-True }",
         "DIRECTORYTOOL": "${ DIRECTORYTOOL:-True }",
         "POLICIESTOOL": "${ POLICIESTOOL:-True }",
         "ADMINTOOL": "${ ADMINTOOL:-True }",

@@ -55,6 +55,7 @@ ENV HOST=${HOST} \
 
 WORKDIR /app
 COPY . /app
+# hadolint ignore=SC2016
 RUN apt-get update \
     && apt-get install -y default-jre ripgrep tree fd-find curl nano build-essential cmake libssl-dev libcurl4-openssl-dev pkg-config \
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
