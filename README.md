@@ -809,19 +809,20 @@ Documentation:
 
 ## MCP Configuration Examples
 
-> **Install the slim `[mcp]` extra.** All examples below install
-> `microsoft-agent[mcp]` — the MCP-server extra that pulls only the FastMCP /
-> FastAPI tooling (`agent-utilities[mcp]`). It deliberately **excludes** the heavy
-> agent runtime (the epistemic-graph engine, `pydantic-ai`, `dspy`, `llama-index`,
-> `tree-sitter`), so `uvx`/container installs are dramatically smaller and faster.
-> Use the full `[agent]` extra only when you need the integrated Pydantic AI agent
-> (see [Installation](#installation)).
+<!-- MCP-CONFIG-EXAMPLES:START -->
 
-### stdio (recommended for local development)
+> **Install the slim `[mcp]` extra.** All examples install `microsoft-agent[mcp]` — the
+> MCP-server extra that pulls only the FastMCP / FastAPI tooling (`agent-utilities[mcp]`).
+> It deliberately **excludes** the heavy agent runtime (`pydantic-ai`, the epistemic-graph
+> engine, `dspy`, `llama-index`), so `uvx` / container installs are far smaller. Use the
+> full `[agent]` extra only when you need the integrated Pydantic AI agent.
+
+#### stdio Transport (local IDEs — Cursor, Claude Desktop, VS Code)
+
 ```json
 {
   "mcpServers": {
-    "microsoft": {
+    "microsoft-mcp": {
       "command": "uvx",
       "args": [
         "--from",
@@ -829,26 +830,190 @@ Documentation:
         "microsoft-mcp"
       ],
       "env": {
-        "MICROSOFT_CLIENT_ID": "",
-        "MICROSOFT_CLIENT_SECRET": "",
-        "MICROSOFT_TENANT_ID": ""
+        "MCP_TOOL_MODE": "condensed",
+        "ADMINTOOL": "true",
+        "AGREEMENTSTOOL": "true",
+        "APPLICATIONSTOOL": "true",
+        "AUDIENCE": "https://graph.microsoft.com",
+        "AUDITTOOL": "true",
+        "AUTHTOOL": "true",
+        "CALENDARTOOL": "true",
+        "CHATTOOL": "true",
+        "COMMUNICATIONSTOOL": "true",
+        "CONNECTIONSTOOL": "true",
+        "CONTACTSTOOL": "true",
+        "DELEGATED_SCOPES": "true",
+        "DEVICESTOOL": "true",
+        "DIRECTORYTOOL": "true",
+        "DOMAINSTOOL": "true",
+        "EDUCATIONTOOL": "true",
+        "EMPLOYEE_EXPERIENCETOOL": "true",
+        "FILESTOOL": "true",
+        "GROUPSTOOL": "true",
+        "IDENTITYTOOL": "true",
+        "MAILTOOL": "true",
+        "METATOOL": "true",
+        "MICROSOFT_ENDPOINTS_JSON": "./endpoints.json",
+        "NOTESTOOL": "true",
+        "ORGANIZATIONTOOL": "true",
+        "PLACESTOOL": "true",
+        "POLICIESTOOL": "true",
+        "PRINTTOOL": "true",
+        "PRIVACYTOOL": "true",
+        "REPORTSTOOL": "true",
+        "SEARCHTOOL": "true",
+        "SECURITYTOOL": "true",
+        "SITESTOOL": "true",
+        "SOLUTIONSTOOL": "true",
+        "STORAGETOOL": "true",
+        "SUBSCRIPTIONSTOOL": "true",
+        "TASKSTOOL": "true",
+        "TEAMSTOOL": "true",
+        "TESTING": "",
+        "USERTOOL": "true",
+        "XDG_DATA_HOME": ""
       }
     }
   }
 }
 ```
 
-### Streamable HTTP (recommended for production)
+#### Streamable-HTTP Transport (networked / production)
+
 ```json
 {
   "mcpServers": {
-    "microsoft": {
-      "url": "http://localhost:8080/microsoft-mcp/mcp"
+    "microsoft-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "microsoft-agent[mcp]",
+        "microsoft-mcp",
+        "--transport",
+        "streamable-http",
+        "--port",
+        "8000"
+      ],
+      "env": {
+        "TRANSPORT": "streamable-http",
+        "HOST": "0.0.0.0",
+        "PORT": "8000",
+        "MCP_TOOL_MODE": "condensed",
+        "ADMINTOOL": "true",
+        "AGREEMENTSTOOL": "true",
+        "APPLICATIONSTOOL": "true",
+        "AUDIENCE": "https://graph.microsoft.com",
+        "AUDITTOOL": "true",
+        "AUTHTOOL": "true",
+        "CALENDARTOOL": "true",
+        "CHATTOOL": "true",
+        "COMMUNICATIONSTOOL": "true",
+        "CONNECTIONSTOOL": "true",
+        "CONTACTSTOOL": "true",
+        "DELEGATED_SCOPES": "true",
+        "DEVICESTOOL": "true",
+        "DIRECTORYTOOL": "true",
+        "DOMAINSTOOL": "true",
+        "EDUCATIONTOOL": "true",
+        "EMPLOYEE_EXPERIENCETOOL": "true",
+        "FILESTOOL": "true",
+        "GROUPSTOOL": "true",
+        "IDENTITYTOOL": "true",
+        "MAILTOOL": "true",
+        "METATOOL": "true",
+        "MICROSOFT_ENDPOINTS_JSON": "./endpoints.json",
+        "NOTESTOOL": "true",
+        "ORGANIZATIONTOOL": "true",
+        "PLACESTOOL": "true",
+        "POLICIESTOOL": "true",
+        "PRINTTOOL": "true",
+        "PRIVACYTOOL": "true",
+        "REPORTSTOOL": "true",
+        "SEARCHTOOL": "true",
+        "SECURITYTOOL": "true",
+        "SITESTOOL": "true",
+        "SOLUTIONSTOOL": "true",
+        "STORAGETOOL": "true",
+        "SUBSCRIPTIONSTOOL": "true",
+        "TASKSTOOL": "true",
+        "TEAMSTOOL": "true",
+        "TESTING": "",
+        "USERTOOL": "true",
+        "XDG_DATA_HOME": ""
+      }
     }
   }
 }
 ```
 
+Alternatively, connect to a pre-deployed Streamable-HTTP instance by `url`:
+
+```json
+{
+  "mcpServers": {
+    "microsoft-mcp": {
+      "url": "http://localhost:8000/microsoft-mcp/mcp"
+    }
+  }
+}
+```
+
+Deploying the Streamable-HTTP server via Docker:
+
+```bash
+docker run -d \
+  --name microsoft-mcp-mcp \
+  -p 8000:8000 \
+  -e TRANSPORT=streamable-http \
+  -e HOST=0.0.0.0 \
+  -e PORT=8000 \
+  -e MCP_TOOL_MODE=condensed \
+  -e ADMINTOOL=true \
+  -e AGREEMENTSTOOL=true \
+  -e APPLICATIONSTOOL=true \
+  -e AUDIENCE=https://graph.microsoft.com \
+  -e AUDITTOOL=true \
+  -e AUTHTOOL=true \
+  -e CALENDARTOOL=true \
+  -e CHATTOOL=true \
+  -e COMMUNICATIONSTOOL=true \
+  -e CONNECTIONSTOOL=true \
+  -e CONTACTSTOOL=true \
+  -e DELEGATED_SCOPES=true \
+  -e DEVICESTOOL=true \
+  -e DIRECTORYTOOL=true \
+  -e DOMAINSTOOL=true \
+  -e EDUCATIONTOOL=true \
+  -e EMPLOYEE_EXPERIENCETOOL=true \
+  -e FILESTOOL=true \
+  -e GROUPSTOOL=true \
+  -e IDENTITYTOOL=true \
+  -e MAILTOOL=true \
+  -e METATOOL=true \
+  -e MICROSOFT_ENDPOINTS_JSON=./endpoints.json \
+  -e NOTESTOOL=true \
+  -e ORGANIZATIONTOOL=true \
+  -e PLACESTOOL=true \
+  -e POLICIESTOOL=true \
+  -e PRINTTOOL=true \
+  -e PRIVACYTOOL=true \
+  -e REPORTSTOOL=true \
+  -e SEARCHTOOL=true \
+  -e SECURITYTOOL=true \
+  -e SITESTOOL=true \
+  -e SOLUTIONSTOOL=true \
+  -e STORAGETOOL=true \
+  -e SUBSCRIPTIONSTOOL=true \
+  -e TASKSTOOL=true \
+  -e TEAMSTOOL=true \
+  -e TESTING="" \
+  -e USERTOOL=true \
+  -e XDG_DATA_HOME="" \
+  knucklessg1/microsoft-agent:mcp
+```
+
+_Auto-generated from the code-read env surface (`MCP_TOOL_MODE` + package vars) — do not edit._
+<!-- MCP-CONFIG-EXAMPLES:END -->
 
 ### Available MCP Tools
 | Tool Module | Toggle Env Var | Enabled by Default | Description & Nested Methods |
