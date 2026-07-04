@@ -2135,6 +2135,62 @@ def register_connections_tools(mcp: FastMCP):
         raise ValueError(f"Unknown action: {action}")
 
 
+def register_kg_tools(mcp: FastMCP):
+    @mcp.tool(tags={"kg"})
+    async def microsoft_ingest_records(
+        kind: str = Field(
+            default="messages",
+            description=(
+                "What to ingest: 'messages' (Outlook mail), 'events' (calendar), "
+                "'files' (OneDrive drive items), or 'users' (directory)."
+            ),
+        ),
+        params_json: str = Field(
+            default="{}",
+            description="JSON string of Graph OData query params (e.g. {\"$top\":25}).",
+        ),
+        client=Depends(get_client),
+        ctx: Context | None = Field(
+            default=None, description="MCP context for progress reporting"
+        ),
+    ) -> dict:
+        """Natively ingest Microsoft 365 records into epistemic-graph as typed nodes.
+
+        Lists the requested ``kind`` via the Microsoft Graph client and pushes the
+        records — as :Message/:Event/:File/:Person nodes (+ :Document bodies and their
+        sender/attendee/owner links) — into the knowledge graph via the fast engine
+        client. Best-effort: ``{"ingested": None}`` when no engine is reachable.
+        CONCEPT:AU-KG.ingest.enterprise-source-extractor.
+        """
+        import json as _json
+
+        from microsoft_agent import kg_ingest
+
+        if ctx:
+            ctx.info(f"Ingesting microsoft {kind}...")
+        try:
+            params = _json.loads(params_json) if params_json else {}
+        except Exception as e:
+            return {"error": f"Invalid params_json: {e}"}
+
+        listers = {
+            "messages": (client.list_mail_messages, kg_ingest.ingest_messages),
+            "events": (client.list_calendar_events, kg_ingest.ingest_events),
+            "files": (client.list_folder_files, kg_ingest.ingest_files),
+            "users": (client.list_users, kg_ingest.ingest_users),
+        }
+        if kind not in listers:
+            return {"error": f"Unknown kind '{kind}'. Use one of {list(listers)}."}
+        lister, mapper = listers[kind]
+
+        resp = await run_blocking(lister, params=params or None)
+        records = kg_ingest._records(resp)
+        result = mapper(records)
+        return {"kind": kind, "listed": len(records), "ingested": result}
+
+    return None
+
+
 def get_mcp_instance() -> tuple[Any, ...]:
     """Initialize and return the MCP instance."""
     load_config()

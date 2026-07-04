@@ -1,0 +1,25 @@
+{
+  "_comment": "Tier-1 mcp_tool source presets for microsoft-agent (AU-KG.ingest.mcp-tool-connector). Sync Microsoft 365 mail/calendar into the KG as documents via the microsoft-agent MCP server. Records come back under the Graph 'value' array. Contributed presets win over the central MCP_TOOL_PRESETS.",
+  "microsoft-mail": {
+    "server": "microsoft-agent",
+    "tool": "microsoft_mail",
+    "action": "list_mail_messages",
+    "records_path": "value",
+    "id_field": "id",
+    "title_field": "subject",
+    "text_field": "bodyPreview",
+    "updated_field": "receivedDateTime",
+    "doc_type": "email"
+  },
+  "microsoft-calendar": {
+    "server": "microsoft-agent",
+    "tool": "microsoft_calendar",
+    "action": "list_calendar_events",
+    "records_path": "value",
+    "id_field": "id",
+    "title_field": "subject",
+    "text_field": "bodyPreview",
+    "updated_field": "lastModifiedDateTime",
+    "doc_type": "event"
+  }
+}
