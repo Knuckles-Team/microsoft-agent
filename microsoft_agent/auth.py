@@ -13,7 +13,7 @@ Authentication priority:
 
 See ``docs/guides/oauth_sso.md`` in agent-utilities for full details.
 
-CONCEPT:ECO-4.1
+CONCEPT:AU-ECO.mcp.fastmcp-middleware
 """
 
 import atexit
@@ -71,7 +71,7 @@ FALLBACK_DIR.mkdir(parents=True, exist_ok=True)
 class AuthManager:
     """Authentication manager for Microsoft Graph API credentials.
 
-    CONCEPT:ECO-4.1 — MCP & Universal Skills
+    CONCEPT:AU-ECO.mcp.fastmcp-middleware — MCP & Universal Skills
     """
 
     def __init__(self, client_id: str, authority: str, scopes: list[str]):

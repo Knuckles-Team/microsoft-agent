@@ -1,6 +1,6 @@
 """Credential Adapter module.
 
-CONCEPT:ECO-4.1
+CONCEPT:AU-ECO.mcp.fastmcp-middleware
 """
 
 import time

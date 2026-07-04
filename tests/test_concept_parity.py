@@ -57,7 +57,7 @@ def extract_concepts_from_codebase(directory):
     return found_concepts
 
 
-@pytest.mark.concept("ECO-4.1")
+@pytest.mark.concept("AU-ECO.mcp.fastmcp-middleware")
 def test_concept_parity():
     """
     Enforces that all concepts documented or used in microsoft-agent
