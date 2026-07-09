@@ -1,5 +1,6 @@
 ---
 name: microsoft-calendar-scheduling
+skill_type: skill
 description: >-
   Outlook calendar and Teams online-meeting scheduling on Microsoft Graph via the
   microsoft-agent MCP server — list a calendar view, read/create/update/delete

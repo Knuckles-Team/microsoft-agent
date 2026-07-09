@@ -1,5 +1,6 @@
 ---
 name: microsoft-teams-messaging
+skill_type: skill
 description: >-
   Microsoft Teams chat and channel messaging on Microsoft Graph via the
   microsoft-agent MCP server — list and read 1:1/group chat messages and channel

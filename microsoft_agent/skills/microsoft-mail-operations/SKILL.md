@@ -1,5 +1,6 @@
 ---
 name: microsoft-mail-operations
+skill_type: skill
 description: >-
   Outlook / Exchange mail operations on Microsoft Graph via the microsoft-agent
   MCP server — list and read messages, send mail and drafts, manage folders, and
