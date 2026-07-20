@@ -1,5 +1,6 @@
 ---
 name: microsoft-agent-operations
+skill_type: skill
 description: >-
   Operate microsoft-agent through its governed MCP and GraphOS capabilities, including discovery, governed operations, ingestion, and verification. Use when a request requires this provider's read, change, automation, ingestion, troubleshooting, or evidence workflows.
 ---
