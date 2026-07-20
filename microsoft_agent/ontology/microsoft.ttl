@@ -1,0 +1,49 @@
+@prefix : <http://knuckles.team/kg#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Zero-PII structural projection for Microsoft Graph. Instances use keyed opaque
+# identifiers. Provider identifiers, names, addresses, content, filenames, URLs,
+# timestamps, and attachment bytes are not properties in this ontology.
+
+:Message a owl:Class ;
+    rdfs:label "Opaque Microsoft message reference" ;
+    rdfs:comment "A content-free keyed reference to an Outlook or Teams message." .
+
+:Event a owl:Class ;
+    rdfs:label "Opaque Microsoft event reference" ;
+    rdfs:comment "A content-free keyed reference to a calendar event or meeting." .
+
+:File a owl:Class ;
+    rdfs:label "Opaque Microsoft file reference" ;
+    rdfs:comment "A content-free keyed reference to a OneDrive or SharePoint item." .
+
+:sentBy a owl:ObjectProperty ;
+    rdfs:label "sent by" ;
+    rdfs:domain :Message ;
+    rdfs:range :Person .
+
+:sentTo a owl:ObjectProperty ;
+    rdfs:label "sent to" ;
+    rdfs:domain :Message ;
+    rdfs:range :Person .
+
+:organizedBy a owl:ObjectProperty ;
+    rdfs:label "organized by" ;
+    rdfs:domain :Event ;
+    rdfs:range :Person .
+
+:hasAttendee a owl:ObjectProperty ;
+    rdfs:label "has attendee" ;
+    rdfs:domain :Event ;
+    rdfs:range :Person .
+
+:ownedByPerson a owl:ObjectProperty ;
+    rdfs:label "owned by person" ;
+    rdfs:domain :File ;
+    rdfs:range :Person .
+
+<http://knuckles.team/kg/microsoft> a owl:Ontology ;
+    rdfs:label "Microsoft Graph zero-PII structural ontology" ;
+    rdfs:comment "Keyed opaque message, event, file, and person relationships for governed Microsoft Graph ingestion." ;
+    owl:imports <http://knuckles.team/kg> .

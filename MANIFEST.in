@@ -1,1 +1,10 @@
-include README.md include requirements.txt recursive-include gitlab_api *.py
+include README.md LICENSE
+include .env.example connector_manifest.yml mkdocs.yml
+recursive-include microsoft_agent *.py *.json *.md *.ttl *.yaml
+recursive-include docs *.md
+recursive-include deployment *.json *.md *.ps1 *.conf *.service *.env
+recursive-include office_addin *.json *.xml *.md *.py *.ts *.cjs *.css *.html *.svg *.b64
+prune microsoft_agent/agent_data
+prune office_addin/node_modules
+prune office_addin/dist
+global-exclude *.py[cod] *.db *.wal __pycache__ .DS_Store

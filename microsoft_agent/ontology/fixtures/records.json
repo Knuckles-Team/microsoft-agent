@@ -1,0 +1,42 @@
+{
+  "connector": "microsoft-agent",
+  "fixtures": [
+    {
+      "expected": {
+        "acl_state": "quarantine",
+        "id": "fixture-record",
+        "title": "Synthetic certification record"
+      },
+      "preset": "microsoft-event-structure",
+      "record": {
+        "acl_public": false,
+        "id": "fixture-record"
+      }
+    },
+    {
+      "expected": {
+        "acl_state": "quarantine",
+        "id": "fixture-record",
+        "title": "Synthetic certification record"
+      },
+      "preset": "microsoft-message-structure",
+      "record": {
+        "acl_public": false,
+        "id": "fixture-record"
+      }
+    },
+    {
+      "expected": {
+        "acl_state": "quarantine",
+        "id": "fixture-record",
+        "title": "Synthetic certification record"
+      },
+      "preset": "microsoft-user-structure",
+      "record": {
+        "acl_public": false,
+        "id": "fixture-record"
+      }
+    }
+  ],
+  "schema_version": "1"
+}

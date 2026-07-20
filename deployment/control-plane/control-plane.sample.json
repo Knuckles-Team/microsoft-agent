@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "bind_host": "127.0.0.1",
+  "port": 8443,
+  "allow_non_loopback_bind": false,
+  "database_path": "state/windows-companion.db",
+  "control_plane": {
+    "token_audience": "00000000-0000-0000-0000-000000000010",
+    "devices": {
+      "example-laptop": {
+        "device": {
+          "identity": {
+            "device_id": "example-laptop",
+            "tenant_id": "00000000-0000-0000-0000-000000000000",
+            "entra_device_id": "00000000-0000-0000-0000-000000000001",
+            "certificate_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          },
+          "display_name": "Disabled example laptop",
+          "enabled": false,
+          "allowed_actions": [],
+          "allowed_file_roots": [],
+          "allowed_services": [],
+          "allowed_desktop_flows": []
+        },
+        "device_principal_subjects": [],
+        "device_client_ids": []
+      }
+    },
+    "trusted_proxy_mtls_header": "X-Client-Cert-Thumbprint",
+    "trusted_proxy_client_hosts": [
+      "127.0.0.1"
+    ],
+    "require_device_mtls": true
+  },
+  "token_validation": {
+    "tenant_id": "00000000-0000-0000-0000-000000000000",
+    "audience": "00000000-0000-0000-0000-000000000010",
+    "jwks": {
+      "keys": [
+        {
+          "alg": "RS256",
+          "e": "AQAB",
+          "key_ops": [
+            "verify"
+          ],
+          "kid": "disabled-sample-key",
+          "kty": "RSA",
+          "n": "uuuH4cl1KzzP3uDCAb3_C0HMpp6yfjS0p-4e0EsUfR-77W-zhQ4eoZsf_N3B9FoCJT_neg3f28MYh-c2KYuZseEzL2_uh_W0sdmxycqVxsH7lIqaAPs7sdtdpOgbl3CgYeWIY0UiZVxSwZ-G6qslK-slYFJ3fNCxV6JoepDVXkcnD4bQ9OprqpWr9uAMn_97ICAqKutsABv3CX0ung13HniQUy3e9scU_NGs2A-7i_y0uOYphAotj69c3aj8QkIrvGRdeHGdDCLLKlgrjR0o2PH4-fA9z7yl3IIUN4LViMO0hipuCJXMyNsp-mb_qQyPrKdTta5igZvBGWC5UOR8yw",
+          "use": "sig"
+        }
+      ]
+    },
+    "allowed_algorithms": [
+      "RS256"
+    ],
+    "leeway_seconds": 60
+  },
+  "access_log": false,
+  "log_level": "info"
+}

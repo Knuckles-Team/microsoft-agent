@@ -1,0 +1,6 @@
+{
+  "allowedBackendOrigins": ["https://localhost:8000"],
+  "defaultBackendUrl": "https://localhost:8000",
+  "healthPath": "/health",
+  "requestTimeoutMs": 10000
+}

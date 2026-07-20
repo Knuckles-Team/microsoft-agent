@@ -1,71 +1,63 @@
 # Installation
 
-`microsoft-agent` is a standard Python package and a prebuilt container image. Pick
-the path that matches how you want to run it.
+Microsoft Agent supports Python 3.11 through 3.14. Install only the capability
+groups required by the deployment.
 
-## Requirements
+## Package extras
 
-- **Python 3.11 – 3.14**.
-- A registered **Microsoft Entra ID (Azure AD) application** with Microsoft Graph
-  permissions, and its client id / client secret. Microsoft 365 is a managed service
-  — see the [Backing Service](deployment.md#backing-service) note for configuration.
+| Extra | Purpose |
+|---|---|
+| `mcp` | Microsoft Graph MCP server and Agent Utilities MCP runtime |
+| `agent` | optional Agent Utilities A2A agent runtime |
+| `documents` | Word and PowerPoint document generation |
+| `cloud` | Azure managed and workload identity support |
+| `windows` | outbound Windows companion client and service |
+| `control-plane` | authenticated Windows control-plane service |
+| `all` | every supported runtime capability |
+| `test` | repository test dependencies |
 
-## From PyPI (recommended)
+Install the MCP server:
 
 ```bash
-pip install microsoft-agent
+python -m pip install "microsoft-agent[mcp]"
 ```
 
-### Optional extras
-
-The base install is intentionally minimal. Install the extra for what you need:
-
-| Extra | Install | Pulls in |
-|---|---|---|
-| `mcp` | `pip install "microsoft-agent[mcp]"` | FastMCP MCP-server runtime (`agent-utilities[mcp]`) |
-| `agent` | `pip install "microsoft-agent[agent]"` | Pydantic-AI A2A agent + Logfire tracing |
-| `all` | `pip install "microsoft-agent[all]"` | MCP server, agent, and Logfire — everything above |
-| `test` | `pip install "microsoft-agent[test]"` | `pytest`, `pytest-asyncio`, `pytest-cov` |
+Install a broader approved profile when required:
 
 ```bash
-# Typical: run the MCP server and the A2A agent together
-pip install "microsoft-agent[all]"
+python -m pip install "microsoft-agent[agent,documents,cloud]"
 ```
 
-## From source
+Agent Utilities resolves Epistemic Graph with the `full` feature set, including the
+folded numeric ABI. Do not substitute a minimal or numeric-only engine artifact.
+
+## Source checkout
+
+For development:
 
 ```bash
-git clone https://github.com/Knuckles-Team/microsoft-agent.git
+git clone <repository-url> microsoft-agent
 cd microsoft-agent
-pip install -e ".[all]"          # editable install with every extra
+uv sync --all-extras --dev
 ```
 
-With [`uv`](https://docs.astral.sh/uv/):
+Keep the package cache, virtual environment, build output, and runtime data on a
+filesystem with adequate capacity. Source checkouts must not contain runtime token
+caches, databases, endpoint profiles, credentials, or generated operator state.
+
+## Containers
+
+Build the dedicated targets from the checked-in Dockerfile:
 
 ```bash
-uv pip install -e ".[all]"
-uv run microsoft-mcp
+docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<version>-mcp .
+docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
-## Prebuilt Docker image
+Images contain application code only. Supply identity, TLS trust, secret
+references, configuration, and writable storage at deployment time.
 
-A multi-stage, slim image is published on every release (installs
-`microsoft-agent[all]`, console scripts `microsoft-mcp` and `microsoft-agent`):
-
-```bash
-docker pull knucklessg1/microsoft-agent:latest
-
-docker run --rm -i \
-  -e MICROSOFT_CLIENT_ID=your-app-registration-client-id \
-  -e MICROSOFT_CLIENT_SECRET=your-client-secret \
-  -e MICROSOFT_SCOPE=https://graph.microsoft.com/.default \
-  knucklessg1/microsoft-agent:latest        # stdio transport (default)
-```
-
-For an HTTP server with a published port and the A2A agent, see
-[Deployment](deployment.md).
-
-## Verify the install
+## Verify the installation
 
 ```bash
 microsoft-mcp --help
@@ -73,8 +65,10 @@ microsoft-agent --help
 python -c "import microsoft_agent; print(microsoft_agent.__version__)"
 ```
 
-## Next steps
+Then run the Agent Utilities doctor against the deployment-owned AgentConfig
+profile. Installation is not release-ready until the doctor confirms engine,
+identity, trust, permission, observability, and optional dependency readiness
+without exposing values.
 
-- **[Deployment](deployment.md)** — run it as a long-lived MCP server and A2A agent behind Caddy + DNS.
-- **[Usage](usage.md)** — call the tools, the API, and the CLI.
-- **[Configuration](deployment.md#configuration-environment)** — every environment variable.
+Continue with [Configuration](configuration.md),
+[Authentication](authentication.md), and [Deployment](deployment.md).

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Microsoft Agent Operations"
+  short_description: "Help with Microsoft Agent Operations tasks"
+  default_prompt: "Use $microsoft-agent-operations to complete a governed provider workflow."

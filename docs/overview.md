@@ -1,74 +1,79 @@
-# microsoft-agent — Concept Overview
+# Architecture overview
 
-> **Category**: Enterprise | **Ecosystem Role**: MCP Server + A2A Agent
-> Built on [`agent-utilities`](https://github.com/Knuckles-Team/agent-utilities) — the unified AGI Harness.
+Microsoft Agent is a governed Microsoft Graph provider for the Agent Utilities and
+Epistemic Graph ecosystem. It contributes one MCP server, one modular Graph client,
+one authentication authority, optional integration adapters, a consolidated skill,
+and a provider-owned connector capability bundle.
 
-## Description
+## Runtime boundaries
 
-Microsoft Graph Agent MCP Server
+| Boundary | Authority |
+|---|---|
+| MCP server and session | Agent Utilities server factory and verified caller session |
+| Microsoft Graph client | `MicrosoftGraphApi` composed from `microsoft_agent/api/` |
+| Microsoft authentication | `microsoft_agent/auth.py` and validated `MicrosoftSettings` |
+| Action authorization | `MicrosoftToolPolicy` applied to the routed action |
+| Agent delegation | Agent Utilities A2A/GraphOS runtime |
+| Knowledge ingestion | governed connector manifest, ontology, mapping, and quarantine |
+| Observability | deployment-configured metadata-only Agent Utilities telemetry |
 
-## Enterprise Readiness
+There is no second API wrapper, raw-token fallback, plaintext token cache, bundled
+database, bundled MCP profile, or alternate agent execution plane.
 
-All agents in the ecosystem inherit enterprise-grade infrastructure from `agent-utilities`:
+## Capability flow
 
-| Feature | Status | Source |
-|:--------|:-------|:-------|
-| **JWT/OIDC Authentication** | ✅ Built-in | `agent-utilities[auth]` — Authlib JWKS + API key middleware |
-| **OpenTelemetry Instrumentation** | ✅ Built-in | `agent-utilities[logfire]` — OTLP export, FastAPI auto-instrumentation |
-| **HashiCorp Vault Integration** | ✅ Built-in | `agent-utilities[vault]` — `secret://`, `env://`, `vault://` URI schemes |
-| **Audit Logging** | ✅ Built-in | Append-only compliance trail with 30+ action types (CONCEPT:OS-5.4) |
-| **Token Usage Analytics** | ✅ Built-in | 4-bucket tracking with budget alerting (CONCEPT:OS-5.4) |
-| **Prompt Injection Defense** | ✅ Built-in | 25+ pattern scanner + jailbreak taxonomy (CONCEPT:OS-5.1) |
-| **Guardrail Engine** | ✅ Built-in | Input/output interception with block/redact/warn (CONCEPT:OS-5.3) |
-| **Action Execution Pipeline** | ✅ Built-in | Token, cost, duration, and node transition limits Dry-run / commit / rollback phases (CONCEPT:ORCH-1.4) |
-| **Resource Scheduling** | ✅ Built-in | Priority queuing + preemption limits (CONCEPT:OS-5.2) |
-| **Session Concurrency** | ✅ Built-in | Enqueue/reject/interrupt/rollback (CONCEPT:OS-5.3) |
+1. The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
+   an explicit optional-capability profile.
+2. The MCP server creates a verified Agent Utilities session and exposes the
+   configured action families through the selected tool mode.
+3. The tool policy classifies the routed action. Reads are allowed by default;
+   writes and destructive actions require separate explicit approvals.
+4. The single Graph client acquires a token through the selected Microsoft identity
+   mode and performs the bounded provider request.
+5. Governed ingestion converts approved records into quarantined change envelopes
+   carrying tenant, ACL, provenance, schema, checkpoint, and privacy metadata.
+6. Metadata-only telemetry links the MCP/delegation outcome to its Langfuse trace
+   and governed parent graph record.
 
-## Concept Registry
+## Source layout
 
-This project implements or inherits the following ecosystem concepts:
-
-| Concept ID | Description | Source |
-|:-----------|:------------|:-------|
-| ECO-4.1 | MCP & Universal Skills | `agent-utilities` (inherited) |
-
-> 📖 **Full Registry**: See [`agent-utilities/docs/overview.md`](https://github.com/Knuckles-Team/agent-utilities/blob/main/docs/overview.md) for the complete 5-Pillar concept index.
-
-## Architecture
-
-This project follows the standardized agent-package pattern:
-
-```
-microsoft-agent/
-├── microsoft_agent/        # Source code
-│   ├── __init__.py
-│   ├── agent_server.py      # Entry point (create_graph_agent_server)
-│   ├── api_client.py        # REST/GraphQL API wrapper
-│   └── mcp_server.py        # FastMCP tool definitions
-├── tests/                   # Test suite
-├── docs/                    # Documentation
-├── pyproject.toml           # Package metadata
-├── mcp_config.json          # MCP server configuration
-├── main_agent.json          # Agent identity & system prompt
-└── Dockerfile               # Container deployment
-```
-
-## MCP Configuration
-
-### stdio Mode
-```json
-{
-  "mcpServers": {
-    "microsoft-agent": {
-      "command": "uv",
-      "args": ["run", "--with", "microsoft-agent", "microsoft-mcp"],
-      "env": {}
-    }
-  }
-}
+```text
+microsoft_agent/
+  api/                    domain Graph client mixins
+  connectors/             provider source presets and schema fingerprints
+  ontology/               ontology, shapes, mappings, fixtures, and migrations
+  skills/                 consolidated Microsoft operations skill
+  api_client.py           sole Graph API client
+  auth.py                 token acquisition and secure-cache authority
+  settings.py             validated identity and policy configuration
+  mcp_server.py           condensed/action-routed MCP server
+  tool_policy.py          fail-closed action policy
+  integration_tools.py    optional native connection points
+  agent_server.py         optional Agent Utilities A2A entry point
 ```
 
-### Streamable HTTP Mode
-```bash
-microsoft-mcp --transport streamable-http --port 8001
-```
+Deployment and Office add-in assets define generic schemas and packaging only.
+Environment URLs, credentials, device inventories, filesystem roots, trust bundles,
+and customized ontologies stay outside the repository.
+
+## Security model
+
+- Microsoft Graph identity and MCP caller identity are independently verified.
+- Unknown routed actions fail closed as writes.
+- Side-effecting and destructive actions use separate enablement controls.
+- Secure OS-backed storage is the only persistent delegated-token cache.
+- Certificate verification remains enabled and trust is deployment-configured.
+- Provider results are bounded, policy-checked, and privacy-sanitized before
+  persistence or observability.
+- Connector records remain quarantined until their governance contract passes.
+
+## Extension model
+
+New provider operations belong in the relevant domain client and action family.
+New optional systems belong behind a native adapter registered only when its
+package extra and external configuration are both present. New ingestion semantics
+extend the provider ontology and mapping, followed by regeneration of schema
+fingerprints and certification artifacts.
+
+Do not add per-operation compatibility tools, alternate authentication managers,
+hardcoded endpoints, local profiles, or provider-specific execution runtimes.

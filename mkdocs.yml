@@ -1,17 +1,12 @@
 site_name: "microsoft-agent"
-site_description: "Microsoft Graph API + MCP Server + A2A Supervisor Agent — manage a Microsoft 365 tenant through typed tools and natural-language delegation."
-site_url: "https://knuckles-team.github.io/microsoft-agent/"
-repo_name: "Knuckles-Team/microsoft-agent"
-repo_url: "https://github.com/Knuckles-Team/microsoft-agent"
-edit_uri: "edit/main/docs/"
-copyright: "Copyright &copy; Knuckles-Team — MIT licensed"
+site_description: "Governed Microsoft Graph MCP provider and optional A2A agent."
+copyright: "Copyright &copy; Project contributors — MIT licensed"
 
 theme:
   name: material
   icon:
     repo: fontawesome/brands/github
     logo: material/graph-outline
-  favicon: https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/material/templates/assets/images/favicon.png
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -77,17 +72,19 @@ markdown_extensions:
   - toc:
       permalink: true
 
-extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/Knuckles-Team/microsoft-agent
-    - icon: fontawesome/brands/python
-      link: https://pypi.org/project/microsoft-agent/
-
 nav:
   - Home: index.md
-  - Overview: overview.md
-  - Installation: installation.md
-  - Deployment: deployment.md
-  - Usage (API / CLI / MCP): usage.md
+  - Architecture: overview.md
+  - Install and configure:
+      - Installation: installation.md
+      - Configuration: configuration.md
+      - Authentication: authentication.md
+      - Enrollment checklist: enrollment-checklist.md
+  - Operate:
+      - Usage: usage.md
+      - Deployment: deployment.md
+  - Integrations:
+      - Microsoft services: integrations.md
+      - Office add-in: office-addin.md
+      - Windows companion: windows-companion.md
   - Concepts: concepts.md

@@ -1,0 +1,42 @@
+schema_version: '1'
+connector: microsoft-agent
+ontology_source: microsoft
+sync:
+- preset: microsoft-event-structure
+  server: microsoft-agent
+  tool: list_microsoft_ingestion_projection
+  action: null
+  records_path: records
+  id_field: id
+  title_field: null
+  text_field: null
+  updated_field: null
+  doc_type: microsoft-event-reference
+  tool_schema_sha256: aed3830a8e60658aa10f9b7bc680226e9ac3a76a43ccdca813161211cea57e15
+- preset: microsoft-message-structure
+  server: microsoft-agent
+  tool: list_microsoft_ingestion_projection
+  action: null
+  records_path: records
+  id_field: id
+  title_field: null
+  text_field: null
+  updated_field: null
+  doc_type: microsoft-message-reference
+  tool_schema_sha256: aed3830a8e60658aa10f9b7bc680226e9ac3a76a43ccdca813161211cea57e15
+- preset: microsoft-user-structure
+  server: microsoft-agent
+  tool: list_microsoft_ingestion_projection
+  action: null
+  records_path: records
+  id_field: id
+  title_field: null
+  text_field: null
+  updated_field: null
+  doc_type: microsoft-person-reference
+  tool_schema_sha256: aed3830a8e60658aa10f9b7bc680226e9ac3a76a43ccdca813161211cea57e15
+governance:
+  default_acl: quarantine
+  identity: opaque-reference
+  tenant: required-at-materialization
+  provenance: required-at-materialization

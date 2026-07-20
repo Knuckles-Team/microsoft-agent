@@ -1,58 +1,10 @@
-import os
-import sys
 from typing import Any
 
 from msgraph.generated.users.users_request_builder import UsersRequestBuilder
 
-from microsoft_agent.auth import AuthManager
-
-CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
-AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = [
-    "User.Read",
-    "Mail.ReadWrite",
-    "Calendars.ReadWrite",
-    "Files.ReadWrite",
-    "Tasks.ReadWrite",
-    "Contacts.ReadWrite",
-    "Group.ReadWrite.All",
-    "Directory.Read.All",
-    "Sites.Read.All",
-    "Chat.Read",
-    "ChatMessage.Read.All",
-    "ChannelMessage.Read.All",
-    "ServiceHealth.Read.All",
-    "ServiceMessage.Read.All",
-    "Domain.ReadWrite.All",
-    "Organization.ReadWrite.All",
-    "OnlineMeetings.ReadWrite",
-    "CallRecords.Read.All",
-    "Presence.Read.All",
-    "User.Invite.All",
-    "SecurityEvents.ReadWrite.All",
-    "SecurityIncident.ReadWrite.All",
-    "ThreatHunting.Read.All",
-    "AuditLog.Read.All",
-    "Reports.Read.All",
-    "Application.ReadWrite.All",
-    "Policy.Read.All",
-    "Policy.ReadWrite.ConditionalAccess",
-    "IdentityRiskEvent.Read.All",
-    "IdentityRiskyUser.ReadWrite.All",
-    "Directory.ReadWrite.All",
-    "RoleManagement.ReadWrite.Directory",
-    "EntitlementManagement.Read.All",
-    "AccessReview.Read.All",
-    "LifecycleWorkflows.Read.All",
-]
-
-# Only create global auth_manager if not in test mode
-auth_manager: AuthManager | None
-if not os.environ.get("TESTING"):
-    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
-else:
-    auth_manager = None
-
+from microsoft_agent.api._graph_models import (
+    graph_model_from_dict,
+)
 from microsoft_agent.api.api_client_base import MicrosoftGraphApiBase
 
 
@@ -93,12 +45,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing users: {e}", file=sys.stderr)
-            return {"error": str(e)}
-
-    async def get_current_user(self, params: dict | None = None) -> dict[str, Any]:
-        """Get current user (alias for get_me)."""
-        return await self.get_me()
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_chats(self, params: dict | None = None) -> dict[str, Any]:
         """List user chats."""
@@ -117,8 +65,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing chats: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_chat(
         self, chat_id: str, params: dict | None = None
@@ -141,8 +89,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting chat: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_joined_teams(self, params: dict | None = None) -> dict[str, Any]:
         """List joined teams."""
@@ -161,8 +109,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing joined teams: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_team(
         self, team_id: str, params: dict | None = None
@@ -185,8 +133,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting team: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_team_channels(
         self, team_id: str, params: dict | None = None
@@ -209,8 +157,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing team channels: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_team_channel(
         self, team_id: str, channel_id: str, params: dict | None = None
@@ -237,8 +185,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting team channel: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_team_members(
         self, team_id: str, params: dict | None = None
@@ -261,8 +209,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing team members: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_groups(self, params: dict | None = None) -> dict[str, Any]:
         """List all Microsoft 365 groups and security groups."""
@@ -303,8 +251,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing groups: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_group(
         self, group_id: str, params: dict | None = None
@@ -326,8 +274,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting group: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_group(
         self, data: dict[str, Any], params: dict | None = None
@@ -338,16 +286,9 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
         from msgraph.generated.models.group import Group
 
         try:
-            group = Group()
-            group.display_name = data.get("displayName")
-            group.description = data.get("description")
-            group.mail_enabled = data.get("mailEnabled", False)
-            group.mail_nickname = data.get("mailNickname")
-            group.security_enabled = data.get("securityEnabled", True)
-            if "groupTypes" in data:
-                group.group_types = data["groupTypes"]
-            if "visibility" in data:
-                group.visibility = data["visibility"]
+            group = graph_model_from_dict(
+                {"mailEnabled": False, "securityEnabled": True, **data}, Group
+            )
             request_config = self.client.groups.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
@@ -358,8 +299,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating group: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_group(
         self, group_id: str, data: dict[str, Any], params: dict | None = None
@@ -370,13 +311,7 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
         from msgraph.generated.models.group import Group
 
         try:
-            group = Group()
-            if "displayName" in data:
-                group.display_name = data["displayName"]
-            if "description" in data:
-                group.description = data["description"]
-            if "visibility" in data:
-                group.visibility = data["visibility"]
+            group = graph_model_from_dict(data, Group)
             request_config = self.client.groups.by_group_id(
                 group_id
             ).to_patch_request_configuration()
@@ -389,8 +324,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating group: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_group(
         self, group_id: str, params: dict | None = None
@@ -412,8 +347,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting group: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_group_members(
         self, group_id: str, params: dict | None = None
@@ -435,8 +370,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group members: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def add_group_member(
         self, group_id: str, data: dict[str, Any], params: dict | None = None
@@ -447,11 +382,14 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
         from msgraph.generated.models.reference_create import ReferenceCreate
 
         try:
-            ref = ReferenceCreate()
-            ref.odata_id = data.get(
-                "@odata.id",
-                f"https://graph.microsoft.com/v1.0/directoryObjects/{data.get('userId', data.get('id', ''))}",
-            )
+            reference_data = {
+                "@odata.id": data.get(
+                    "@odata.id",
+                    "https://graph.microsoft.com/v1.0/directoryObjects/"
+                    f"{data.get('userId', data.get('id', ''))}",
+                )
+            }
+            ref = graph_model_from_dict(reference_data, ReferenceCreate)
             request_config = self.client.groups.by_group_id(
                 group_id
             ).members.ref.to_post_request_configuration()
@@ -464,8 +402,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "member added"}
         except Exception as e:
-            print(f"Error adding group member: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def remove_group_member(
         self, group_id: str, member_id: str, params: dict | None = None
@@ -491,8 +429,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "member removed"}
         except Exception as e:
-            print(f"Error removing group member: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_group_owners(
         self, group_id: str, params: dict | None = None
@@ -514,8 +452,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group owners: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_group_conversations(
         self, group_id: str, params: dict | None = None
@@ -537,8 +475,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing group conversations: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_presences(self, params: dict | None = None) -> dict[str, Any]:
         """List presence information for users."""
@@ -558,8 +496,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing presences: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_presence(
         self, user_id: str, params: dict | None = None
@@ -581,8 +519,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting presence: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_my_presence(self, params: dict | None = None) -> dict[str, Any]:
         """Get current user's presence."""
@@ -600,8 +538,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting my presence: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_office365_active_users(
         self, period: str = "D7", params: dict | None = None
@@ -627,8 +565,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting active users report: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_teams_user_activity(
         self, period: str = "D7", params: dict | None = None
@@ -652,8 +590,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting Teams user activity report: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_risky_users(self, params: dict | None = None) -> dict[str, Any]:
         """List risky users."""
@@ -671,8 +609,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing risky users: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_risky_user(
         self, user_id: str, params: dict | None = None
@@ -698,8 +636,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting risky user: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def dismiss_risky_user(
         self, user_id: str, params: dict | None = None
@@ -726,8 +664,8 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "dismissed"}
         except Exception as e:
-            print(f"Error dismissing risky user: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_education_users(self, params: dict | None = None) -> dict[str, Any]:
         """List education users."""
@@ -745,5 +683,5 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing education users: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}

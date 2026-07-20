@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://appsforoffice.microsoft.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://localhost:*; object-src 'none'; base-uri 'none'; form-action 'none';"
+    />
+    <title>Microsoft Agent Office Companion</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script defer src="taskpane.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <img src="assets/icon.svg" width="36" height="36" alt="" />
+      <div>
+        <h1>Office Companion</h1>
+        <p id="host-summary">Waiting for Office…</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="capability-title">
+        <div class="section-heading">
+          <h2 id="capability-title">Host and capabilities</h2>
+          <button id="refresh-capabilities" type="button">Refresh</button>
+        </div>
+        <pre id="capability-report" class="report">Office has not initialized.</pre>
+      </section>
+
+      <section id="word-tools" class="card" aria-labelledby="word-title" hidden>
+        <h2 id="word-title">Word</h2>
+
+        <div class="tool-block">
+          <label for="word-selection">Current selection</label>
+          <button id="read-word-selection" type="button">Read selection</button>
+          <textarea id="word-selection" rows="4" readonly></textarea>
+        </div>
+
+        <div class="tool-block">
+          <label for="word-content">Content to insert</label>
+          <textarea id="word-content" rows="5" maxlength="100000"></textarea>
+          <label for="word-insert-mode">Insertion mode</label>
+          <select id="word-insert-mode">
+            <option value="Replace">Replace selection</option>
+            <option value="End">Append to selection</option>
+            <option value="Start">Prepend to selection</option>
+          </select>
+          <button id="write-word-content" type="button">Apply content</button>
+        </div>
+
+        <div class="tool-block">
+          <label for="word-placeholder">Placeholder text</label>
+          <input id="word-placeholder" type="text" maxlength="500" placeholder="{{customer_name}}" />
+          <label for="word-replacement">Replacement</label>
+          <textarea id="word-replacement" rows="3" maxlength="100000"></textarea>
+          <button id="replace-word-placeholders" type="button">Replace all matches</button>
+        </div>
+      </section>
+
+      <section id="powerpoint-tools" class="card" aria-labelledby="powerpoint-title" hidden>
+        <h2 id="powerpoint-title">PowerPoint</h2>
+
+        <div class="tool-block">
+          <div class="button-row">
+            <button id="list-slides" type="button">List slides</button>
+            <button id="add-slide" type="button">Add slide</button>
+          </div>
+          <ol id="slide-list" class="slide-list"></ol>
+        </div>
+
+        <div class="tool-block danger-block">
+          <label for="delete-slide-index">Slide number to delete</label>
+          <input id="delete-slide-index" type="number" min="1" step="1" inputmode="numeric" />
+          <button id="delete-slide" class="danger" type="button">Delete slide…</button>
+        </div>
+
+        <div class="tool-block">
+          <h3>Add text box</h3>
+          <p class="requirement-note">Requires PowerPointApi 1.4.</p>
+          <label for="ppt-text-slide-index">Slide number</label>
+          <input id="ppt-text-slide-index" type="number" min="1" step="1" inputmode="numeric" />
+          <label for="ppt-text">Text</label>
+          <textarea id="ppt-text" rows="4" maxlength="100000"></textarea>
+          <div class="coordinate-grid">
+            <label>Left <input id="ppt-left" type="number" min="0" max="10000" value="40" /></label>
+            <label>Top <input id="ppt-top" type="number" min="0" max="10000" value="40" /></label>
+            <label>Width <input id="ppt-width" type="number" min="1" max="10000" value="480" /></label>
+            <label>Height <input id="ppt-height" type="number" min="1" max="10000" value="120" /></label>
+          </div>
+          <button id="insert-ppt-text" type="button">Insert text box</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="backend-title">
+        <h2 id="backend-title">Microsoft Agent backend</h2>
+        <p>
+          The URL must match a deployment-approved origin. Access tokens stay in memory and are never saved.
+        </p>
+        <label for="backend-url">Backend URL</label>
+        <input id="backend-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" />
+        <label for="backend-token">Bearer access token (optional until authentication is configured)</label>
+        <input id="backend-token" type="password" autocomplete="off" spellcheck="false" maxlength="8192" />
+        <div class="button-row">
+          <button id="save-backend" type="button">Save URL</button>
+          <button id="test-backend" type="button">Test connection</button>
+          <button id="clear-backend-token" type="button">Clear token</button>
+        </div>
+        <pre id="backend-result" class="report">Backend not tested.</pre>
+
+        <div class="tool-block" aria-labelledby="office-bridge-title">
+          <h3 id="office-bridge-title">Agent pairing</h3>
+          <p>
+            Ask the agent to create a pairing secret for this Word or PowerPoint window. Pairing secrets
+            work once and expire after five minutes; the resulting session token stays only in memory.
+          </p>
+          <label for="office-pairing-token">One-time pairing secret</label>
+          <input
+            id="office-pairing-token"
+            type="password"
+            autocomplete="off"
+            spellcheck="false"
+            maxlength="256"
+          />
+          <div class="button-row">
+            <button id="pair-office" type="button">Pair this window</button>
+            <button id="disconnect-office" type="button" disabled>Disconnect</button>
+          </div>
+          <pre id="office-bridge-result" class="report">Office bridge is not paired.</pre>
+        </div>
+      </section>
+    </main>
+
+    <div id="status" class="status" role="status" aria-live="polite">Initializing…</div>
+    <noscript>This add-in requires JavaScript.</noscript>
+  </body>
+</html>

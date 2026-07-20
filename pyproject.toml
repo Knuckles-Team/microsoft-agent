@@ -1,58 +1,142 @@
 [build-system]
-requires = [ "setuptools>=80.9.0", "wheel",]
+requires = ["setuptools>=80.9.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "microsoft-agent"
-version = "0.30.0"
-description = "Microsoft Graph Agent MCP Server"
+dynamic = ["version"]
+description = "Governed Microsoft Graph agent and MCP server"
 readme = "README.md"
-classifiers = [ "Development Status :: 3 - Alpha", "License :: OSI Approved :: MIT License", "Environment :: Console", "Operating System :: POSIX :: Linux", "Programming Language :: Python :: 3",]
-requires-python = ">=3.11, <3.15"
-dependencies = [ "agent-utilities>=0.45.0", "msal>=1.31.0", "keyring>=25.1.0", "msgraph-sdk>=1.54.0",]
-[[project.authors]]
-name = "Audel Rouhi"
-email = "knucklessg1@gmail.com"
+requires-python = ">=3.11,<3.15"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+]
+dependencies = [
+  "agent-utilities[mcp]>=1.27.1,<2.0.0",
+  "azure-core>=1.31,<2.0",
+  "httpx>=0.27,<1.0",
+  "keyring>=25.1,<26",
+  "msal>=1.31,<2.0",
+  "msgraph-sdk>=1.54,<2.0",
+  "pydantic>=2.12,<3.0",
+]
+license = "MIT"
 
-[project.license]
-text = "MIT"
+[[project.authors]]
+name = "Project Maintainers"
+email = "maintainers@users.noreply.github.com"
 
 [project.optional-dependencies]
-mcp = [ "agent-utilities[mcp]>=0.45.0",]
-agent = [ "agent-utilities[agent,logfire]>=0.45.0",]
-all = [ "agent-utilities[mcp,agent,logfire]>=0.45.0",]
-test = [ "pytest", "pytest-asyncio", "pytest-cov", "pytest-cov",]
+mcp = ["agent-utilities[mcp]>=1.27.1,<2.0.0"]
+agent = ["agent-utilities[agent-runtime,logfire]>=1.27.1,<2.0.0"]
+documents = ["python-docx>=1.1,<2.0", "python-pptx>=1.0,<2.0"]
+cloud = ["azure-identity>=1.19,<2.0", "httpx>=0.27,<1.0"]
+windows = [
+  "cryptography>=43,<49",
+  "msal[broker]>=1.31,<2.0; sys_platform == 'win32'",
+  "pywin32>=308; sys_platform == 'win32'",
+  "win10toast>=0.9; sys_platform == 'win32'",
+]
+control-plane = [
+  "cryptography>=43,<49",
+  "fastapi>=0.115,<1.0",
+  "PyJWT[crypto]>=2.9,<3.0",
+  "uvicorn>=0.30,<1.0",
+]
+docs = ["mkdocs-material>=9.5,<10"]
+all = [
+  "agent-utilities[mcp,agent-runtime,logfire]>=1.27.1,<2.0.0",
+  "azure-identity>=1.19,<2.0",
+  "cryptography>=43,<49",
+  "fastapi>=0.115,<1.0",
+  "httpx>=0.27,<1.0",
+  "mkdocs-material>=9.5,<10",
+  "PyJWT[crypto]>=2.9,<3.0",
+  "python-docx>=1.1,<2.0",
+  "python-pptx>=1.0,<2.0",
+  "uvicorn>=0.30,<1.0",
+  "msal[broker]>=1.31,<2.0; sys_platform == 'win32'",
+  "pywin32>=308; sys_platform == 'win32'",
+  "win10toast>=0.9; sys_platform == 'win32'",
+]
+test = [
+  "cryptography>=43,<49",
+  "fastapi>=0.115,<1.0",
+  "httpx>=0.27,<1.0",
+  "PyJWT[crypto]>=2.9,<3.0",
+  "pytest>=8,<10",
+  "pytest-asyncio>=0.24,<2",
+  "pytest-cov>=6,<8",
+  "pytest-env>=1.1,<2",
+  "pytest-timeout>=2.4,<3",
+  "python-docx>=1.1,<2.0",
+  "python-pptx>=1.0,<2.0",
+  "PyYAML>=6,<7",
+]
 
 [project.scripts]
 microsoft-mcp = "microsoft_agent.mcp_server:mcp_server"
 microsoft-agent = "microsoft_agent.agent_server:agent_server"
+microsoft-config = "microsoft_agent.config_cli:main"
+microsoft-windows-companion = "microsoft_agent.windows_companion_service:main"
+microsoft-windows-control-plane = "microsoft_agent.windows_control_plane_service:main"
 
-[tool.setuptools]
-include-package-data = true
+[project.entry-points."agent_utilities.source_connector_providers"]
+microsoft-agent = "microsoft_agent.connectors"
 
-[tool.ruff]
-line-length = 88
-target-version = "py310"
+[project.entry-points."agent_utilities.skill_providers"]
+microsoft-agent = "microsoft_agent.skills"
 
-[tool.mypy]
-python_version = "3.10"
-ignore_missing_imports = true
-check_untyped_defs = true
+[project.entry-points."agent_utilities.ontology_providers"]
+microsoft-agent = "microsoft_agent.ontology"
+
+[project.entry-points."agent_utilities.prompt_providers"]
+microsoft-agent = "microsoft_agent.prompts"
 
 [dependency-groups]
 dev = [
-    "pytest-timeout>=2.4.0",
+  "mypy>=1.15,<2",
+  "pytest>=8,<10",
+  "pytest-asyncio>=0.24,<2",
+  "pytest-cov>=6,<8",
+  "pytest-env>=1.1,<2",
+  "pytest-timeout>=2.4,<3",
+  "ruff>=0.15,<1",
 ]
 
-[tool.setuptools.package-data]
-microsoft_agent = [ "mcp_config.json", "agent_data/**",]
+[tool.setuptools]
+include-package-data = false
 
-[tool.ruff.lint]
-select = [ "E", "F", "I", "UP", "B",]
-ignore = [ "E402", "E501", "B008",]
+[tool.setuptools.dynamic]
+version = {attr = "microsoft_agent._version.__version__"}
+
+[tool.setuptools.package-data]
+microsoft_agent = ["connectors/**", "ontology/**", "prompts/**", "skills/**"]
+
+[tool.setuptools.exclude-package-data]
+microsoft_agent = ["**/*.wal", "**/*.db"]
 
 [tool.setuptools.packages.find]
-where = [ ".",]
+where = ["."]
+include = ["microsoft_agent", "microsoft_agent.*"]
+namespaces = false
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E402", "E501", "B008"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+check_untyped_defs = true
+follow_imports = "skip"
 
 [tool.vulture]
 ignore_names = ["request", "config"]

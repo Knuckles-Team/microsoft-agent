@@ -1,0 +1,64 @@
+{
+  "documents": {
+    "max_artifact_bytes": 104857600,
+    "max_template_bytes": 52428800
+  },
+  "power_platform": {
+    "dataverse_environment_url": "https://example.invalid",
+    "dataverse_audience": "https://example.invalid",
+    "allow_lifecycle_changes": false,
+    "allow_desktop_flow_runs": false,
+    "allow_desktop_flow_cancellations": false,
+    "named_flows": {
+      "example-disabled-flow": {
+        "trigger_url": "https://flow.example.invalid/trigger",
+        "audience": "https://service.flow.microsoft.com/",
+        "enabled": false,
+        "expected_status_codes": [
+          200,
+          202
+        ]
+      }
+    },
+    "named_desktop_flows": {
+      "example-disabled-desktop-flow": {
+        "workflow_id": "00000000-0000-0000-0000-000000000020",
+        "connection_name": "replace-with-connection-or-reference-name",
+        "connection_type": 1,
+        "allowed_run_modes": [
+          "attended"
+        ],
+        "timeout_seconds": 7200,
+        "enabled": false
+      }
+    }
+  },
+  "windows_companion": {
+    "control_plane_url": "https://companion.example.invalid",
+    "token_audience": "api://00000000-0000-0000-0000-000000000010",
+    "connection_mode": "outbound_relay",
+    "devices": {
+      "example-laptop": {
+        "identity": {
+          "device_id": "example-laptop",
+          "tenant_id": "00000000-0000-0000-0000-000000000000",
+          "entra_device_id": "00000000-0000-0000-0000-000000000001",
+          "certificate_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "display_name": "Disabled example laptop",
+        "enabled": false,
+        "allowed_actions": [],
+        "allowed_file_roots": [],
+        "allowed_services": [],
+        "allowed_desktop_flows": []
+      }
+    }
+  },
+  "intune": {
+    "allowed_device_ids": [
+      "00000000-0000-0000-0000-000000000001"
+    ],
+    "allowed_actions": [],
+    "allow_tenant_detected_apps": false
+  }
+}

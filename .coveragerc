@@ -1,0 +1,16 @@
+[run]
+source = microsoft_agent
+omit =
+    microsoft_agent/__main__.py
+    microsoft_agent/agent_server.py
+    tests/*
+    */site-packages/*
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+# fail_under = 50  # Disabled - focus on functionality over coverage metrics
+
+[html]
+directory = htmlcov

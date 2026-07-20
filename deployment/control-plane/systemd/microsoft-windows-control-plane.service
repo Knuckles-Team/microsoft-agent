@@ -1,0 +1,69 @@
+[Unit]
+Description=Microsoft Agent Windows companion control plane
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=microsoft-agent-control-plane
+Group=microsoft-agent-control-plane
+EnvironmentFile=/etc/microsoft-agent/control-plane.env
+WorkingDirectory=/var/lib/microsoft-agent-control-plane
+ExecStartPre=/opt/microsoft-agent-control-plane/venv/bin/microsoft-windows-control-plane --config ${MICROSOFT_WINDOWS_CONTROL_PLANE_CONFIG} --validate-config
+ExecStart=/opt/microsoft-agent-control-plane/venv/bin/microsoft-windows-control-plane --config ${MICROSOFT_WINDOWS_CONTROL_PLANE_CONFIG}
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=30s
+TimeoutStopSec=30s
+KillSignal=SIGINT
+UMask=0077
+
+StateDirectory=microsoft-agent-control-plane
+StateDirectoryMode=0700
+RuntimeDirectory=microsoft-agent-control-plane
+RuntimeDirectoryMode=0700
+
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateDevices=true
+PrivateMounts=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ProcSubset=pid
+RemoveIPC=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+KeyringMode=private
+DevicePolicy=closed
+TasksMax=256
+LimitNOFILE=4096
+OOMPolicy=stop
+
+# The service has pinned signing keys and needs network access only to its
+# loopback Nginx peer. Keep the application listener on 127.0.0.1:8443.
+IPAddressDeny=any
+IPAddressAllow=127.0.0.0/8
+IPAddressAllow=::1/128
+SocketBindDeny=any
+SocketBindAllow=tcp:8443
+
+[Install]
+WantedBy=multi-user.target

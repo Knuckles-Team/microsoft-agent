@@ -1,56 +1,8 @@
-import os
-import sys
 from typing import Any
 
-from microsoft_agent.auth import AuthManager
-
-CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
-AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = [
-    "User.Read",
-    "Mail.ReadWrite",
-    "Calendars.ReadWrite",
-    "Files.ReadWrite",
-    "Tasks.ReadWrite",
-    "Contacts.ReadWrite",
-    "Group.ReadWrite.All",
-    "Directory.Read.All",
-    "Sites.Read.All",
-    "Chat.Read",
-    "ChatMessage.Read.All",
-    "ChannelMessage.Read.All",
-    "ServiceHealth.Read.All",
-    "ServiceMessage.Read.All",
-    "Domain.ReadWrite.All",
-    "Organization.ReadWrite.All",
-    "OnlineMeetings.ReadWrite",
-    "CallRecords.Read.All",
-    "Presence.Read.All",
-    "User.Invite.All",
-    "SecurityEvents.ReadWrite.All",
-    "SecurityIncident.ReadWrite.All",
-    "ThreatHunting.Read.All",
-    "AuditLog.Read.All",
-    "Reports.Read.All",
-    "Application.ReadWrite.All",
-    "Policy.Read.All",
-    "Policy.ReadWrite.ConditionalAccess",
-    "IdentityRiskEvent.Read.All",
-    "IdentityRiskyUser.ReadWrite.All",
-    "Directory.ReadWrite.All",
-    "RoleManagement.ReadWrite.Directory",
-    "EntitlementManagement.Read.All",
-    "AccessReview.Read.All",
-    "LifecycleWorkflows.Read.All",
-]
-
-# Only create global auth_manager if not in test mode
-auth_manager: AuthManager | None
-if not os.environ.get("TESTING"):
-    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
-else:
-    auth_manager = None
-
+from microsoft_agent.api._graph_models import (
+    graph_model_from_dict,
+)
 from microsoft_agent.api.api_client_base import MicrosoftGraphApiBase
 
 
@@ -73,8 +25,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service health: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_service_health(
         self, service_name: str, params: dict | None = None
@@ -96,8 +48,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service health: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_service_health_issues(
         self, params: dict | None = None
@@ -117,8 +69,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service health issues: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_service_health_issue(
         self, issue_id: str, params: dict | None = None
@@ -140,8 +92,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service health issue: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_organization(self, params: dict | None = None) -> dict[str, Any]:
         """List organization properties."""
@@ -159,8 +111,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing organization: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_organization(
         self, org_id: str, params: dict | None = None
@@ -182,8 +134,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting organization: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_organization(
         self, org_id: str, data: dict[str, Any], params: dict | None = None
@@ -194,9 +146,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         from msgraph.generated.models.organization import Organization
 
         try:
-            org = Organization()
-            if "displayName" in data:
-                org.display_name = data["displayName"]
+            org = graph_model_from_dict(data, Organization)
             request_config = self.client.organization.by_organization_id(
                 org_id
             ).to_patch_request_configuration()
@@ -209,8 +159,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating organization: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_domains(self, params: dict | None = None) -> dict[str, Any]:
         """List tenant domains."""
@@ -228,8 +178,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing domains: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_domain(
         self, domain_id: str, params: dict | None = None
@@ -251,8 +201,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting domain: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_domain(
         self, data: dict[str, Any], params: dict | None = None
@@ -263,8 +213,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         from msgraph.generated.models.domain import Domain
 
         try:
-            domain = Domain()
-            domain.id = data.get("id")
+            domain = graph_model_from_dict(data, Domain)
             request_config = self.client.domains.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
@@ -275,8 +224,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating domain: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_domain(
         self, domain_id: str, params: dict | None = None
@@ -298,8 +247,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting domain: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def verify_domain(
         self, domain_id: str, params: dict | None = None
@@ -321,8 +270,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error verifying domain: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_domain_service_configuration_records(
         self, domain_id: str, params: dict | None = None
@@ -344,11 +293,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(
-                f"Error listing domain service configuration records: {e}",
-                file=sys.stderr,
-            )
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_security_alerts(self, params: dict | None = None) -> dict[str, Any]:
         """List security alerts (v2)."""
@@ -368,8 +314,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing security alerts: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_security_alert(
         self, alert_id: str, params: dict | None = None
@@ -391,8 +337,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting security alert: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_security_alert(
         self, alert_id: str, data: dict[str, Any], params: dict | None = None
@@ -403,15 +349,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         from msgraph.generated.models.security.alert import Alert
 
         try:
-            alert = Alert()
-            if "status" in data:
-                alert.status = data["status"]
-            if "assignedTo" in data:
-                alert.assigned_to = data["assignedTo"]
-            if "classification" in data:
-                alert.classification = data["classification"]
-            if "determination" in data:
-                alert.determination = data["determination"]
+            alert = graph_model_from_dict(data, Alert)
             request_config = self.client.security.alerts_v2.by_alert_id(
                 alert_id
             ).to_patch_request_configuration()
@@ -424,8 +362,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating security alert: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_security_incidents(
         self, params: dict | None = None
@@ -447,8 +385,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing security incidents: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_security_incident(
         self, incident_id: str, params: dict | None = None
@@ -470,8 +408,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting security incident: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_security_incident(
         self, incident_id: str, data: dict[str, Any], params: dict | None = None
@@ -482,15 +420,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         from msgraph.generated.models.security.incident import Incident
 
         try:
-            incident = Incident()
-            if "status" in data:
-                incident.status = data["status"]
-            if "assignedTo" in data:
-                incident.assigned_to = data["assignedTo"]
-            if "classification" in data:
-                incident.classification = data["classification"]
-            if "determination" in data:
-                incident.determination = data["determination"]
+            incident = graph_model_from_dict(data, Incident)
             request_config = self.client.security.incidents.by_incident_id(
                 incident_id
             ).to_patch_request_configuration()
@@ -503,8 +433,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating security incident: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def run_hunting_query(
         self, data: dict[str, Any], params: dict | None = None
@@ -517,8 +447,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         )
 
         try:
-            body = RunHuntingQueryPostRequestBody()
-            body.query = data.get("query")
+            body = graph_model_from_dict(data, RunHuntingQueryPostRequestBody)
             request_config = self.client.security.microsoft_graph_security_run_hunting_query.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
@@ -529,8 +458,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error running hunting query: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_directory_audits(self, params: dict | None = None) -> dict[str, Any]:
         """List directory audit logs."""
@@ -550,8 +479,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory audits: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_directory_audit(
         self, audit_id: str, params: dict | None = None
@@ -577,8 +506,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting directory audit: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_conditional_access_policies(
         self, params: dict | None = None
@@ -600,8 +529,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing conditional access policies: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_conditional_access_policy(
         self, policy_id: str, params: dict | None = None
@@ -623,8 +552,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting conditional access policy: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_conditional_access_policy(
         self, data: dict[str, Any], params: dict | None = None
@@ -637,11 +566,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         )
 
         try:
-            policy = ConditionalAccessPolicy()
-            if "displayName" in data:
-                policy.display_name = data["displayName"]
-            if "state" in data:
-                policy.state = data["state"]
+            policy = graph_model_from_dict(data, ConditionalAccessPolicy)
             request_config = self.client.identity.conditional_access.policies.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
@@ -654,8 +579,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating conditional access policy: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_conditional_access_policy(
         self, policy_id: str, data: dict[str, Any], params: dict | None = None
@@ -668,11 +593,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         )
 
         try:
-            policy = ConditionalAccessPolicy()
-            if "displayName" in data:
-                policy.display_name = data["displayName"]
-            if "state" in data:
-                policy.state = data["state"]
+            policy = graph_model_from_dict(data, ConditionalAccessPolicy)
             request_config = self.client.identity.conditional_access.policies.by_conditional_access_policy_id(
                 policy_id
             ).to_patch_request_configuration()
@@ -685,8 +606,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating conditional access policy: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_conditional_access_policy(
         self, policy_id: str, params: dict | None = None
@@ -708,8 +629,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting conditional access policy: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_access_reviews(self, params: dict | None = None) -> dict[str, Any]:
         """List access review definitions."""
@@ -729,8 +650,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing access reviews: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_access_review(
         self, review_id: str, params: dict | None = None
@@ -752,8 +673,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting access review: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_entitlement_access_packages(
         self, params: dict | None = None
@@ -773,8 +694,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing access packages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_lifecycle_workflows(
         self, params: dict | None = None
@@ -796,8 +717,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing lifecycle workflows: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_directory_roles(self, params: dict | None = None) -> dict[str, Any]:
         """List directory roles."""
@@ -815,8 +736,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory roles: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_directory_role(
         self, role_id: str, params: dict | None = None
@@ -838,8 +759,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting directory role: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_directory_role_templates(
         self, params: dict | None = None
@@ -861,8 +782,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing directory role templates: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_authorization_policy(
         self, params: dict | None = None
@@ -884,8 +805,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting authorization policy: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_admin_consent_policy(
         self, params: dict | None = None
@@ -907,8 +828,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting admin consent policy: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_role_definitions(self, params: dict | None = None) -> dict[str, Any]:
         """List role definitions."""
@@ -928,8 +849,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing role definitions: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_role_definition(
         self, role_id: str, params: dict | None = None
@@ -951,8 +872,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting role definition: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_role_assignments(self, params: dict | None = None) -> dict[str, Any]:
         """List role assignments."""
@@ -972,8 +893,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing role assignments: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_role_assignment(
         self, assignment_id: str, params: dict | None = None
@@ -995,8 +916,8 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting role assignment: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_role_assignment(
         self, data: dict[str, Any], params: dict | None = None
@@ -1009,10 +930,9 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
         )
 
         try:
-            assignment = UnifiedRoleAssignment()
-            assignment.role_definition_id = data.get("roleDefinitionId")
-            assignment.principal_id = data.get("principalId")
-            assignment.directory_scope_id = data.get("directoryScopeId", "/")
+            assignment = graph_model_from_dict(
+                {"directoryScopeId": "/", **data}, UnifiedRoleAssignment
+            )
             request_config = self.client.role_management.directory.role_assignments.to_post_request_configuration()
             request_config.options.append(
                 ResponseHandlerOption(NativeResponseHandler())
@@ -1025,5 +945,5 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating role assignment: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}

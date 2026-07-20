@@ -1,0 +1,6 @@
+{
+  "connector": "microsoft-agent",
+  "current_ontology_source": "microsoft",
+  "migrations": [],
+  "schema_version": "1"
+}

@@ -3,6 +3,7 @@ import ast
 import glob
 import os
 import sys
+from pathlib import Path
 
 BASELINES = {
     "adguard-home-agent": 89.2,
@@ -30,31 +31,31 @@ BASELINES = {
 }
 
 
-def parse_api_client(filepath):
-    """
-    Parses api_client.py to find the main API/Client class and its public methods.
-    Returns a set of method names.
-    """
-    with open(filepath, encoding="utf-8") as f:
-        tree = ast.parse(f.read(), filename=filepath)
-
+def parse_api_clients(filepaths):
+    """Return public methods across a composed API client's source modules."""
     methods = {}
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            # Focus on Api or Client classes
+    for filepath in sorted(filepaths):
+        with open(filepath, encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=filepath)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
             class_name = node.name.lower()
-            if "api" in class_name or "client" in class_name or node.name == "Api":
-                for item in node.body:
-                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                        # Filter out private methods and constructor
-                        if (
-                            not item.name.startswith("_")
-                            and item.name != "authenticate"
-                        ):
-                            methods[item.name] = {
-                                "line": item.lineno,
-                                "class": node.name,
-                            }
+            if (
+                "api" not in class_name
+                and "client" not in class_name
+                and node.name != "Api"
+            ):
+                continue
+            for item in node.body:
+                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and (
+                    not item.name.startswith("_") and item.name != "authenticate"
+                ):
+                    methods[item.name] = {
+                        "line": item.lineno,
+                        "class": node.name,
+                        "source": filepath,
+                    }
     return methods
 
 
@@ -135,9 +136,9 @@ def parse_mcp_server(filepath, api_methods):
 
 
 def verify_agent(agent_dir):
-    # Find api_client.py and mcp_server.py
+    # Composed clients keep public domain methods in api_client_*.py mixins.
     api_clients = glob.glob(
-        os.path.join(agent_dir, "**", "api_client.py"), recursive=True
+        os.path.join(agent_dir, "**", "api_client*.py"), recursive=True
     )
     mcp_servers = glob.glob(
         os.path.join(agent_dir, "**", "mcp_server.py"), recursive=True
@@ -146,10 +147,15 @@ def verify_agent(agent_dir):
     if not api_clients or not mcp_servers:
         return None
 
-    api_client_path = api_clients[0]
+    api_clients = sorted(
+        path
+        for path in api_clients
+        if not any(part.startswith(".") for part in Path(path).parts)
+        and "site-packages" not in Path(path).parts
+    )
     mcp_server_path = mcp_servers[0]
 
-    api_methods = parse_api_client(api_client_path)
+    api_methods = parse_api_clients(api_clients)
     if not api_methods:
         return None
 
@@ -163,7 +169,7 @@ def verify_agent(agent_dir):
 
     return {
         "agent_name": os.path.basename(agent_dir),
-        "api_client": api_client_path,
+        "api_clients": api_clients,
         "mcp_server": mcp_server_path,
         "total_methods": total_methods,
         "covered_methods": covered_methods,
@@ -218,7 +224,9 @@ def main():
             sys.exit(0)
 
     # --- Default Mode (Workspace-wide Scan) ---
-    agents_dir = "/home/apps/workspace/agent-packages/agents"
+    agents_dir = os.environ.get(
+        "AGENT_PACKAGES_AGENTS_ROOT", str(Path(__file__).resolve().parents[2])
+    )
     agent_dirs = [
         d for d in glob.glob(os.path.join(agents_dir, "*")) if os.path.isdir(d)
     ]
@@ -242,12 +250,15 @@ def main():
             res = verify_agent(agent_dir)
             if res:
                 results.append(res)
-        except Exception as e:
-            print(f"Error parsing {agent_dir}: {e}", file=sys.stderr)
+        except Exception as exc:
+            print(
+                f"Error parsing {os.path.basename(agent_dir)}: {type(exc).__name__}",
+                file=sys.stderr,
+            )
 
     # Print a beautiful report
     print("# API to MCP Integration Parity Report")
-    print(f"Scan Directory: `{agents_dir}`\n")
+    print("Scan scope: configured agent package root\n")
     print("| Agent Name | API Methods | Covered Methods | Coverage % | Status |")
     print("|---|---|---|---|---|")
 
@@ -261,7 +272,7 @@ def main():
     for r in results:
         if r["coverage"] < 100.0:
             print(f"### ⚠️ {r['agent_name']} ({r['coverage']:.1f}% Integration)")
-            print(f"- **API Client**: `{os.path.relpath(r['api_client'], agents_dir)}`")
+            print(f"- **API Client Modules**: {len(r['api_clients'])}")
             print(f"- **MCP Server**: `{os.path.relpath(r['mcp_server'], agents_dir)}`")
             print("- **Unmapped API Methods**:")
             for m in r["unmapped"]:

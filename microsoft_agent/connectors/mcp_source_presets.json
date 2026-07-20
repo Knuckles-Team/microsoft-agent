@@ -1,0 +1,39 @@
+{
+  "_comment": "Keyed zero-PII source projections. Raw Microsoft values never cross this tool boundary; materialization remains quarantined until tenant, ACL, provenance, signature, and privacy policy pass.",
+  "microsoft-message-structure": {
+    "server": "microsoft-agent",
+    "tool": "list_microsoft_ingestion_projection",
+    "params_style": "args",
+    "params": {
+      "kind": "messages",
+      "params_json": "{\"$top\":100}"
+    },
+    "records_path": "records",
+    "id_field": "id",
+    "doc_type": "microsoft-message-reference"
+  },
+  "microsoft-event-structure": {
+    "server": "microsoft-agent",
+    "tool": "list_microsoft_ingestion_projection",
+    "params_style": "args",
+    "params": {
+      "kind": "events",
+      "params_json": "{\"$top\":100}"
+    },
+    "records_path": "records",
+    "id_field": "id",
+    "doc_type": "microsoft-event-reference"
+  },
+  "microsoft-user-structure": {
+    "server": "microsoft-agent",
+    "tool": "list_microsoft_ingestion_projection",
+    "params_style": "args",
+    "params": {
+      "kind": "users",
+      "params_json": "{\"$top\":100}"
+    },
+    "records_path": "records",
+    "id_field": "id",
+    "doc_type": "microsoft-person-reference"
+  }
+}

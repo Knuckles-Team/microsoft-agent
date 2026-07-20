@@ -1,56 +1,8 @@
-import os
-import sys
 from typing import Any
 
-from microsoft_agent.auth import AuthManager
-
-CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
-AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = [
-    "User.Read",
-    "Mail.ReadWrite",
-    "Calendars.ReadWrite",
-    "Files.ReadWrite",
-    "Tasks.ReadWrite",
-    "Contacts.ReadWrite",
-    "Group.ReadWrite.All",
-    "Directory.Read.All",
-    "Sites.Read.All",
-    "Chat.Read",
-    "ChatMessage.Read.All",
-    "ChannelMessage.Read.All",
-    "ServiceHealth.Read.All",
-    "ServiceMessage.Read.All",
-    "Domain.ReadWrite.All",
-    "Organization.ReadWrite.All",
-    "OnlineMeetings.ReadWrite",
-    "CallRecords.Read.All",
-    "Presence.Read.All",
-    "User.Invite.All",
-    "SecurityEvents.ReadWrite.All",
-    "SecurityIncident.ReadWrite.All",
-    "ThreatHunting.Read.All",
-    "AuditLog.Read.All",
-    "Reports.Read.All",
-    "Application.ReadWrite.All",
-    "Policy.Read.All",
-    "Policy.ReadWrite.ConditionalAccess",
-    "IdentityRiskEvent.Read.All",
-    "IdentityRiskyUser.ReadWrite.All",
-    "Directory.ReadWrite.All",
-    "RoleManagement.ReadWrite.Directory",
-    "EntitlementManagement.Read.All",
-    "AccessReview.Read.All",
-    "LifecycleWorkflows.Read.All",
-]
-
-# Only create global auth_manager if not in test mode
-auth_manager: AuthManager | None
-if not os.environ.get("TESTING"):
-    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
-else:
-    auth_manager = None
-
+from microsoft_agent.api._graph_models import (
+    graph_model_from_dict,
+)
 from microsoft_agent.api.api_client_base import MicrosoftGraphApiBase
 
 
@@ -90,8 +42,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing events: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_calendar_event(
         self,
@@ -129,8 +81,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_calendar_event(
         self, data: dict[str, Any], params: dict | None = None
@@ -138,39 +90,10 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         """Create calendar event."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.date_time_time_zone import DateTimeTimeZone
         from msgraph.generated.models.event import Event
-        from msgraph.generated.models.item_body import ItemBody
 
         try:
-            event = Event()
-            event.subject = data.get("subject")
-
-            body_data = data.get("body", {})
-            if body_data:
-                body = ItemBody()
-                body.content = body_data.get("content")
-                body.content_type = (
-                    BodyType.Html
-                    if body_data.get("contentType") == "HTML"
-                    else BodyType.Text
-                )
-                event.body = body
-
-            start_data = data.get("start", {})
-            if start_data:
-                start = DateTimeTimeZone()
-                start.date_time = start_data.get("dateTime")
-                start.time_zone = start_data.get("timeZone")
-                event.start = start
-
-            end_data = data.get("end", {})
-            if end_data:
-                end = DateTimeTimeZone()
-                end.date_time = end_data.get("dateTime")
-                end.time_zone = end_data.get("timeZone")
-                event.end = end
+            event = graph_model_from_dict(data, Event)
 
             request_config = self.client.me.events.to_post_request_configuration()
             request_config.options.append(
@@ -183,8 +106,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_calendar_event(
         self, event_id: str, data: dict[str, Any], params: dict | None = None
@@ -195,8 +118,7 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         from msgraph.generated.models.event import Event
 
         try:
-            event = Event()
-            event.subject = data.get("subject")
+            event = graph_model_from_dict(data, Event)
 
             request_config = self.client.me.events.by_event_id(
                 event_id
@@ -211,8 +133,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_calendar_event(
         self, event_id: str, params: dict | None = None
@@ -222,8 +144,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             await self.client.me.events.by_event_id(event_id).delete()
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_calendars(self, params: dict | None = None) -> dict[str, Any]:
         """List calendars."""
@@ -253,8 +175,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing calendars: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_calendar_view(
         self, params: dict | None = None, timezone: str | None = None
@@ -289,8 +211,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting calendar view: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_specific_calendar_events(
         self,
@@ -330,8 +252,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing specific calendar events: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_specific_calendar_event(
         self,
@@ -372,8 +294,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting specific calendar event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_specific_calendar_event(
         self, calendar_id: str, data: dict[str, Any], params: dict | None = None
@@ -384,8 +306,7 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         from msgraph.generated.models.event import Event
 
         try:
-            event = Event()
-            event.subject = data.get("subject")
+            event = graph_model_from_dict(data, Event)
 
             request_config = self.client.me.calendars.by_calendar_id(
                 calendar_id
@@ -400,8 +321,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating specific calendar event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_specific_calendar_event(
         self,
@@ -416,8 +337,7 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         from msgraph.generated.models.event import Event
 
         try:
-            event = Event()
-            event.subject = data.get("subject")
+            event = graph_model_from_dict(data, Event)
 
             request_config = (
                 self.client.me.calendars.by_calendar_id(calendar_id)
@@ -436,8 +356,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating specific calendar event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_specific_calendar_event(
         self, calendar_id: str, event_id: str, params: dict | None = None
@@ -451,8 +371,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             )
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting specific calendar event: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def find_meeting_times(
         self, data: dict[str, Any], params: dict | None = None
@@ -468,12 +388,10 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         )
 
         try:
-            request_body = FindMeetingTimesPostRequestBody()
+            request_body = graph_model_from_dict(data, FindMeetingTimesPostRequestBody)
 
-            request_config = (
-                FindMeetingTimesRequestBuilder.FindMeetingTimesPostRequestConfiguration(
-                    options=[ResponseHandlerOption(NativeResponseHandler())]
-                )
+            request_config = FindMeetingTimesRequestBuilder.FindMeetingTimesRequestBuilderPostRequestConfiguration(
+                options=[ResponseHandlerOption(NativeResponseHandler())]
             )
             native_response = await self.client.me.find_meeting_times.post(
                 request_body, request_configuration=request_config
@@ -481,8 +399,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error finding meeting times: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_outlook_contacts(self, params: dict | None = None) -> dict[str, Any]:
         """List Outlook contacts."""
@@ -501,8 +419,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing outlook contacts: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_outlook_contact(
         self, contact_id: str, params: dict | None = None
@@ -525,8 +443,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting outlook contact: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_outlook_contact(
         self, data: dict[str, Any], params: dict | None = None
@@ -535,19 +453,9 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.contact import Contact
-        from msgraph.generated.models.email_address import EmailAddress
 
         try:
-            contact = Contact()
-            contact.given_name = data.get("givenName")
-            contact.surname = data.get("surname")
-
-            emails = []
-            for email_str in data.get("emailAddresses", []):
-                email = EmailAddress()
-                email.address = email_str
-                emails.append(email)
-            contact.email_addresses = emails
+            contact = graph_model_from_dict(data, Contact)
 
             request_config = self.client.me.contacts.to_post_request_configuration()
             request_config.options.append(
@@ -560,8 +468,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating outlook contact: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_outlook_contact(
         self, contact_id: str, data: dict[str, Any], params: dict | None = None
@@ -572,9 +480,7 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
         from msgraph.generated.models.contact import Contact
 
         try:
-            contact = Contact()
-            contact.given_name = data.get("givenName")
-            contact.surname = data.get("surname")
+            contact = graph_model_from_dict(data, Contact)
 
             request_config = self.client.me.contacts.by_contact_id(
                 contact_id
@@ -589,8 +495,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating outlook contact: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_outlook_contact(
         self, contact_id: str, params: dict | None = None
@@ -600,29 +506,51 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             await self.client.me.contacts.by_contact_id(contact_id).delete()
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting outlook contact: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_online_meetings(self, params: dict | None = None) -> dict[str, Any]:
         """List online meetings for the current user."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
+        from msgraph.generated.users.item.online_meetings.online_meetings_request_builder import (
+            OnlineMeetingsRequestBuilder,
+        )
+
+        query_params = OnlineMeetingsRequestBuilder.OnlineMeetingsRequestBuilderGetQueryParameters()
+        if params:
+            if "$filter" in params:
+                query_params.filter = params["$filter"]
+            if "$select" in params:
+                query_params.select = params["$select"].split(",")
+            if "$expand" in params:
+                query_params.expand = params["$expand"].split(",")
+            if "$orderby" in params:
+                query_params.orderby = params["$orderby"].split(",")
+            if "$search" in params:
+                query_params.search = params["$search"]
+            if "$skip" in params:
+                query_params.skip = int(params["$skip"])
+            if "$top" in params:
+                query_params.top = int(params["$top"])
+            if "$count" in params:
+                query_params.count = str(params["$count"]).casefold() == "true"
 
         try:
-            request_config = (
-                self.client.me.online_meetings.to_get_request_configuration()
+            request_config = OnlineMeetingsRequestBuilder.OnlineMeetingsRequestBuilderGetRequestConfiguration(
+                query_parameters=query_params,
+                options=[ResponseHandlerOption(NativeResponseHandler())],
             )
-            request_config.options.append(
-                ResponseHandlerOption(NativeResponseHandler())
-            )
+            if params and "Accept-Language" in params:
+                request_config.headers.add("Accept-Language", params["Accept-Language"])
             native_response = await self.client.me.online_meetings.get(
                 request_configuration=request_config
             )
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing online meetings: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_online_meeting(
         self, meeting_id: str, params: dict | None = None
@@ -644,31 +572,19 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting online meeting: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_online_meeting(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
         """Create a new online meeting."""
-        import datetime
-
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.online_meeting import OnlineMeeting
 
         try:
-            meeting = OnlineMeeting()
-            if "subject" in data:
-                meeting.subject = data["subject"]
-            if "startDateTime" in data:
-                meeting.start_date_time = datetime.datetime.fromisoformat(
-                    data["startDateTime"]
-                )
-            if "endDateTime" in data:
-                meeting.end_date_time = datetime.datetime.fromisoformat(
-                    data["endDateTime"]
-                )
+            meeting = graph_model_from_dict(data, OnlineMeeting)
             request_config = (
                 self.client.me.online_meetings.to_post_request_configuration()
             )
@@ -681,31 +597,19 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating online meeting: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_online_meeting(
         self, meeting_id: str, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
         """Update an online meeting."""
-        import datetime
-
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
         from msgraph.generated.models.online_meeting import OnlineMeeting
 
         try:
-            meeting = OnlineMeeting()
-            if "subject" in data:
-                meeting.subject = data["subject"]
-            if "startDateTime" in data:
-                meeting.start_date_time = datetime.datetime.fromisoformat(
-                    data["startDateTime"]
-                )
-            if "endDateTime" in data:
-                meeting.end_date_time = datetime.datetime.fromisoformat(
-                    data["endDateTime"]
-                )
+            meeting = graph_model_from_dict(data, OnlineMeeting)
             request_config = self.client.me.online_meetings.by_online_meeting_id(
                 meeting_id
             ).to_patch_request_configuration()
@@ -718,8 +622,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error updating online meeting: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_online_meeting(
         self, meeting_id: str, params: dict | None = None
@@ -741,8 +645,8 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"status": "deleted"}
         except Exception as e:
-            print(f"Error deleting online meeting: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_virtual_events(self, params: dict | None = None) -> dict[str, Any]:
         """List virtual event townhalls."""
@@ -760,5 +664,5 @@ class MicrosoftGraphApiCalendar(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing virtual events: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}

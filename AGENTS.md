@@ -1,205 +1,74 @@
-# AGENTS.md
+# Microsoft Agent contributor contract
 
-> Claude Code loads this file via `CLAUDE.md` (`@AGENTS.md` import) — the two stay
-> in sync. Edit **this** file, not `CLAUDE.md`.
+## Architecture
 
-## Tech Stack & Architecture
-- Language/Version: Python 3.10+
-- Core Libraries: `agent-utilities`, `fastmcp`, `pydantic-ai`
-- Key principles: Functional patterns, Pydantic for data validation, asynchronous tool execution.
-- Architecture:
-    - `mcp_server.py`: Main MCP server entry point and tool registration.
-    - `agent_server.py`: Pydantic AI agent definition and logic.
-    - `skills/`: Directory containing modular agent skills (if applicable).
-    - `agent/`: Internal agent logic and prompt templates.
+- `microsoft_agent/mcp_server.py` exposes the current condensed Microsoft Graph
+  action tools through the Agent Utilities MCP server factory.
+- `microsoft_agent/api_client.py` composes the domain clients in
+  `microsoft_agent/api/`; it is the only Graph API client authority.
+- `microsoft_agent/auth.py` and `microsoft_agent/settings.py` implement validated
+  delegated, application, on-behalf-of, external-token, managed-identity, and
+  workload-identity configuration.
+- `microsoft_agent/integration_tools.py` supplies optional Office document,
+  Power Platform, Intune, and Windows companion tools.
+- `microsoft_agent/tool_policy.py` is the fail-closed read/write/destructive
+  authorization boundary.
+- `connector_manifest.yml`, `microsoft_agent/connectors/`, and
+  `microsoft_agent/ontology/` form the provider-owned ingestion and ontology
+  capability bundle.
+- `microsoft_agent/skills/microsoft-agent-operations/` is the single consolidated
+  provider skill.
 
-### Architecture Diagram
-```mermaid
-graph TD
-    User([User/A2A]) --> Server[A2A Server / FastAPI]
-    Server --> Agent[Pydantic AI Agent]
-    Agent --> Skills[Modular Skills]
-    Agent --> MCP[MCP Server / FastMCP]
-    MCP --> Client[API Client / Wrapper]
-    Client --> ExternalAPI([External Service API])
-```
+## Current-only policy
 
-### Workflow Diagram
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant S as Server
-    participant A as Agent
-    participant T as MCP Tool
-    participant API as External API
+- Do not add compatibility aliases, retired environment variables, duplicate API
+  wrappers, duplicate skill families, or fallback execution planes.
+- Do not package databases, token caches, MCP client configurations, generated
+  runtime state, credentials, endpoints, hostnames, or environment-specific
+  profiles.
+- Configuration values belong in deployment-owned environment/configuration or
+  referenced secret stores. Repository examples must remain generic and value-free.
+- TLS verification is mandatory and configured by the deployment trust profile.
+  Never hardcode verification bypasses.
+- Use the Agent Utilities server/session/configuration boundaries; do not create a
+  second MCP, authentication, graph, or agent runtime.
 
-    U->>S: Request
-    S->>A: Process Query
-    A->>T: Invoke Tool
-    T->>API: API Request
-    API-->>T: API Response
-    T-->>A: Tool Result
-    A-->>S: Final Response
-    S-->>U: Output
-```
+## Security invariants
 
-## Commands (run these exactly)
-# Installation
-pip install .[all]
+- Microsoft identity coordinates are mandatory at authentication time; there is no
+  baked-in client identifier.
+- Tokens are stored only through secure OS-backed storage. A keyring failure leaves
+  tokens in memory and must not enable plaintext persistence.
+- Condensed action tools authorize the routed action, not merely the envelope tool
+  name. Unknown actions are treated as writes and fail closed.
+- Writes require `MICROSOFT_ALLOW_WRITES`; destructive actions additionally require
+  `MICROSOFT_ALLOW_DESTRUCTIVE`.
+- Connector materialization remains quarantined until tenant, ACL, provenance,
+  schema, and privacy policy are verified.
+- Tests must mock all provider and network interactions.
 
-# Quality & Linting (run from project root)
-pre-commit run --all-files
-
-# Execution Commands
-# microsoft-mcp\nmicrosoft_agent.mcp:mcp_server\n# microsoft-agent\nmicrosoft_agent.agent:agent_server
-
-## Project Structure Quick Reference
-- MCP Entry Point → `mcp_server.py`
-- Agent Entry Point → `agent_server.py`
-- Source Code → `microsoft_agent/`
-- Skills → `skills/` (if exists)
-
-### File Tree
-```text
-├── .bumpversion.cfg\n├── .dockerignore\n├── .env\n├── .gitattributes\n├── .github\n│   └── workflows\n│       └── pipeline.yml\n├── .gitignore\n├── .pre-commit-config.yaml\n├── AGENTS.md\n├── Dockerfile\n├── LICENSE\n├── MANIFEST.in\n├── README.md\n├── compose.yml\n├── debug.Dockerfile\n├── mcp.compose.yml\n├── microsoft_agent\n│   ├── __init__.py\n│   ├── agent\n│   │   ├── AGENTS.md\n│   │   ├── CRON.md\n│   │   ├── HEARTBEAT.md\n│   │   ├── IDENTITY.md\n│   │   ├── MEMORY.md\n│   │   ├── USER.md\n│   │   └── templates.py\n│   ├── agent_server.py\n│   ├── auth.py\n│   ├── credential_adapter.py\n│   ├── mcp_server.py\n│   └── api_wrapper.py\n├── pyproject.toml\n├── requirements.txt\n└── scripts\n    ├── generate_code.py\n    ├── generate_mcp_server.py\n    ├── microsoft.py\n    └── validate_a2a_agent.py
-```
-
-## Code Style & Conventions
-**Always:**
-- Use `agent-utilities` for common patterns (e.g., `create_mcp_server`, `create_agent`).
-- Define input/output models using Pydantic.
-- Include descriptive docstrings for all tools (they are used as tool descriptions for LLMs).
-- Check for optional dependencies using `try/except ImportError`.
-
-**Good example:**
-```python
-from agent_utilities import create_mcp_server
-from mcp.server.fastmcp import FastMCP
-
-mcp = create_mcp_server("my-agent")
-
-@mcp.tool()
-async def my_tool(param: str) -> str:
-    """Description for LLM."""
-    return f"Result: {param}"
-```
-
-## Dos and Don'ts
-**Do:**
-- Run `pre-commit` before pushing changes.
-- Use existing patterns from `agent-utilities`.
-- Keep tools focused and idempotent where possible.
-
-**Don't:**
-- Use `cd` commands in scripts; use absolute paths or relative to project root.
-- Add new dependencies to `dependencies` in `pyproject.toml` without checking `optional-dependencies` first.
-- Hardcode secrets; use environment variables or `.env` files.
-
-## Safety & Boundaries
-**Always do:**
-- Run lint/test via `pre-commit`.
-- Use `agent-utilities` base classes.
-
-**Ask first:**
-- Major refactors of `mcp_server.py` or `agent.py`.
-- Deleting or renaming public tool functions.
-
-**Never do:**
-- Commit `.env` files or secrets.
-- Modify `agent-utilities` or `universal-skills` files from within this package.
-
-## When Stuck
-- Propose a plan first before making large changes.
-- Check `agent-utilities` documentation for existing helpers.
-
-
-## Graph Architecture
-
-This agent uses `pydantic-graph` orchestration for intelligent routing and optimal context management.
-
-```mermaid
----
-title: Microsoft Agent Graph Agent
----
-stateDiagram-v2
-  [*] --> RouterNode: User Query
-  RouterNode --> DomainNode: Classified Domain
-  RouterNode --> [*]: Low confidence / Error
-  DomainNode --> [*]: Domain Result
-```
-
-- **RouterNode**: A fast, lightweight LLM (e.g., `nvidia/nemotron-3-super`) that classifies the user's query into one of the specialized domains.
-- **DomainNode**: The executor node. For the selected domain, it dynamically sets environment variables to temporarily enable ONLY the tools relevant to that domain, creating a highly focused sub-agent (e.g., `gpt-4o`) to complete the request. This preserves LLM context and prevents tool hallucination.
-
-
-## Testing with Timeout
-
-To run tests with a timeout to prevent hanging, use the `pytest-timeout` plugin. You can combine it with the `-k` flag to run specific tests:
+## Development commands
 
 ```bash
-uv run pytest --timeout=60 -k "test_name_pattern"
+uv sync --all-extras --dev
+uv run pytest
+uv run ruff check .
+uv run python scripts/security_sanitizer.py
+uv run python scripts/security_contract.py --contract .security/security-contract.json validate
+uv run python scripts/verify_api_integration.py --local
+uv run mkdocs build --strict
 ```
 
-## ⛔ No Scratch or Temporary Files in Repository
+Run commands from the repository root. Do not run native builds or services in
+parallel with other resource-intensive workspace validation.
 
-**NEVER write any of the following to this repository:**
-- Temporary test scripts (`test_*.py`, `debug_*.py` outside of `tests/`)
-- Scratch scripts or experimental one-off files
-- Log files (`.log`, `.txt` command output)
-- Random text files with command output or debug dumps
-- Any file that is NOT production source code, tests in `tests/`, or documentation
+## Change discipline
 
-**Why:** These files expose private filesystem paths, credentials, and internal infrastructure details when pushed to GitHub publicly.
-
-**Where to put scratch work instead:**
-- Use `~/workspace/scratch/` for temporary scripts and experiments
-- Use `~/workspace/reports/` for command output and reports
-- Keep test scripts in the `tests/` directory following proper pytest conventions
-
-## ⛔ Keep the Repository Root Pristine — No Scratch / Temp / Debug Files
-
-**The repository ROOT must contain only canonical project files** (packaging,
-config, docs, lockfiles). The only hidden directories allowed at root are
-`.git/`, `.github/`, and `.specify/` (plus a local, git-ignored `.venv/`).
-
-**NEVER write any of the following — anywhere in the repo, and ESPECIALLY at the root:**
-- One-off / debug / migration scripts: `fix_*.py`, `migrate_*.py`, `refactor_*.py`,
-  `replace_*.py`, `update_*.py`, `debug_*.py`, or `test_*.py` **at the root**
-  (real tests live in `tests/` only).
-- Databases / data dumps: `*.db`, `*.db-wal`, `*.sqlite*`, `*.corrupted`.
-- Logs / command output: `*.log`, scratch `*.txt`, `*.orig`, `*.rej`, `*.bak`.
-- Build artifacts: `*.tsbuildinfo`, compiled binaries, coverage files.
-- AI agent scratch directories: `.agent/`, `.agents/`, `.agent_data/`, `.tmp/`,
-  `.hypothesis/`, or any per-tool cache committed to git.
-- Any file that is NOT production source, a test in `tests/`, documentation, or
-  a recognized config/lockfile.
-
-**Why:** scratch at the root leaks private paths/credentials, bloats the tree,
-and erodes a pristine codebase.
-
-**Where scratch goes instead:** `~/workspace/scratch/` (experiments),
-`~/workspace/reports/` (command output); tests go in `tests/` (pytest).
-Before finishing a task, run `git status` and confirm no stray root files were added.
-
-## Working with Git Worktrees (multi-session)
-
-Multiple agents/sessions work the `agent-packages/*` repos concurrently. **Do not
-edit the canonical checkout** (`/home/apps/workspace/agent-packages/<repo>`) — a
-background `repository-manager` sync can reset its working tree and discard
-uncommitted edits. Take your own git worktree on your own branch instead:
-
-```bash
-# preferred — repository-manager MCP:
-rm_worktree add <repo> <your-branch>      # -> /home/apps/worktrees/<repo>/<your-branch>
-
-# raw-git fallback:
-git -C agent-packages/<repo> checkout main
-git -C agent-packages/<repo> worktree add /home/apps/worktrees/<repo>/<branch> -b <branch>
-```
-
-Work in the worktree, **commit often** (commits survive a working-tree reset),
-then merge to main locally (`rm_worktree merge <repo> <branch>`, or `git merge
---no-ff`). Each session must use a **distinct branch** — git allows a branch in
-only one worktree, which is what keeps concurrent sessions from colliding.
-Worktrees live under `/home/apps/worktrees/` (outside the workspace scan, so the
-sync leaves them alone). Push only when asked.
+- Preserve unrelated user changes and repository history.
+- Use a dedicated branch or worktree per concurrent session; configure workspace and
+  worktree roots outside the repository.
+- Do not reset, stash, rebase, force-push, or discard another session's work.
+- Keep versions, dependency constraints, lockfiles, manifests, generated provider
+  attestations, documentation, and tests synchronized.
+- A change is complete only when its focused tests, static checks, security/privacy
+  gates, documentation contract, and generated artifacts agree.

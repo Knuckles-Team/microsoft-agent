@@ -138,6 +138,11 @@ celerybeat.pid
 
 # Environments
 .env
+.microsoft-agent/
+*.local.integrations.json
+*.local.companion.json
+*.local.control-plane.json
+deployment/control-plane/state/
 .envrc
 .venv
 env/
@@ -207,19 +212,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+**/agent_data/chats/
 
-# Graph Database
+# Runtime graph state and generated local artifacts
 knowledge_graph.db*
 .repo_graph/
 .ladybug/
-# Model-generated transient scripts at root level
 /test_*.py
 /fix_*.py
 /debug_*.py
 /scratch_*.py
 /temp_*.py
-
-# Transient logs, traces, patch files, and test outputs
 *.orig
 *.rej
 *.patch
