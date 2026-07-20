@@ -92,45 +92,47 @@ class MethodCallVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def parse_mcp_server(filepath, api_methods):
+def parse_mcp_server(filepaths, api_methods):
     """
-    Parses mcp_server.py to extract registered tools and identify which
-    api_methods they leverage.
+    Parses mcp_server.py (and, where the fleet's api/ + mcp/ domain-split
+    convention is in use, its sibling mcp/*.py registrar modules) to extract
+    registered tools and identify which api_methods they leverage.
     """
-    with open(filepath, encoding="utf-8") as f:
-        tree = ast.parse(f.read(), filename=filepath)
-
     tool_mappings = {}
     all_mapped_methods = set()
 
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            # Check if this function is a tool (e.g. decorated with mcp.tool)
-            is_tool = False
-            for dec in node.decorator_list:
-                if isinstance(dec, ast.Call):
-                    func = dec.func
-                    if isinstance(func, ast.Attribute) and func.attr == "tool":
-                        is_tool = True
-                elif isinstance(dec, ast.Attribute) and dec.attr == "tool":
-                    is_tool = True
+    for filepath in filepaths:
+        with open(filepath, encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=filepath)
 
-            if (
-                is_tool
-                or node.name.startswith("github_")
-                or node.name.startswith("gitlab_")
-                or node.name.startswith("adguard_")
-                or node.name.startswith("atlassian_")
-            ):
-                visitor = MethodCallVisitor()
-                visitor.visit(node)
-                # Find which of the visited methods are in our api_methods list
-                mapped = visitor.called_methods.intersection(api_methods.keys())
-                tool_mappings[node.name] = {
-                    "methods": list(mapped),
-                    "actions": list(visitor.action_literals),
-                }
-                all_mapped_methods.update(mapped)
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Check if this function is a tool (e.g. decorated with mcp.tool)
+                is_tool = False
+                for dec in node.decorator_list:
+                    if isinstance(dec, ast.Call):
+                        func = dec.func
+                        if isinstance(func, ast.Attribute) and func.attr == "tool":
+                            is_tool = True
+                    elif isinstance(dec, ast.Attribute) and dec.attr == "tool":
+                        is_tool = True
+
+                if (
+                    is_tool
+                    or node.name.startswith("github_")
+                    or node.name.startswith("gitlab_")
+                    or node.name.startswith("adguard_")
+                    or node.name.startswith("atlassian_")
+                ):
+                    visitor = MethodCallVisitor()
+                    visitor.visit(node)
+                    # Find which of the visited methods are in our api_methods list
+                    mapped = visitor.called_methods.intersection(api_methods.keys())
+                    tool_mappings[node.name] = {
+                        "methods": list(mapped),
+                        "actions": list(visitor.action_literals),
+                    }
+                    all_mapped_methods.update(mapped)
 
     return tool_mappings, all_mapped_methods
 
@@ -155,11 +157,20 @@ def verify_agent(agent_dir):
     )
     mcp_server_path = mcp_servers[0]
 
+    # Fleet api/ + mcp/ convention: a monolith's tool registrars may live in a
+    # sibling mcp/ domain-split package (mcp_<domain>.py) that mcp_server.py
+    # imports rather than defining inline. Scan those too when present, so
+    # coverage reflects the live tool surface regardless of which file the
+    # registrar body physically lives in.
+    mcp_package_dir = os.path.join(os.path.dirname(mcp_server_path), "mcp")
+    mcp_module_paths = sorted(glob.glob(os.path.join(mcp_package_dir, "*.py")))
+    mcp_source_paths = [mcp_server_path, *mcp_module_paths]
+
     api_methods = parse_api_clients(api_clients)
     if not api_methods:
         return None
 
-    tool_mappings, mapped_methods = parse_mcp_server(mcp_server_path, api_methods)
+    tool_mappings, mapped_methods = parse_mcp_server(mcp_source_paths, api_methods)
 
     total_methods = len(api_methods)
     covered_methods = len(mapped_methods)

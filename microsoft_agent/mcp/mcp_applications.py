@@ -3,11 +3,28 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
+from agent_utilities.mcp.action_dispatch import resolve_action
+from agent_utilities.mcp.concurrency import invoke_client_method
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
 
-from microsoft_agent.auth import get_client
+from microsoft_agent.auth import get_client_dependency
+
+_APPLICATIONS_ACTIONS = (
+    "list_applications",
+    "get_application",
+    "create_application",
+    "update_application",
+    "delete_application",
+    "add_application_password",
+    "remove_application_password",
+    "list_service_principals",
+    "get_service_principal",
+    "create_service_principal",
+    "update_service_principal",
+    "delete_service_principal",
+)
 
 
 def register_applications_tools(mcp: FastMCP):
@@ -19,7 +36,7 @@ def register_applications_tools(mcp: FastMCP):
         params_json: str = Field(
             default="{}", description="JSON string of parameters to pass to the action."
         ),
-        client=Depends(get_client),
+        client=Depends(get_client_dependency),
         ctx: Context | None = Field(
             default=None, description="MCP context for progress reporting"
         ),
@@ -31,33 +48,42 @@ def register_applications_tools(mcp: FastMCP):
 
         try:
             kwargs = json.loads(params_json)
-        except Exception as e:
-            return {"error": f"Invalid params_json: {e}"}
+        except Exception:
+            return {"error": "Invalid params_json"}
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
+        resolved = resolve_action(
+            action, _APPLICATIONS_ACTIONS, service="microsoft-agent"
+        )
+        if isinstance(resolved, dict):
+            return resolved
+        action = resolved
+
         if action == "list_applications":
-            return client.list_applications(**kwargs)
+            return await invoke_client_method(client.list_applications, **kwargs)
         if action == "get_application":
-            return client.get_application(**kwargs)
+            return await invoke_client_method(client.get_application, **kwargs)
         if action == "create_application":
-            return client.create_application(**kwargs)
+            return await invoke_client_method(client.create_application, **kwargs)
         if action == "update_application":
-            return client.update_application(**kwargs)
+            return await invoke_client_method(client.update_application, **kwargs)
         if action == "delete_application":
-            return client.delete_application(**kwargs)
+            return await invoke_client_method(client.delete_application, **kwargs)
         if action == "add_application_password":
-            return client.add_application_password(**kwargs)
+            return await invoke_client_method(client.add_application_password, **kwargs)
         if action == "remove_application_password":
-            return client.remove_application_password(**kwargs)
+            return await invoke_client_method(
+                client.remove_application_password, **kwargs
+            )
         if action == "list_service_principals":
-            return client.list_service_principals(**kwargs)
+            return await invoke_client_method(client.list_service_principals, **kwargs)
         if action == "get_service_principal":
-            return client.get_service_principal(**kwargs)
+            return await invoke_client_method(client.get_service_principal, **kwargs)
         if action == "create_service_principal":
-            return client.create_service_principal(**kwargs)
+            return await invoke_client_method(client.create_service_principal, **kwargs)
         if action == "update_service_principal":
-            return client.update_service_principal(**kwargs)
+            return await invoke_client_method(client.update_service_principal, **kwargs)
         if action == "delete_service_principal":
-            return client.delete_service_principal(**kwargs)
+            return await invoke_client_method(client.delete_service_principal, **kwargs)
         raise ValueError(f"Unknown action: {action}")
