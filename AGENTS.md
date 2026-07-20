@@ -11,6 +11,16 @@
   workload-identity configuration.
 - `microsoft_agent/integration_tools.py` supplies optional Office document,
   Power Platform, Intune, and Windows companion tools.
+- `microsoft_agent/office_bridge.py` implements the Office.js live-document
+  bridge: typed MCP tools plus the exact-origin `/office-bridge/*` HTTP routes
+  that `office_addin/` (a thin TypeScript task-pane client, not a second
+  server) calls through `backend-client.ts`/`office-bridge.ts`.
+- `microsoft_agent/windows_companion.py`/`windows_companion_service.py` and
+  `microsoft_agent/windows_control_plane.py`/`windows_control_plane_service.py`
+  (built on `microsoft_agent/windows_runtime.py`) are the outbound Windows
+  companion and its control-plane relay; `deployment/windows/` and
+  `deployment/control-plane/` are only their PowerShell/systemd/nginx deploy
+  wrappers around the packaged console scripts, never application logic.
 - `microsoft_agent/tool_policy.py` is the fail-closed read/write/destructive
   authorization boundary.
 - `connector_manifest.yml`, `microsoft_agent/connectors/`, and
