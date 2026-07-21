@@ -23,17 +23,14 @@ class AuthManagerCredential(TokenCredential):
     def get_token(
         self,
         *scopes: str,
-        claims: str | None = None,
-        tenant_id: str | None = None,
-        **kwargs: Any,
+        _claims: str | None = None,
+        _tenant_id: str | None = None,
+        **_kwargs: Any,
     ) -> AccessToken:
-
+        requested_scopes = tuple(scope for scope in scopes if scope)
         token_details = self.auth_manager.get_token_details(
-            claims=claims, tenant_id=tenant_id, **kwargs
+            scopes=requested_scopes or None
         )
-
-        if not token_details:
-            pass
 
         if token_details and "access_token" in token_details:
             expires_on = token_details.get("expires_on")
@@ -43,6 +40,6 @@ class AuthManagerCredential(TokenCredential):
 
             return AccessToken(token_details["access_token"], int(expires_on))
 
-        raise Exception(
+        raise RuntimeError(
             "Failed to acquire token. Please use the 'login' tool to authenticate."
         )

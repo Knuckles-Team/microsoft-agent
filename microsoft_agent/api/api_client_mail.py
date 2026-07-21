@@ -1,56 +1,9 @@
-import os
-import sys
 from typing import Any
 
-from microsoft_agent.auth import AuthManager
-
-CLIENT_ID = os.environ.get("OIDC_CLIENT_ID", "14d82eec-204b-4c2f-b7e8-296a70dab67e")
-AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = [
-    "User.Read",
-    "Mail.ReadWrite",
-    "Calendars.ReadWrite",
-    "Files.ReadWrite",
-    "Tasks.ReadWrite",
-    "Contacts.ReadWrite",
-    "Group.ReadWrite.All",
-    "Directory.Read.All",
-    "Sites.Read.All",
-    "Chat.Read",
-    "ChatMessage.Read.All",
-    "ChannelMessage.Read.All",
-    "ServiceHealth.Read.All",
-    "ServiceMessage.Read.All",
-    "Domain.ReadWrite.All",
-    "Organization.ReadWrite.All",
-    "OnlineMeetings.ReadWrite",
-    "CallRecords.Read.All",
-    "Presence.Read.All",
-    "User.Invite.All",
-    "SecurityEvents.ReadWrite.All",
-    "SecurityIncident.ReadWrite.All",
-    "ThreatHunting.Read.All",
-    "AuditLog.Read.All",
-    "Reports.Read.All",
-    "Application.ReadWrite.All",
-    "Policy.Read.All",
-    "Policy.ReadWrite.ConditionalAccess",
-    "IdentityRiskEvent.Read.All",
-    "IdentityRiskyUser.ReadWrite.All",
-    "Directory.ReadWrite.All",
-    "RoleManagement.ReadWrite.Directory",
-    "EntitlementManagement.Read.All",
-    "AccessReview.Read.All",
-    "LifecycleWorkflows.Read.All",
-]
-
-# Only create global auth_manager if not in test mode
-auth_manager: AuthManager | None
-if not os.environ.get("TESTING"):
-    auth_manager = AuthManager(CLIENT_ID, AUTHORITY, SCOPES)
-else:
-    auth_manager = None
-
+from microsoft_agent.api._graph_models import (
+    chat_message_from_dict,
+    graph_model_from_dict,
+)
 from microsoft_agent.api.api_client_base import MicrosoftGraphApiBase
 
 
@@ -92,8 +45,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_mail_folders(self, params: dict | None = None) -> dict[str, Any]:
         """List mail folders."""
@@ -127,8 +80,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing mail folders: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_mail_folder_messages(
         self, mailFolder_id: str, params: dict | None = None
@@ -164,8 +117,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing folder messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_mail_message(
         self, message_id: str, params: dict | None = None
@@ -197,58 +150,30 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def send_mail(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
         """Send mail."""
-        from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.email_address import EmailAddress
-        from msgraph.generated.models.item_body import ItemBody
         from msgraph.generated.models.message import Message
-        from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.users.item.send_mail.send_mail_post_request_body import (
             SendMailPostRequestBody,
         )
 
         try:
             request_body = SendMailPostRequestBody()
-            message = Message()
-
-            msg_data = data.get("message", {})
-            message.subject = msg_data.get("subject")
-
-            body_data = msg_data.get("body", {})
-            body = ItemBody()
-            body.content = body_data.get("content")
-            body.content_type = (
-                BodyType.Html
-                if body_data.get("contentType") == "HTML"
-                else BodyType.Text
+            request_body.message = graph_model_from_dict(
+                data.get("message", {}), Message
             )
-            message.body = body
-
-            to_recipients = []
-            for recipient in msg_data.get("toRecipients", []):
-                rec = Recipient()
-                email = EmailAddress()
-                email_data = recipient.get("emailAddress", {})
-                email.address = email_data.get("address")
-                email.name = email_data.get("name")
-                rec.email_address = email
-                to_recipients.append(rec)
-            message.to_recipients = to_recipients
-
-            request_body.message = message
             request_body.save_to_sent_items = data.get("saveToSentItems", True)
 
             await self.client.me.send_mail.post(request_body)
             return {"status": "success"}
         except Exception as e:
-            print(f"Error sending mail: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def create_draft_email(
         self, data: dict[str, Any], params: dict | None = None
@@ -256,37 +181,10 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
         """Create draft email."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.email_address import EmailAddress
-        from msgraph.generated.models.item_body import ItemBody
         from msgraph.generated.models.message import Message
-        from msgraph.generated.models.recipient import Recipient
 
         try:
-            message = Message()
-            message.subject = data.get("subject")
-
-            body_data = data.get("body", {})
-            if body_data:
-                body = ItemBody()
-                body.content = body_data.get("content")
-                body.content_type = (
-                    BodyType.Html
-                    if body_data.get("contentType") == "HTML"
-                    else BodyType.Text
-                )
-                message.body = body
-
-            to_recipients = []
-            for recipient in data.get("toRecipients", []):
-                rec = Recipient()
-                email = EmailAddress()
-                email_data = recipient.get("emailAddress", {})
-                email.address = email_data.get("address")
-                email.name = email_data.get("name")
-                rec.email_address = email
-                to_recipients.append(rec)
-            message.to_recipients = to_recipients
+            message = graph_model_from_dict(data, Message)
 
             request_config = self.client.me.messages.to_post_request_configuration()
             request_config.options.append(
@@ -299,8 +197,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error creating draft: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_mail_message(
         self, message_id: str, params: dict | None = None
@@ -309,8 +207,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
         try:
             await self.client.me.messages.by_message_id(message_id).delete()
             return {"status": "success"}
-        except Exception as e:
-            return {"error": str(e)}
+        except Exception:
+            return {"error": "Operation failed"}
 
     async def move_mail_message(
         self, message_id: str, data: dict[str, Any], params: dict | None = None
@@ -326,8 +224,7 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
         )
 
         try:
-            request_body = MovePostRequestBody()
-            request_body.destination_id = data.get("destinationId")
+            request_body = graph_model_from_dict(data, MovePostRequestBody)
 
             request_config = (
                 MoveRequestBuilder.MoveRequestBuilderPostRequestConfiguration(
@@ -340,8 +237,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error moving message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def update_mail_message(
         self, message_id: str, data: dict[str, Any], params: dict | None = None
@@ -354,9 +251,7 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             MessageItemRequestBuilder,
         )
 
-        message = Message()
-        message.subject = data.get("subject")
-        message.is_read = data.get("isRead")
+        message = graph_model_from_dict(data, Message)
 
         request_config = MessageItemRequestBuilder.MessageItemRequestBuilderPatchRequestConfiguration(
             options=[ResponseHandlerOption(NativeResponseHandler())]
@@ -368,8 +263,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             ).patch(message, request_configuration=request_config)
             native_response.raise_for_status()
             return native_response.json()
-        except Exception as e:
-            return {"error": str(e)}
+        except Exception:
+            return {"error": "Operation failed"}
 
     async def add_mail_attachment(
         self, message_id: str, data: dict[str, Any], params: dict | None = None
@@ -402,8 +297,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error adding attachment: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_mail_attachments(
         self, message_id: str, params: dict | None = None
@@ -433,8 +328,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing attachments: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_mail_attachment(
         self, message_id: str, attachment_id: str, params: dict | None = None
@@ -464,8 +359,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting attachment: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def delete_mail_attachment(
         self, message_id: str, attachment_id: str, params: dict | None = None
@@ -479,8 +374,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             )
             return {"status": "success"}
         except Exception as e:
-            print(f"Error deleting attachment: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_shared_mailbox_messages(
         self, user_id: str, params: dict | None = None
@@ -518,8 +413,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing shared mailbox messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_shared_mailbox_folder_messages(
         self, user_id: str, mailFolder_id: str, params: dict | None = None
@@ -559,8 +454,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing shared mailbox folder messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_shared_mailbox_message(
         self, user_id: str, message_id: str, params: dict | None = None
@@ -592,59 +487,31 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting shared mailbox message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def send_shared_mailbox_mail(
         self, user_id: str, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
         """Send mail from a shared mailbox."""
-        from msgraph.generated.models.body_type import BodyType
-        from msgraph.generated.models.email_address import EmailAddress
-        from msgraph.generated.models.item_body import ItemBody
         from msgraph.generated.models.message import Message
-        from msgraph.generated.models.recipient import Recipient
         from msgraph.generated.users.item.send_mail.send_mail_post_request_body import (
             SendMailPostRequestBody,
         )
 
         try:
             request_body = SendMailPostRequestBody()
-            message = Message()
-
-            msg_data = data.get("message", {})
-            message.subject = msg_data.get("subject")
-
-            body_data = msg_data.get("body", {})
-            body = ItemBody()
-            body.content = body_data.get("content")
-            body.content_type = (
-                BodyType.Html
-                if body_data.get("contentType") == "HTML"
-                else BodyType.Text
+            request_body.message = graph_model_from_dict(
+                data.get("message", {}), Message
             )
-            message.body = body
-
-            to_recipients = []
-            for recipient in msg_data.get("toRecipients", []):
-                rec = Recipient()
-                email = EmailAddress()
-                email_data = recipient.get("emailAddress", {})
-                email.address = email_data.get("address")
-                email.name = email_data.get("name")
-                rec.email_address = email
-                to_recipients.append(rec)
-            message.to_recipients = to_recipients
-
-            request_body.message = message
             request_body.save_to_sent_items = data.get("saveToSentItems", True)
 
             await self.client.users.by_user_id(user_id).send_mail.post(request_body)
 
             return {"status": "success"}
         except Exception as e:
-            print(f"Error sending shared mailbox mail: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_chat_messages(
         self, chat_id: str, params: dict | None = None
@@ -667,8 +534,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing chat messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_chat_message(
         self, chat_id: str, chatMessage_id: str, params: dict | None = None
@@ -695,8 +562,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting chat message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def send_chat_message(
         self, chat_id: str, data: dict[str, Any], params: dict | None = None
@@ -704,15 +571,13 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
         """Send chat message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.chat_message import ChatMessage
-        from msgraph.generated.models.item_body import ItemBody
 
         try:
-            message = ChatMessage()
-            body = ItemBody()
-            body.content = data.get("body", {}).get("content")
-            message.body = body
+            message = chat_message_from_dict(data)
+        except ValueError as exc:
+            return {"error": str(exc)}
 
+        try:
             request_config = self.client.chats.by_chat_id(
                 chat_id
             ).messages.to_post_request_configuration()
@@ -726,8 +591,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error sending chat message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_channel_messages(
         self, team_id: str, channel_id: str, params: dict | None = None
@@ -754,8 +619,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing channel messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_channel_message(
         self,
@@ -788,8 +653,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting channel message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def send_channel_message(
         self,
@@ -801,15 +666,13 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
         """Send channel message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.chat_message import ChatMessage
-        from msgraph.generated.models.item_body import ItemBody
 
         try:
-            message = ChatMessage()
-            body = ItemBody()
-            body.content = data.get("body", {}).get("content")
-            message.body = body
+            message = chat_message_from_dict(data)
+        except ValueError as exc:
+            return {"error": str(exc)}
 
+        try:
             request_config = (
                 self.client.teams.by_team_id(team_id)
                 .channels.by_channel_id(channel_id)
@@ -827,8 +690,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error sending channel message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_chat_message_replies(
         self, chat_id: str, chatMessage_id: str, params: dict | None = None
@@ -855,8 +718,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing chat message replies: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def reply_to_chat_message(
         self,
@@ -868,15 +731,13 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
         """Reply to a chat message."""
         from kiota_abstractions.native_response_handler import NativeResponseHandler
         from kiota_http.middleware.options import ResponseHandlerOption
-        from msgraph.generated.models.chat_message import ChatMessage
-        from msgraph.generated.models.item_body import ItemBody
 
         try:
-            message = ChatMessage()
-            body = ItemBody()
-            body.content = data.get("body", {}).get("content")
-            message.body = body
+            message = chat_message_from_dict(data)
+        except ValueError as exc:
+            return {"error": str(exc)}
 
+        try:
             request_config = (
                 self.client.chats.by_chat_id(chat_id)
                 .messages.by_chat_message_id(chatMessage_id)
@@ -894,8 +755,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error replying to chat message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def list_service_update_messages(
         self, params: dict | None = None
@@ -915,8 +776,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error listing service update messages: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_service_update_message(
         self, message_id: str, params: dict | None = None
@@ -938,8 +799,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return native_response.json()
         except Exception as e:
-            print(f"Error getting service update message: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_email_activity_report(
         self, period: str = "D7", params: dict | None = None
@@ -965,8 +826,8 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting email activity report: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
 
     async def get_mailbox_usage_report(
         self, period: str = "D7", params: dict | None = None
@@ -990,5 +851,71 @@ class MicrosoftGraphApiMail(MicrosoftGraphApiBase):
             native_response.raise_for_status()
             return {"content": native_response.text()}
         except Exception as e:
-            print(f"Error getting mailbox usage report: {e}", file=sys.stderr)
-            return {"error": str(e)}
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
+
+    async def list_channel_message_replies(
+        self,
+        team_id: str,
+        channel_id: str,
+        chatMessage_id: str,
+        params: dict | None = None,
+    ) -> dict[str, Any]:
+        """List replies to a Teams channel message."""
+        from kiota_abstractions.native_response_handler import NativeResponseHandler
+        from kiota_http.middleware.options import ResponseHandlerOption
+
+        try:
+            replies = (
+                self.client.teams.by_team_id(team_id)
+                .channels.by_channel_id(channel_id)
+                .messages.by_chat_message_id(chatMessage_id)
+                .replies
+            )
+            request_config = replies.to_get_request_configuration()
+            request_config.options.append(
+                ResponseHandlerOption(NativeResponseHandler())
+            )
+            native_response = await replies.get(request_configuration=request_config)
+            native_response.raise_for_status()
+            return native_response.json()
+        except Exception as e:
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}
+
+    async def reply_to_channel_message(
+        self,
+        team_id: str,
+        channel_id: str,
+        chatMessage_id: str,
+        data: dict[str, Any],
+        params: dict | None = None,
+    ) -> dict[str, Any]:
+        """Reply to a Teams channel message."""
+        from kiota_abstractions.native_response_handler import NativeResponseHandler
+        from kiota_http.middleware.options import ResponseHandlerOption
+
+        try:
+            message = chat_message_from_dict(data)
+        except ValueError as exc:
+            return {"error": str(exc)}
+
+        try:
+            replies = (
+                self.client.teams.by_team_id(team_id)
+                .channels.by_channel_id(channel_id)
+                .messages.by_chat_message_id(chatMessage_id)
+                .replies
+            )
+            request_config = replies.to_post_request_configuration()
+            request_config.options.append(
+                ResponseHandlerOption(NativeResponseHandler())
+            )
+            native_response = await replies.post(
+                message, request_configuration=request_config
+            )
+            native_response.raise_for_status()
+            return native_response.json()
+        except Exception as e:
+            print(f"Operation failed: {type(e).__name__}")
+            return {"error": "Operation failed"}

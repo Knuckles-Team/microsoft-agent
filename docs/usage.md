@@ -1,104 +1,104 @@
-# Usage — API / CLI / MCP
+# Usage
 
-`microsoft-agent` exposes the same capability three ways: as **MCP tools** an agent
-calls, as a **Python API** (`MicrosoftGraphApi`) you import, and as **command-line
-servers**. The complete tool surface and the agent architecture are described in
-[Overview](overview.md).
+Microsoft Agent exposes one governed Microsoft Graph client through an MCP server
+and, when installed, an A2A agent. The MCP server is the normal integration point.
+The Python client is available for trusted in-process extensions.
 
-## As an MCP server
+## MCP surface
 
-Once [deployed](deployment.md), the server registers domain-routed tools across 36
-Microsoft Graph domains. Each domain is enabled or disabled with its `*TOOL`
-environment flag, so the registered surface can be scoped per deployment.
+`MCP_TOOL_MODE=intent` exposes the compact Agent Utilities intent and control
+surface. It discovers the installed Microsoft action schemas at runtime and routes
+requests while preserving caller identity, approval, policy, and trace context.
+Use MCP discovery as the authority for exact schemas; do not copy generated action
+lists into prompts or configuration.
 
-| Group | Domains |
-|---|---|
-| People & identity | `user`, `groups`, `directory`, `identity`, `contacts`, `organization` |
-| Productivity | `calendar`, `mail`, `files`, `notes`, `tasks`, `chat`, `teams` |
-| Administration | `admin`, `applications`, `devices`, `domains`, `policies`, `security`, `reports`, `audit` |
-| Platform | `search`, `sites`, `storage`, `solutions`, `subscriptions`, `print`, `places`, `education` |
+The installed provider families cover:
 
-Tools follow the `action_resource` naming convention (for example `list_user`,
-`get_group`, `send_mail`, `post_events`). Example agent prompts that map onto these
-tools:
+- authentication, metadata, search, users, groups, and directory operations;
+- mail, calendars, contacts, tasks, files, sites, notes, Teams, and chat;
+- applications, policy, security, audit, reports, devices, storage, print, and
+  subscriptions;
+- keyed zero-PII projection and governed Epistemic Graph ingestion; and
+- optional documents, Office bridge, Power Platform, Intune, and Windows
+  companion capabilities.
 
-- *"List the members of the 'Engineering' group."* → `list_members_group`
-- *"Send a status email to the operations distribution list."* → `send_mail`
-- *"Schedule a meeting with the Engineering team next Tuesday."* → `post_events`
+Every routed action crosses the fail-closed Microsoft tool policy. Read actions are
+available by default. Unknown actions are classified as writes. Non-destructive
+writes require `MICROSOFT_ALLOW_WRITES=true`; destructive actions additionally
+require `MICROSOFT_ALLOW_DESTRUCTIVE=true`.
 
-## As a Python API
+`list_microsoft_ingestion_projection` returns only keyed opaque node identifiers,
+types, and relationships. GraphOS validates the signed source manifest and
+commits that projection through the native ChangeEnvelope seam. Projection requires a deployment-owned
+pseudonymization key; neither returns or persists Microsoft content or identity
+fields.
 
-`MicrosoftGraphApi` is a layered client over the Microsoft Graph SDK, organized by
-domain (mail, calendar, drive, directory, applications, administration). Build one
-from the environment with the `get_client()` helper:
+## MCP server
+
+Use stdio when the MCP client owns the process:
+
+```bash
+microsoft-mcp --transport stdio
+```
+
+Use streamable HTTP only behind deployment-owned caller authentication and TLS:
+
+```bash
+microsoft-mcp --transport streamable-http --host 127.0.0.1 --port 8000
+```
+
+The supported transports are exactly `stdio` and `streamable-http`. A non-loopback
+listener must not be exposed until its MCP caller-authentication policy, TLS trust,
+and network controls are configured.
+
+## Python client
+
+`get_client()` returns the sole authenticated `MicrosoftGraphApi` authority. Its
+methods are asynchronous.
 
 ```python
 import asyncio
+
 from microsoft_agent.auth import get_client
 
-async def main():
-    api = await get_client()          # reads MICROSOFT_* from the environment / .env
 
-    # Reads
-    users = api.list_user()
-    group = api.get_group(group_id="<group-id>")
-    events = api.list_calendarview()
+async def main() -> None:
+    graph = await get_client()
+    users = await graph.list_users(params={"$top": 25})
+    events = await graph.list_calendar_events(params={"$top": 25})
+    print(len(users.get("value", [])), len(events.get("value", [])))
+
 
 asyncio.run(main())
 ```
 
-Construct the client directly from an `AuthManager` when you manage authentication
-yourself:
+Authentication settings are validated immediately before token acquisition. Do
+not construct a second token client or persist access tokens outside the supplied
+secure authentication boundary.
 
-```python
-from microsoft_agent.auth import AuthManager, AUTHORITY, SCOPES
-from microsoft_agent.api_client import MicrosoftGraphApi
+## A2A agent
 
-auth = AuthManager(client_id="<client-id>", authority=AUTHORITY, scopes=SCOPES)
-api = MicrosoftGraphApi(auth)
-```
-
-### Writes
-
-Write operations follow the same `action_resource` convention and require an
-application granted the corresponding Microsoft Graph permissions:
-
-```python
-api.send_mail(message={"subject": "Status", "body": {"content": "All green."}})
-api.post_events(event={"subject": "Sync", "start": {...}, "end": {...}})
-```
-
-## As CLI servers
-
-Two console scripts are installed.
-
-### MCP server CLI (`microsoft-mcp`)
-
-| Short | Long | Description |
-|---|---|---|
-| `-t` | `--transport` | `stdio`, `http`, or `sse` (default: `stdio`) |
-| `-s` | `--host` | Host address for HTTP transport (default: `0.0.0.0`) |
-| `-p` | `--port` | Port for HTTP transport (default: `8000`) |
-|  | `--auth-type` | `none`, `static`, `jwt`, `oauth-proxy`, `oidc-proxy` |
+Install the `agent` extra, then point the agent at an authenticated MCP endpoint or
+an external MCP configuration:
 
 ```bash
-microsoft-mcp --transport http --host 0.0.0.0 --port 8000
+microsoft-agent \
+  --mcp-url <mcp-url> \
+  --provider <provider> \
+  --model-id <model-id>
 ```
 
-### A2A agent CLI (`microsoft-agent`)
+Model endpoints, keys, TLS profiles, Langfuse settings, and skills remain external
+Agent Utilities configuration. The package does not ship a provider, model, API
+key, MCP URL, or local filesystem profile.
 
-| Argument | Description | Default |
-|---|---|---|
-| `--host` | Host to bind the agent server to | `0.0.0.0` |
-| `--port` | Port to bind the agent server to | `9000` |
-| `--provider` | LLM provider (`openai`, `anthropic`, `google`, `huggingface`) | `openai` |
-| `--model-id` | LLM model id | `nvidia/nemotron-3-super` |
-| `--mcp-url` | MCP server URL the agent consumes | `http://microsoft-agent:8000/mcp` |
+## Optional capability groups
 
-```bash
-microsoft-agent --provider openai --model-id gpt-4o --api-key sk-... \
-  --mcp-url http://localhost:8000/mcp
-```
+Set `MICROSOFT_ENABLED_TOOL_GROUPS` to the explicit families approved for the
+deployment. Optional document, Office bridge, Power Platform, Intune, and Windows
+capabilities also require their corresponding package extras and external
+integration configuration. Disabled groups are not registered.
 
-See [Deployment](deployment.md) for running both servers together under Docker
-Compose.
+See [Configuration](configuration.md) for identity and policy controls,
+[Authentication](authentication.md) for supported token modes, and
+[Deployment](deployment.md) for process and container examples.

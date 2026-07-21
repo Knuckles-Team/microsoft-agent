@@ -1,6 +1,6 @@
 default_language_version:
   python: python3
-exclude: 'dotnet'
+exclude: 'dotnet|node_modules'
 ci:
   autofix_prs: true
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit suggestions'
@@ -12,7 +12,9 @@ repos:
   hooks:
   - id: check-added-large-files
     args: ["--maxkb=2000"]
+    exclude: ^uv\.lock$
   - id: check-ast
+    exclude: ^(tests/|test/|scripts/|script/)
   - id: check-yaml
     args: ["--unsafe"]
   - id: check-toml
@@ -25,29 +27,38 @@ repos:
   - id: end-of-file-fixer
   - id: no-commit-to-branch
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.8
+  rev: v0.15.11
   hooks:
-  - id: ruff
-    exclude: ^(test/|tests/|gitlab_api/gitlab_gql\.py$)
+  - id: ruff-check
+    exclude: ^(test/|tests/|scripts/|script/|gitlab_api/gitlab_gql\.py$)
     types_or: [python, pyi, jupyter]
-    args: ["--fix", "--ignore=E402"]
+    args: ["--fix", "--ignore=E402,B008,E501"]
+  - id: ruff-format
+    exclude: ^(test/|tests/|scripts/|script/)
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.15.0
+  hooks:
+  - id: mypy
+    additional_dependencies: [pydantic==2.13.4, types-PyYAML==6.0.12.20260518, types-requests==2.33.0.20260518, types-setuptools==83.0.0.20260706]
+    args: ["--ignore-missing-imports"]
 - repo: https://github.com/jendrikseipp/vulture
   rev: v2.16
   hooks:
   - id: vulture
     pass_filenames: false
-    args: [".", "--min-confidence", "95", --exclude, '.venv,venv,node_modules,.git,build,dist']     # or 100 if you want very high confidence only
+    args: [".", "--min-confidence", "95", "--exclude", ".venv,venv,node_modules,.git,build,dist,dotnet"]
     require_serial: true
 - repo: https://github.com/codespell-project/codespell
   rev: v2.4.2
   hooks:
   - id: codespell
-    args: ["-L", "ans,linar,nam,tread,ot,checkin,allTime"]
+    args: ["-L", "ans,linar,nam,tread,ot,checkin,allTime", "--ignore-words=.codespellignore"]
     exclude: |
       (?x)^(
         \./test/.*|
         \./tests/.*|
-        microsoft_agent/skills/.*-docs/.*
+        microsoft_agent/skills/.*-docs/.*|
+        .*lock.*
       )$
 - repo: https://github.com/PyCQA/bandit
   rev: 1.8.6
@@ -60,6 +71,10 @@ repos:
   hooks:
   - id: nbqa-ruff
     exclude: ^(\.\/test/|\./tests/)
+- repo: https://github.com/astral-sh/uv-pre-commit
+  rev: 0.11.7
+  hooks:
+  - id: uv-lock
 - repo: local
   hooks:
   - id: okf-no-legacy-concepts
@@ -134,6 +149,31 @@ repos:
     language: system
     pass_filenames: false
     always_run: true
+  - id: security-sanitizer
+    name: security and privacy sanitizer
+    entry: python scripts/security_sanitizer.py
+    language: system
+    pass_filenames: false
+    always_run: true
+  - id: security-contract
+    name: validate repository security contract
+    entry: python scripts/security_contract.py --contract .security/security-contract.json validate
+    language: system
+    pass_filenames: false
+    always_run: true
+  - id: verify-api-integration
+    name: verify API-to-MCP integration coverage
+    entry: python scripts/verify_api_integration.py --local
+    language: system
+    pass_filenames: false
+    always_run: true
+  - id: pytest
+    name: pytest
+    entry: pytest
+    language: system
+    types: [python]
+    pass_filenames: false
+    always_run: true
 - repo: https://github.com/AleksaC/hadolint-py
   rev: v2.14.0
   hooks:
@@ -148,20 +188,3 @@ repos:
   rev: v3.0.1
   hooks:
   - id: docker-compose-check
-
-- repo: local
-  hooks:
-  - id: verify-api-integration
-    name: Verify API-to-MCP Integration Coverage
-    entry: python scripts/verify_api_integration.py --local
-    language: system
-    pass_filenames: false
-    always_run: true
-- repo: local
-  hooks:
-  - id: security-sanitizer
-    name: Security and Garbage Sanitizer
-    entry: python scripts/security_sanitizer.py
-    language: python
-    pass_filenames: false
-    always_run: true

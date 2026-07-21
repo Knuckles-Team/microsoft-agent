@@ -1,8 +1,4 @@
-"""Action-discovery standardization tests.
-
-Verifies the shared ``agent_utilities.mcp_utilities.resolve_action`` helper is
-wired into every action-routed tool so callers get ``list_actions`` discovery,
-plural->singular aliases, and a rich did-you-mean error on unknown actions.
+"""Action-discovery tests for the current mixed MCP tool surface.
 
 CONCEPT:AU-ECO.mcp.fastmcp-middleware
 """
@@ -14,6 +10,18 @@ import pytest
 
 from microsoft_agent.mcp_server import get_mcp_instance
 
+_ACTION_ENVELOPE_FIELDS = {"action", "params_json"}
+
+
+def _action_routed_tools(tools):
+    """Return only tools exposing the current action-routing envelope."""
+
+    return [
+        tool
+        for tool in tools
+        if set(tool.parameters.get("properties", {})) == _ACTION_ENVELOPE_FIELDS
+    ]
+
 
 @pytest.mark.concept("AU-ECO.mcp.fastmcp-middleware")
 @pytest.mark.asyncio
@@ -22,12 +30,14 @@ async def test_list_actions_returns_action_names():
         mcp, _, _ = get_mcp_instance()
 
     tools = await mcp.list_tools()
-    assert tools, "expected registered action-routed tools"
+    action_tools = _action_routed_tools(tools)
+    assert action_tools, "expected registered action-routed tools"
+    assert len(action_tools) < len(tools), "expected a mixed MCP tool surface"
 
     client = MagicMock()
     ctx = MagicMock()
 
-    for tool in tools:
+    for tool in action_tools:
         result = await tool.fn(
             action="list_actions",
             params_json="{}",
@@ -46,15 +56,13 @@ async def test_unknown_action_raises_with_discovery_hint():
     with patch.object(sys, "argv", ["mcp_server.py"]):
         mcp, _, _ = get_mcp_instance()
 
-    tools = await mcp.list_tools()
-    client = MagicMock()
-    ctx = MagicMock()
+    action_tools = _action_routed_tools(await mcp.list_tools())
+    assert action_tools, "expected registered action-routed tools"
 
-    tool = tools[0]
     with pytest.raises(ValueError, match="list_actions"):
-        await tool.fn(
+        await action_tools[0].fn(
             action="definitely_not_a_real_action",
             params_json="{}",
-            client=client,
-            ctx=ctx,
+            client=MagicMock(),
+            ctx=MagicMock(),
         )

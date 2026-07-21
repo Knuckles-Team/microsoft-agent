@@ -1,12 +1,22 @@
-# Concept Registry — microsoft-agent
+# Capability concepts
 
 > **Prefix**: `CONCEPT:MSFT-*`
 > **Version**: 0.15.0
 > **Bridge**: [`CONCEPT:AU-ECO.messaging.native-backend-abstraction`](https://github.com/Knuckles-Team/agent-utilities/blob/main/docs/concepts.md) (Unified Toolkit Ingestion)
+Microsoft Agent contributes Microsoft Graph provider semantics to the ecosystem; it
+does not replace Agent Utilities or Epistemic Graph authorities.
 
----
+| Concept | Provider responsibility | Ecosystem authority |
+|---|---|---|
+| Microsoft identity | acquire a tenant- and audience-bound Graph token through one validated mode | Agent Utilities verifies MCP caller and delegation identity |
+| Graph actions | execute bounded asynchronous operations through one modular client | Agent Utilities owns tool discovery, session, approval, and trace context |
+| Action policy | classify the routed action and fail closed for writes/destructive actions | permission governance supplies caller policy and approval |
+| Optional integrations | expose native document, Power Platform, Intune, Office, and Windows connection points | deployment AgentConfig supplies allowlists, endpoints, trust, and secrets |
+| Knowledge ingestion | map approved provider records into quarantined change envelopes | Epistemic Graph owns persistence, ACL, provenance, lineage, and deletion semantics |
+| Microsoft skill | provide one consolidated operational workflow and provider catalog | GraphOS owns skill discovery and direct/delegated execution |
+| Observability | attach privacy-safe provider outcome metadata | Agent Utilities and Langfuse own trace transport and retention policy |
 
-## Project-Specific Concepts
+## Provider domains
 
 | Concept ID | Name | Description |
 |------------|------|-------------|
@@ -46,8 +56,14 @@
 | `CONCEPT:MS-OS.governance.msft-34` | Tasks Operations | MCP tool domain `tasks` — Action-routed dynamic tool registration |
 | `CONCEPT:MS-OS.governance.msft-35` | Teams Operations | MCP tool domain `teams` — Action-routed dynamic tool registration |
 | `CONCEPT:MS-OS.governance.msft-36` | User & Identity Management | MCP tool domain `user` — Action-routed dynamic tool registration |
+The action catalog covers authentication and metadata; users, groups, directory,
+applications, policies, audit, security, and reports; Outlook, calendar, contacts,
+tasks, files, sites, Excel, OneNote, Teams, and chat; and supporting device,
+storage, print, communications, subscription, and search domains.
 
-## Cross-Project References (from agent-utilities)
+The installed MCP schema is the authoritative domain/action inventory. Documentation
+describes capability families only so it cannot silently diverge from dynamically
+registered tool schemas.
 
 | Concept ID | Name | Origin |
 |------------|------|--------|
@@ -62,3 +78,14 @@
 ## Synergy with agent-utilities
 
 This project integrates with `agent-utilities` via `CONCEPT:AU-ECO.messaging.native-backend-abstraction` (Unified Toolkit Ingestion). The `microsoft_agent` MCP server registers its tools with the agent-utilities FastMCP middleware, enabling automatic discovery, telemetry, and Knowledge Graph ingestion of all MSFT-* concepts.
+## Invariants
+
+- One Graph client and one Microsoft authentication manager exist.
+- Microsoft identity never substitutes for MCP caller identity.
+- Unknown actions fail closed as writes.
+- Optional integrations remain absent until dependencies and external configuration
+  are both ready.
+- Provider records remain quarantined until schema, tenant, ACL, provenance,
+  signature, retention, and privacy checks pass.
+- Generated fingerprints and certification metadata are invalid after any tool or
+  ontology change and must be regenerated before release.

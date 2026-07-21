@@ -1,25 +1,39 @@
 {
-  "_comment": "Tier-1 mcp_tool source presets for microsoft-agent (AU-KG.ingest.mcp-tool-connector). Sync Microsoft 365 mail/calendar into the KG as documents via the microsoft-agent MCP server. Records come back under the Graph 'value' array. Contributed presets win over the central MCP_TOOL_PRESETS.",
-  "microsoft-mail": {
+  "_comment": "Keyed zero-PII source projections. Raw Microsoft values never cross this tool boundary; materialization remains quarantined until tenant, ACL, provenance, signature, and privacy policy pass.",
+  "microsoft-message-structure": {
     "server": "microsoft-agent",
-    "tool": "microsoft_mail",
-    "action": "list_mail_messages",
-    "records_path": "value",
+    "tool": "list_microsoft_ingestion_projection",
+    "params_style": "args",
+    "params": {
+      "kind": "messages",
+      "params_json": "{\"$top\":100}"
+    },
+    "records_path": "records",
     "id_field": "id",
-    "title_field": "subject",
-    "text_field": "bodyPreview",
-    "updated_field": "receivedDateTime",
-    "doc_type": "email"
+    "doc_type": "microsoft-message-reference"
   },
-  "microsoft-calendar": {
+  "microsoft-event-structure": {
     "server": "microsoft-agent",
-    "tool": "microsoft_calendar",
-    "action": "list_calendar_events",
-    "records_path": "value",
+    "tool": "list_microsoft_ingestion_projection",
+    "params_style": "args",
+    "params": {
+      "kind": "events",
+      "params_json": "{\"$top\":100}"
+    },
+    "records_path": "records",
     "id_field": "id",
-    "title_field": "subject",
-    "text_field": "bodyPreview",
-    "updated_field": "lastModifiedDateTime",
-    "doc_type": "event"
+    "doc_type": "microsoft-event-reference"
+  },
+  "microsoft-user-structure": {
+    "server": "microsoft-agent",
+    "tool": "list_microsoft_ingestion_projection",
+    "params_style": "args",
+    "params": {
+      "kind": "users",
+      "params_json": "{\"$top\":100}"
+    },
+    "records_path": "records",
+    "id_field": "id",
+    "doc_type": "microsoft-person-reference"
   }
 }

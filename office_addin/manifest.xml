@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xsi:type="TaskPaneApp">
+  <Id>7b434d31-23d7-4f63-8ca5-01c69b86378c</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Microsoft Agent</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Microsoft Agent Office Companion" />
+  <Description DefaultValue="Read and update Word documents and PowerPoint presentations with guarded Office.js operations." />
+  <IconUrl DefaultValue="https://localhost:3000/assets/icon.png" />
+  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon.png" />
+  <SupportUrl DefaultValue="https://localhost:3000/" />
+  <AppDomains>
+    <AppDomain>https://localhost:3000</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document" />
+    <Host Name="Presentation" />
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:3000/taskpane.html" />
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>

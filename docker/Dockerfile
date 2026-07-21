@@ -1,62 +1,37 @@
-# syntax=docker/dockerfile:1
-# Two right-sized images from ONE Dockerfile, selected by build --target. Both are
-# slim multi-stage (build in a builder, ship only /usr/local — no dev-tools/source):
-#
-#   --target agent  (DEFAULT)  installs microsoft-agent[agent] = the FULL runtime
-#                              (agent-utilities[agent]: engine + pydantic-ai + dspy +
-#                              skills). Because [agent] also includes [mcp], this image
-#                              can run EITHER the agent OR the mcp server. Push as the
-#                              default tags: latest / main / <version>.
-#
-#   --target mcp               installs microsoft-agent[mcp]   = MCP-server tooling ONLY
-#                              (agent-utilities[mcp]: fastmcp/fastapi — NO engine,
-#                              pydantic-ai, dspy, llama-index, tree-sitter). The slim
-#                              variant. Push as the :mcp / :mcp-<version> tag.
-#
-#   docker build --target agent -t microsoft-agent:latest .
-#   docker build --target mcp   -t microsoft-agent:mcp    .
-FROM python:3.11-slim AS builder-base
-COPY --from=ghcr.io/astral-sh/uv:0.11.7 /uv /uvx /bin/
-ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    UV_SYSTEM_PYTHON=1 \
-    UV_HTTP_TIMEOUT=3600
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# syntax=docker/dockerfile:1.7
 
-# Slim MCP-only dependency closure.
-FROM builder-base AS builder-mcp
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system --upgrade --break-system-packages --prerelease=allow microsoft-agent[mcp]>=1.0.1
+# The digest pins the multi-platform Python 3.12 slim image. Refresh it only as
+# part of an audited dependency update.
+ARG PYTHON_IMAGE=python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de
 
-# Full agent runtime dependency closure.
-FROM builder-base AS builder-agent
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system --upgrade --break-system-packages --prerelease=allow microsoft-agent[agent]>=1.0.1
+FROM ${PYTHON_IMAGE} AS source
+WORKDIR /build
+COPY pyproject.toml README.md LICENSE MANIFEST.in ./
+COPY microsoft_agent ./microsoft_agent
 
-FROM python:3.11-slim AS runtime-base
-ARG HOST=0.0.0.0
-ARG PORT=8000
-ARG TRANSPORT="stdio"
-ARG AUTH_TYPE="none"
-ENV HOST=${HOST} \
-    PORT=${PORT} \
-    TRANSPORT=${TRANSPORT} \
-    AUTH_TYPE=${AUTH_TYPE} \
-    PYTHONUNBUFFERED=1 \
-    PATH="/root/.local/bin:/usr/local/bin:${PATH}" \
-    UV_HTTP_TIMEOUT=3600 \
-    UV_SYSTEM_PYTHON=1 \
-    UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
+FROM source AS builder-mcp
+RUN python -m venv /opt/microsoft-agent \
+    && /opt/microsoft-agent/bin/python -m pip install \
+        --disable-pip-version-check --no-cache-dir ".[mcp]"
 
-# Slim image: MCP server only.
+FROM source AS builder-agent
+RUN python -m venv /opt/microsoft-agent \
+    && /opt/microsoft-agent/bin/python -m pip install \
+        --disable-pip-version-check --no-cache-dir ".[agent]"
+
+FROM ${PYTHON_IMAGE} AS runtime-base
+RUN groupadd --system --gid 65532 microsoft-agent \
+    && useradd --system --uid 65532 --gid 65532 --no-create-home \
+        --shell /usr/sbin/nologin microsoft-agent
+ENV PATH="/opt/microsoft-agent/bin:${PATH}" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+USER 65532:65532
+
 FROM runtime-base AS mcp
-COPY --from=builder-mcp /usr/local /usr/local
-CMD ["microsoft-mcp"]
+COPY --from=builder-mcp --chown=65532:65532 /opt/microsoft-agent /opt/microsoft-agent
+ENTRYPOINT ["microsoft-mcp"]
 
-# Full image (DEFAULT target): agent runtime; can also run the mcp server.
 FROM runtime-base AS agent
-COPY --from=builder-agent /usr/local /usr/local
-CMD ["microsoft-agent"]
+COPY --from=builder-agent --chown=65532:65532 /opt/microsoft-agent /opt/microsoft-agent
+ENTRYPOINT ["microsoft-agent"]

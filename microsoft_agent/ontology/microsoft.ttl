@@ -1,208 +1,49 @@
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix dc: <http://purl.org/dc/terms/> .
 @prefix : <http://knuckles.team/kg#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# Microsoft 365 / Graph collaboration ontology — mail, calendar, files, Teams chat,
-# and directory. All classes and properties live in the shared `:` (kg#) namespace;
-# only the owl:Ontology node gets the per-package IRI. Backs the microsoft-agent MCP
-# tool surface (microsoft_mail / microsoft_calendar / microsoft_files / microsoft_chat
-# / microsoft_teams / microsoft_user / …). The shared classes :Person, :Document,
-# :Blob and :MediaAsset are REUSED (never redefined) — users/contacts map to :Person,
-# message bodies to :Document, attachments to :Blob.
-
-# --- classes (owl:Class) ---
+# Zero-PII structural projection for Microsoft Graph. Instances use keyed opaque
+# identifiers. Provider identifiers, names, addresses, content, filenames, URLs,
+# timestamps, and attachment bytes are not properties in this ontology.
 
 :Message a owl:Class ;
-    rdfs:label "Message" ;
-    rdfs:comment "A Microsoft 365 message — an Outlook mail message or a Teams chat/channel post (microsoft_mail / microsoft_chat)." .
+    rdfs:label "Opaque Microsoft message reference" ;
+    rdfs:comment "A content-free keyed reference to an Outlook or Teams message." .
 
 :Event a owl:Class ;
-    rdfs:label "Event" ;
-    rdfs:comment "A calendar event or Teams online meeting (microsoft_calendar)." .
+    rdfs:label "Opaque Microsoft event reference" ;
+    rdfs:comment "A content-free keyed reference to a calendar event or meeting." .
 
 :File a owl:Class ;
-    rdfs:label "File" ;
-    rdfs:comment "A OneDrive or SharePoint drive item / document (microsoft_files)." .
-
-:Calendar a owl:Class ;
-    rdfs:label "Calendar" ;
-    rdfs:comment "A user or group calendar that owns events (microsoft_calendar)." .
-
-:MailFolder a owl:Class ;
-    rdfs:label "Mail Folder" ;
-    rdfs:comment "An Outlook mail folder containing messages (microsoft_mail)." .
-
-:Team a owl:Class ;
-    rdfs:label "Team" ;
-    rdfs:comment "A Microsoft Teams team backed by a Microsoft 365 group (microsoft_teams)." .
-
-:Channel a owl:Class ;
-    rdfs:label "Channel" ;
-    rdfs:comment "A channel within a Team that hosts channel messages (microsoft_teams)." .
-
-:Chat a owl:Class ;
-    rdfs:label "Chat" ;
-    rdfs:comment "A 1:1 or group Teams chat thread (microsoft_chat)." .
-
-:Group a owl:Class ;
-    rdfs:label "Group" ;
-    rdfs:comment "A Microsoft 365 / Entra ID group (microsoft_groups)." .
-
-:SharePointSite a owl:Class ;
-    rdfs:label "SharePoint Site" ;
-    rdfs:comment "A SharePoint site collection hosting drives and lists (microsoft_sites)." .
-
-# --- links (owl:ObjectProperty) ---
+    rdfs:label "Opaque Microsoft file reference" ;
+    rdfs:comment "A content-free keyed reference to a OneDrive or SharePoint item." .
 
 :sentBy a owl:ObjectProperty ;
     rdfs:label "sent by" ;
-    rdfs:comment "Links a Message to the Person who sent it." ;
     rdfs:domain :Message ;
     rdfs:range :Person .
 
 :sentTo a owl:ObjectProperty ;
     rdfs:label "sent to" ;
-    rdfs:comment "Links a Message to a Person recipient." ;
     rdfs:domain :Message ;
     rdfs:range :Person .
 
-:hasAttachment a owl:ObjectProperty ;
-    rdfs:label "has attachment" ;
-    rdfs:comment "Links a Message or Event to a :Blob attachment stored in the knowledge graph." ;
-    rdfs:range :Blob .
-
-:hasBody a owl:ObjectProperty ;
-    rdfs:label "has body" ;
-    rdfs:comment "Links a Message or Event to the :Document carrying its searchable text body." ;
-    rdfs:range :Document .
-
-:inChannel a owl:ObjectProperty ;
-    rdfs:label "in channel" ;
-    rdfs:comment "Links a channel Message to the Channel it was posted in." ;
-    rdfs:domain :Message ;
-    rdfs:range :Channel .
-
-:inChat a owl:ObjectProperty ;
-    rdfs:label "in chat" ;
-    rdfs:comment "Links a chat Message to the Chat thread it belongs to." ;
-    rdfs:domain :Message ;
-    rdfs:range :Chat .
-
-:inFolder a owl:ObjectProperty ;
-    rdfs:label "in folder" ;
-    rdfs:comment "Links a mail Message to its MailFolder." ;
-    rdfs:domain :Message ;
-    rdfs:range :MailFolder .
-
-:channelOfTeam a owl:ObjectProperty ;
-    rdfs:label "channel of team" ;
-    rdfs:comment "Links a Channel to its owning Team." ;
-    rdfs:domain :Channel ;
-    rdfs:range :Team .
-
 :organizedBy a owl:ObjectProperty ;
     rdfs:label "organized by" ;
-    rdfs:comment "Links an Event to the Person who organized it." ;
     rdfs:domain :Event ;
     rdfs:range :Person .
 
 :hasAttendee a owl:ObjectProperty ;
     rdfs:label "has attendee" ;
-    rdfs:comment "Links an Event to a Person attendee." ;
     rdfs:domain :Event ;
     rdfs:range :Person .
-
-:inCalendar a owl:ObjectProperty ;
-    rdfs:label "in calendar" ;
-    rdfs:comment "Links an Event to the Calendar that owns it." ;
-    rdfs:domain :Event ;
-    rdfs:range :Calendar .
 
 :ownedByPerson a owl:ObjectProperty ;
     rdfs:label "owned by person" ;
-    rdfs:comment "Links a File to the Person who created or owns it." ;
     rdfs:domain :File ;
     rdfs:range :Person .
 
-:storedInSite a owl:ObjectProperty ;
-    rdfs:label "stored in site" ;
-    rdfs:comment "Links a File to the SharePointSite it is stored in." ;
-    rdfs:domain :File ;
-    rdfs:range :SharePointSite .
-
-:memberOfTeam a owl:ObjectProperty ;
-    rdfs:label "member of team" ;
-    rdfs:comment "Links a Person to a Team they belong to." ;
-    rdfs:domain :Person ;
-    rdfs:range :Team .
-
-:memberOfGroup a owl:ObjectProperty ;
-    rdfs:label "member of group" ;
-    rdfs:comment "Links a Person to a Group they belong to." ;
-    rdfs:domain :Person ;
-    rdfs:range :Group .
-
-# --- fields (owl:DatatypeProperty) ---
-
-:subject a owl:DatatypeProperty ;
-    rdfs:label "subject" ;
-    rdfs:comment "Subject line of a Message or Event." ;
-    rdfs:range xsd:string .
-
-:webLink a owl:DatatypeProperty ;
-    rdfs:label "web link" ;
-    rdfs:comment "Canonical Microsoft 365 web URL of the object (webLink / webUrl)." ;
-    rdfs:range xsd:string .
-
-:receivedDateTime a owl:DatatypeProperty ;
-    rdfs:label "received date time" ;
-    rdfs:comment "ISO-8601 timestamp a Message was received or created." ;
-    rdfs:range xsd:dateTime .
-
-:startDateTime a owl:DatatypeProperty ;
-    rdfs:label "start date time" ;
-    rdfs:comment "ISO-8601 start time of an Event." ;
-    rdfs:range xsd:dateTime .
-
-:endDateTime a owl:DatatypeProperty ;
-    rdfs:label "end date time" ;
-    rdfs:comment "ISO-8601 end time of an Event." ;
-    rdfs:range xsd:dateTime .
-
-:mimeType a owl:DatatypeProperty ;
-    rdfs:label "mime type" ;
-    rdfs:comment "MIME type of a File or attachment Blob." ;
-    rdfs:range xsd:string .
-
-:sizeBytes a owl:DatatypeProperty ;
-    rdfs:label "size bytes" ;
-    rdfs:comment "Size of a File or attachment in bytes." ;
-    rdfs:range xsd:integer .
-
-:userPrincipalName a owl:DatatypeProperty ;
-    rdfs:label "user principal name" ;
-    rdfs:comment "The userPrincipalName (login) of a Person." ;
-    rdfs:range xsd:string .
-
-:emailAddress a owl:DatatypeProperty ;
-    rdfs:label "email address" ;
-    rdfs:comment "Primary SMTP address of a Person, Message sender, or attendee." ;
-    rdfs:range xsd:string .
-
-:externalToolId a owl:DatatypeProperty ;
-    rdfs:label "external tool id" ;
-    rdfs:comment "The native Microsoft Graph id of the object." ;
-    rdfs:range xsd:string .
-
 <http://knuckles.team/kg/microsoft> a owl:Ontology ;
-    rdfs:label "Microsoft 365 Collaboration Ontology" ;
-    rdfs:comment """Microsoft 365 / Graph collaboration model — Outlook mail, calendar
-    events and meetings, OneDrive/SharePoint files, Teams chats and channels, and Entra
-    directory groups — with their sender/attendee/attachment relationships, federated
-    into the agent-utilities knowledge-graph hub. Reuses the shared :Person, :Document,
-    :Blob and :MediaAsset classes.""" ;
+    rdfs:label "Microsoft Graph zero-PII structural ontology" ;
+    rdfs:comment "Keyed opaque message, event, file, and person relationships for governed Microsoft Graph ingestion." ;
     owl:imports <http://knuckles.team/kg> .

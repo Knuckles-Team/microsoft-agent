@@ -1,0 +1,84 @@
+{
+  "delegated": {
+    "read_only": [
+      "User.Read",
+      "Mail.Read",
+      "Calendars.Read",
+      "Files.Read",
+      "Sites.Selected",
+      "Chat.Read",
+      "ChannelMessage.Read.All",
+      "Team.ReadBasic.All",
+      "Channel.ReadBasic.All",
+      "Tasks.Read",
+      "Notes.Read",
+      "Contacts.Read"
+    ],
+    "productivity": [
+      "User.Read",
+      "Mail.ReadWrite",
+      "Mail.Send",
+      "Calendars.ReadWrite",
+      "Files.ReadWrite",
+      "Sites.Selected",
+      "Tasks.ReadWrite",
+      "Notes.ReadWrite",
+      "Contacts.ReadWrite"
+    ],
+    "collaboration": [
+      "User.Read",
+      "Chat.ReadWrite",
+      "ChatMessage.Send",
+      "ChannelMessage.Read.All",
+      "ChannelMessage.Send",
+      "Team.ReadBasic.All",
+      "Channel.ReadBasic.All",
+      "TeamMember.Read.All",
+      "Group.Read.All",
+      "OnlineMeetings.ReadWrite",
+      "Presence.Read.All"
+    ],
+    "device_read": [
+      "Device.Read.All",
+      "DeviceManagementManagedDevices.Read.All",
+      "DeviceManagementConfiguration.Read.All"
+    ],
+    "device_admin": [
+      "Device.ReadWrite.All",
+      "DeviceManagementManagedDevices.ReadWrite.All",
+      "DeviceManagementManagedDevices.PrivilegedOperations.All",
+      "DeviceManagementConfiguration.ReadWrite.All"
+    ],
+    "tenant_admin": [
+      "Directory.ReadWrite.All",
+      "Group.ReadWrite.All",
+      "Application.ReadWrite.All",
+      "Policy.ReadWrite.ConditionalAccess",
+      "RoleManagement.ReadWrite.Directory",
+      "AuditLog.Read.All",
+      "Reports.Read.All",
+      "SecurityIncident.ReadWrite.All"
+    ]
+  },
+  "application": {
+    "productivity": [
+      "User.Read.All",
+      "Mail.ReadWrite",
+      "Mail.Send",
+      "Calendars.ReadWrite",
+      "Files.ReadWrite.All",
+      "Sites.Selected"
+    ],
+    "device_read": [
+      "Device.Read.All",
+      "DeviceManagementManagedDevices.Read.All",
+      "DeviceManagementConfiguration.Read.All"
+    ],
+    "device_admin": [
+      "Device.ReadWrite.All",
+      "DeviceManagementManagedDevices.ReadWrite.All",
+      "DeviceManagementManagedDevices.PrivilegedOperations.All",
+      "DeviceManagementConfiguration.ReadWrite.All"
+    ]
+  }
+}

@@ -1,195 +1,171 @@
-"""Native epistemic-graph typed-node ingestion — Wire-First coverage.
-
-Exercises the real ``ingest_entities`` / ``ingest_messages`` / ``ingest_events`` /
-``ingest_files`` / ``ingest_users`` seam with a fake engine client (no engine
-required), asserting the txn add_node/commit + edge calls and the Microsoft Graph
-record → typed-node mapping. CONCEPT:AU-KG.ingest.enterprise-source-extractor.
-"""
+"""Tests for the keyed zero-PII Microsoft source projection."""
 
 from __future__ import annotations
 
-from microsoft_agent.kg_ingest import (
-    _records,
-    ingest_entities,
-    ingest_events,
-    ingest_files,
-    ingest_messages,
-    ingest_users,
-)
+import pytest
+
+from microsoft_agent import kg_ingest
 
 
-class _FakeTxn:
-    def __init__(self):
-        self.nodes = {}
-        self.committed = False
+class ProjectionSettings:
+    key = b"test-only-pseudonymization-key-32-bytes"
 
-    def begin(self, graph=None):
-        self.graph = graph
-        return "txn-1"
-
-    def add_node(self, txn, node_id, props):
-        self.nodes[node_id] = props
-
-    def commit(self, txn):
-        self.committed = True
-        return True
+    def require_ingestion_pseudonymization_key(self) -> bytes:
+        return self.key
 
 
-class _FakeEdges:
-    def __init__(self):
-        self.edges = []
-
-    def add(self, src, dst, props):
-        self.edges.append((src, dst, props))
+@pytest.fixture(autouse=True)
+def projection_settings(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(kg_ingest, "get_settings", lambda: ProjectionSettings())
 
 
-class _FakeClient:
-    def __init__(self):
-        self.txn = _FakeTxn()
-        self.edges = _FakeEdges()
-
-
-def test_ingest_entities_writes_nodes_and_edges():
-    c = _FakeClient()
-    res = ingest_entities(
-        [
-            {"id": "a", "type": "Message", "subject": "hi"},
-            {"id": "b", "type": "Person"},
-        ],
-        [{"source": "a", "target": "b", "type": "sentBy"}],
-        client=c,
-        graph="__commons__",
-    )
-    assert res == {"nodes": 2, "edges": 1}
-    assert c.txn.committed is True
-    assert set(c.txn.nodes) == {"a", "b"}
-    # provenance is stamped
-    assert c.txn.nodes["a"]["source"] == "microsoft-agent"
-    assert c.txn.nodes["a"]["domain"] == "microsoft"
-    assert c.edges.edges == [("a", "b", {"type": "sentBy"})]
-
-
-def test_ingest_messages_maps_message_person_and_body():
-    c = _FakeClient()
-    res = ingest_messages(
-        [
+def test_message_projection_exposes_only_opaque_structure() -> None:
+    source_record = {
+        "id": "provider-message-id",
+        "subject": "private subject",
+        "bodyPreview": "private preview",
+        "body": {"content": "private body", "contentType": "text"},
+        "webLink": "https://provider.example.invalid/private-message",
+        "receivedDateTime": "2026-07-01T10:00:00Z",
+        "from": {
+            "emailAddress": {
+                "address": "sender@example.invalid",
+                "name": "Sender Name",
+            }
+        },
+        "toRecipients": [
             {
-                "id": "MSG1",
-                "subject": "Quarterly report",
-                "bodyPreview": "see attached",
-                "body": {"content": "Full body text", "contentType": "text"},
-                "webLink": "https://outlook/MSG1",
-                "receivedDateTime": "2026-07-01T10:00:00Z",
-                "from": {"emailAddress": {"address": "ana@contoso.com", "name": "Ana"}},
-                "toRecipients": [
-                    {"emailAddress": {"address": "bo@contoso.com", "name": "Bo"}}
-                ],
+                "emailAddress": {
+                    "address": "recipient@example.invalid",
+                    "name": "Recipient Name",
+                }
             }
         ],
-        client=c,
-        graph="__commons__",
-    )
-    assert res is not None
-    msg = c.txn.nodes["microsoft:Message:MSG1"]
-    assert msg["type"] == "Message"
-    assert msg["subject"] == "Quarterly report"
-    assert msg["externalToolId"] == "MSG1"
-    # sender + recipient became :Person nodes
-    assert c.txn.nodes["microsoft:Person:ana@contoso.com"]["type"] == "Person"
-    assert c.txn.nodes["microsoft:Person:bo@contoso.com"]["type"] == "Person"
-    # body :Document written (second commit) + links present
-    assert c.txn.nodes["microsoft:Document:message:MSG1"]["type"] == "Document"
-    edge_types = {e[2]["type"] for e in c.edges.edges}
-    assert {"sentBy", "sentTo", "hasBody"} <= edge_types
+    }
+
+    projection = kg_ingest.project_records("messages", [source_record])
+
+    assert {node["node_type"] for node in projection["records"]} == {
+        "Message",
+        "Person",
+    }
+    assert {edge["relationship"] for edge in projection["relationships"]} == {
+        "sentBy",
+        "sentTo",
+    }
+    serialized = repr(projection)
+    for raw_value in (
+        "provider-message-id",
+        "private subject",
+        "private preview",
+        "private body",
+        "private-message",
+        "sender@example.invalid",
+        "recipient@example.invalid",
+        "Sender Name",
+        "Recipient Name",
+    ):
+        assert raw_value not in serialized
 
 
-def test_ingest_events_maps_event_and_attendees():
-    c = _FakeClient()
-    ingest_events(
+def test_event_projection_exposes_only_opaque_structure() -> None:
+    projection = kg_ingest.project_records(
+        "events",
         [
             {
-                "id": "EV1",
-                "subject": "Design sync",
-                "start": {"dateTime": "2026-07-05T15:00:00", "timeZone": "UTC"},
-                "end": {"dateTime": "2026-07-05T15:30:00", "timeZone": "UTC"},
-                "organizer": {"emailAddress": {"address": "ana@contoso.com"}},
-                "attendees": [
-                    {"emailAddress": {"address": "bo@contoso.com"}, "type": "required"}
-                ],
+                "id": "provider-event-id",
+                "subject": "private event",
+                "organizer": {"emailAddress": {"address": "owner@example.invalid"}},
+                "attendees": [{"emailAddress": {"address": "guest@example.invalid"}}],
             }
         ],
-        client=c,
-        graph="__commons__",
     )
-    ev = c.txn.nodes["microsoft:Event:EV1"]
-    assert ev["type"] == "Event"
-    assert ev["startDateTime"] == "2026-07-05T15:00:00"
-    edge_types = {e[2]["type"] for e in c.edges.edges}
-    assert {"organizedBy", "hasAttendee"} <= edge_types
+
+    assert {tuple(sorted(node)) for node in projection["records"]} == {
+        ("id", "node_type")
+    }
+    assert {edge["relationship"] for edge in projection["relationships"]} == {
+        "organizedBy",
+        "hasAttendee",
+    }
+    assert "provider-event-id" not in repr(projection)
+    assert "owner@example.invalid" not in repr(projection)
+    assert "guest@example.invalid" not in repr(projection)
 
 
-def test_ingest_files_maps_file_and_owner():
-    c = _FakeClient()
-    ingest_files(
+def test_file_and_user_projections_discard_provider_attributes() -> None:
+    files = kg_ingest.project_records(
+        "files",
         [
             {
-                "id": "F1",
-                "name": "budget.xlsx",
-                "webUrl": "https://sp/F1",
-                "size": 2048,
-                "file": {"mimeType": "application/vnd.ms-excel"},
-                "lastModifiedDateTime": "2026-06-30T09:00:00Z",
-                "createdBy": {"user": {"id": "u9", "displayName": "Cy"}},
+                "id": "provider-file-id",
+                "name": "private-budget.xlsx",
+                "webUrl": "https://provider.example.invalid/private-file",
+                "createdBy": {
+                    "user": {"id": "provider-person-id", "displayName": "Owner"}
+                },
             }
         ],
-        client=c,
-        graph="__commons__",
     )
-    f = c.txn.nodes["microsoft:File:F1"]
-    assert f["type"] == "File"
-    assert f["mimeType"] == "application/vnd.ms-excel"
-    assert f["sizeBytes"] == 2048
-    assert c.txn.nodes["microsoft:Person:u9"]["type"] == "Person"
-    assert c.edges.edges[0][2]["type"] == "ownedByPerson"
-
-
-def test_ingest_users_maps_person():
-    c = _FakeClient()
-    ingest_users(
+    users = kg_ingest.project_records(
+        "users",
         [
             {
-                "id": "u1",
-                "displayName": "Ana Admin",
-                "mail": "ana@contoso.com",
-                "userPrincipalName": "ana@contoso.com",
-                "jobTitle": "Ops",
+                "id": "provider-person-id",
+                "displayName": "Private Name",
+                "userPrincipalName": "operator@example.invalid",
             }
         ],
-        client=c,
-        graph="__commons__",
     )
-    p = c.txn.nodes["microsoft:Person:u1"]
-    assert p["type"] == "Person"
-    assert p["emailAddress"] == "ana@contoso.com"
-    assert p["jobTitle"] == "Ops"
+
+    assert files["relationships"][0]["relationship"] == "ownedByPerson"
+    assert users["records"][0]["node_type"] == "Person"
+    assert set(users["records"][0]) == {"id", "node_type"}
+    serialized = repr((files, users))
+    assert "provider-file-id" not in serialized
+    assert "private-budget.xlsx" not in serialized
+    assert "provider-person-id" not in serialized
+    assert "operator@example.invalid" not in serialized
 
 
-def test_records_normalizes_graph_value_envelope():
-    assert _records({"value": [{"id": "a"}, {"id": "b"}]}) == [
+def test_opaque_ids_are_keyed_and_domain_separated() -> None:
+    key = ProjectionSettings.key
+    first = kg_ingest._opaque_id("Person", "same-provider-id", key)
+    second = kg_ingest._opaque_id("Person", "same-provider-id", key)
+    other_type = kg_ingest._opaque_id("Message", "same-provider-id", key)
+    other_key = kg_ingest._opaque_id("Person", "same-provider-id", b"x" * 32)
+
+    assert first == second
+    assert first != other_type
+    assert first != other_key
+    assert "same-provider-id" not in first
+
+
+def test_missing_pseudonymization_key_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class MissingKey:
+        def require_ingestion_pseudonymization_key(self) -> bytes:
+            raise ValueError("pseudonymization key required")
+
+    monkeypatch.setattr(kg_ingest, "get_settings", lambda: MissingKey())
+    with pytest.raises(ValueError, match="pseudonymization key required"):
+        kg_ingest.project_records("messages", [{"id": "provider-message-id"}])
+
+
+def test_empty_projection_is_an_explicit_zero_change() -> None:
+    assert kg_ingest.project_records("messages", []) == {
+        "records": [],
+        "relationships": [],
+    }
+
+
+def test_records_normalizes_graph_value_envelope() -> None:
+    assert kg_ingest._records({"value": [{"id": "a"}, {"id": "b"}]}) == [
         {"id": "a"},
         {"id": "b"},
     ]
-    assert _records({"error": "boom"}) == []
-    assert _records({"id": "solo"}) == [{"id": "solo"}]
-    assert _records(None) == []
-
-
-def test_ingest_noops_without_engine():
-    # No injected client + no reachable engine -> clean no-op.
-    assert ingest_entities([{"id": "a", "type": "Message"}]) is None
-
-
-def test_ingest_empty_is_noop():
-    assert ingest_entities([], client=_FakeClient()) is None
-    assert ingest_messages([], client=_FakeClient()) is None
-    assert ingest_events([], client=_FakeClient()) is None
+    with pytest.raises(ValueError, match="provider returned an error"):
+        kg_ingest._records({"error": "provider-error"})
+    assert kg_ingest._records({"id": "single"}) == [{"id": "single"}]
+    assert kg_ingest._records(None) == []

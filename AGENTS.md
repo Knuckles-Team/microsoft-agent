@@ -1,67 +1,80 @@
-# AGENTS.md
+# Microsoft Agent contributor contract
 
-> Claude Code loads this file via `CLAUDE.md` (`@AGENTS.md` import) — the two stay
-> in sync. Edit **this** file, not `CLAUDE.md`.
+## Architecture
 
-## Tech Stack & Architecture
-- Language/Version: Python 3.10+
-- Core Libraries: `agent-utilities`, `fastmcp`, `pydantic-ai`
-- Key principles: Functional patterns, Pydantic for data validation, asynchronous tool execution.
-- Architecture:
-    - `mcp_server.py`: Main MCP server entry point and tool registration.
-    - `agent_server.py`: Pydantic AI agent definition and logic.
-    - `skills/`: Directory containing modular agent skills (if applicable).
+- `microsoft_agent/mcp_server.py` exposes the current condensed Microsoft Graph
+  action tools through the Agent Utilities MCP server factory.
+- `microsoft_agent/api_client.py` composes the domain clients in
+  `microsoft_agent/api/`; it is the only Graph API client authority.
+- `microsoft_agent/auth.py` and `microsoft_agent/settings.py` implement validated
+  delegated, application, on-behalf-of, external-token, managed-identity, and
+  workload-identity configuration.
+- `microsoft_agent/integration_tools.py` supplies optional Office document,
+  Power Platform, Intune, and Windows companion tools.
+- `microsoft_agent/office_bridge.py` implements the Office.js live-document
+  bridge: typed MCP tools plus the exact-origin `/office-bridge/*` HTTP routes
+  that `office_addin/` (a thin TypeScript task-pane client, not a second
+  server) calls through `backend-client.ts`/`office-bridge.ts`.
+- `microsoft_agent/windows_companion.py`/`windows_companion_service.py` and
+  `microsoft_agent/windows_control_plane.py`/`windows_control_plane_service.py`
+  (built on `microsoft_agent/windows_runtime.py`) are the outbound Windows
+  companion and its control-plane relay; `deployment/windows/` and
+  `deployment/control-plane/` are only their PowerShell/systemd/nginx deploy
+  wrappers around the packaged console scripts, never application logic.
+- `microsoft_agent/tool_policy.py` is the fail-closed read/write/destructive
+  authorization boundary.
+- `connector_manifest.yml`, `microsoft_agent/connectors/`, and
+  `microsoft_agent/ontology/` form the provider-owned ingestion and ontology
+  capability bundle.
+- `microsoft_agent/skills/microsoft-agent-operations/` is the single consolidated
+  provider skill.
 
-### Architecture Diagram
-```mermaid
-graph TD
-    User([User/A2A]) --> Server[A2A Server / FastAPI]
-    Server --> Agent[Pydantic AI Agent]
-    Agent --> Skills[Modular Skills]
-    Agent --> MCP[MCP Server / FastMCP]
-    MCP --> Client[API Client / Wrapper]
-    Client --> ExternalAPI([External Service API])
+**Key principles:** functional patterns, Pydantic for data validation, and
+asynchronous tool execution. Core libraries: `agent-utilities`, `fastmcp`,
+`pydantic-ai`.
+
+## Current-only policy
+
+- Do not add compatibility aliases, retired environment variables, duplicate API
+  wrappers, duplicate skill families, or fallback execution planes.
+- Do not package databases, token caches, MCP client configurations, generated
+  runtime state, credentials, endpoints, hostnames, or environment-specific
+  profiles.
+- Configuration values belong in deployment-owned environment/configuration or
+  referenced secret stores. Repository examples must remain generic and value-free.
+- TLS verification is mandatory and configured by the deployment trust profile.
+  Never hardcode verification bypasses.
+- Use the Agent Utilities server/session/configuration boundaries; do not create a
+  second MCP, authentication, graph, or agent runtime.
+
+## Security invariants
+
+- Microsoft identity coordinates are mandatory at authentication time; there is no
+  baked-in client identifier.
+- Tokens are stored only through secure OS-backed storage. A keyring failure leaves
+  tokens in memory and must not enable plaintext persistence.
+- Condensed action tools authorize the routed action, not merely the envelope tool
+  name. Unknown actions are treated as writes and fail closed.
+- Writes require `MICROSOFT_ALLOW_WRITES`; destructive actions additionally require
+  `MICROSOFT_ALLOW_DESTRUCTIVE`.
+- Connector materialization remains quarantined until tenant, ACL, provenance,
+  schema, and privacy policy are verified.
+- Tests must mock all provider and network interactions.
+
+## Development commands
+
+```bash
+uv sync --all-extras --dev
+uv run pytest
+uv run ruff check .
+uv run python scripts/security_sanitizer.py
+uv run python scripts/security_contract.py --contract .security/security-contract.json validate
+uv run python scripts/verify_api_integration.py --local
+uv run mkdocs build --strict
 ```
 
-### Workflow Diagram
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant S as Server
-    participant A as Agent
-    participant T as MCP Tool
-    participant API as External API
-
-    U->>S: Request
-    S->>A: Process Query
-    A->>T: Invoke Tool
-    T->>API: API Request
-    API-->>T: API Response
-    T-->>A: Tool Result
-    A-->>S: Final Response
-    S-->>U: Output
-```
-
-## Commands (run these exactly)
-# Installation
-pip install .[all]
-
-# Quality & Linting (run from project root)
-pre-commit run --all-files
-
-# Execution Commands
-# microsoft-mcp\nmicrosoft_agent.mcp:mcp_server\n# microsoft-agent\nmicrosoft_agent.agent:agent_server
-
-## Project Structure Quick Reference
-- MCP Entry Point → `mcp_server.py`
-- Agent Entry Point → `agent_server.py`
-- Source Code → `microsoft_agent/`
-- Skills → `skills/` (if exists)
-
-### File Tree
-```text
-├── .bumpversion.cfg\n├── .dockerignore\n├── .env\n├── .gitattributes\n├── .github\n│   └── workflows\n│       └── pipeline.yml\n├── .gitignore\n├── .pre-commit-config.yaml\n├── AGENTS.md\n├── Dockerfile\n├── LICENSE\n├── MANIFEST.in\n├── README.md\n├── compose.yml\n├── debug.Dockerfile\n├── mcp.compose.yml\n├── microsoft_agent\n│   ├── __init__.py\n│   ├── agent_server.py\n│   ├── auth.py\n│   ├── credential_adapter.py\n│   ├── mcp_server.py\n│   └── api_wrapper.py\n├── pyproject.toml\n├── requirements.txt\n└── scripts\n    ├── generate_code.py\n    ├── generate_mcp_server.py\n    ├── microsoft.py\n    └── validate_a2a_agent.py
-```
+Run commands from the repository root. Do not run native builds or services in
+parallel with other resource-intensive workspace validation.
 
 ## Code Style & Conventions
 **Always:**
@@ -111,7 +124,6 @@ async def my_tool(param: str) -> str:
 - Propose a plan first before making large changes.
 - Check `agent-utilities` documentation for existing helpers.
 
-
 ## Graph Architecture
 
 This agent uses `pydantic-graph` orchestration for intelligent routing and optimal context management.
@@ -130,7 +142,6 @@ stateDiagram-v2
 - **RouterNode**: A fast, lightweight LLM (e.g., `nvidia/nemotron-3-super`) that classifies the user's query into one of the specialized domains.
 - **DomainNode**: The executor node. For the selected domain, it dynamically sets environment variables to temporarily enable ONLY the tools relevant to that domain, creating a highly focused sub-agent (e.g., `gpt-4o`) to complete the request. This preserves LLM context and prevents tool hallucination.
 
-
 ## Testing with Timeout
 
 To run tests with a timeout to prevent hanging, use the `pytest-timeout` plugin. You can combine it with the `-k` flag to run specific tests:
@@ -139,21 +150,16 @@ To run tests with a timeout to prevent hanging, use the `pytest-timeout` plugin.
 uv run pytest --timeout=60 -k "test_name_pattern"
 ```
 
-## ⛔ No Scratch or Temporary Files in Repository
+## Change discipline
 
-**NEVER write any of the following to this repository:**
-- Temporary test scripts (`test_*.py`, `debug_*.py` outside of `tests/`)
-- Scratch scripts or experimental one-off files
-- Log files (`.log`, `.txt` command output)
-- Random text files with command output or debug dumps
-- Any file that is NOT production source code, tests in `tests/`, or documentation
-
-**Why:** These files expose private filesystem paths, credentials, and internal infrastructure details when pushed to GitHub publicly.
-
-**Where to put scratch work instead:**
-- Use `~/workspace/scratch/` for temporary scripts and experiments
-- Use `~/workspace/reports/` for command output and reports
-- Keep test scripts in the `tests/` directory following proper pytest conventions
+- Preserve unrelated user changes and repository history.
+- Use a dedicated branch or worktree per concurrent session; configure workspace and
+  worktree roots outside the repository.
+- Do not reset, stash, rebase, force-push, or discard another session's work.
+- Keep versions, dependency constraints, lockfiles, manifests, generated provider
+  attestations, documentation, and tests synchronized.
+- A change is complete only when its focused tests, static checks, security/privacy
+  gates, documentation contract, and generated artifacts agree.
 
 ## ⛔ Keep the Repository Root Pristine — No Scratch / Temp / Debug Files
 

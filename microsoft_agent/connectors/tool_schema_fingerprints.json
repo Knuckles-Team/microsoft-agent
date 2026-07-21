@@ -1,0 +1,8 @@
+{
+  "algorithm": "agent-utilities:mcp-tool-schema-compat:v1",
+  "connector": "microsoft-agent",
+  "schema_version": "1",
+  "tools": {
+    "list_microsoft_ingestion_projection": "aed3830a8e60658aa10f9b7bc680226e9ac3a76a43ccdca813161211cea57e15"
+  }
+}

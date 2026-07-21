@@ -1,0 +1,29 @@
+{
+  "name": "microsoft-agent-office-addin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A guarded Word and PowerPoint task-pane companion for microsoft-agent.",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "validate:manifest": "python scripts/validate_manifest.py manifest.xml",
+    "check": "npm run typecheck && npm run test && npm run build && npm run validate:manifest"
+  },
+  "engines": {
+    "node": ">=22.15"
+  },
+  "devDependencies": {
+    "@types/office-js": "^1.0.599",
+    "copy-webpack-plugin": "^14.0.0",
+    "office-addin-dev-certs": "^2.0.10",
+    "ts-loader": "^9.6.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10",
+    "webpack": "^5.108.4",
+    "webpack-cli": "^7.2.1",
+    "webpack-dev-server": "^6.0.0"
+  }
+}
