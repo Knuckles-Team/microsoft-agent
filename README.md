@@ -4,7 +4,7 @@ Microsoft Agent provides a governed Microsoft Graph MCP server and an optional A
 agent. It uses Agent Utilities for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
-Current package version: **1.0.1**
+Current package version: **2.0.0**
 
 ## Capabilities
 
