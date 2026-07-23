@@ -15,7 +15,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 dependencies = [
-  "agent-utilities[mcp]>=1.27.1,<2.0.0",
+  "agent-utilities[mcp]>=2.0.0,<3.0.0",
   "azure-core>=1.41.0",
   "httpx>=0.28.1",
   "keyring>=25.7.0",
@@ -30,8 +30,8 @@ name = "Project Maintainers"
 email = "maintainers@users.noreply.github.com"
 
 [project.optional-dependencies]
-mcp = ["agent-utilities[mcp]>=1.27.1,<2.0.0"]
-agent = ["agent-utilities[agent-runtime,logfire]>=1.27.1,<2.0.0"]
+mcp = ["agent-utilities[mcp]>=2.0.0,<3.0.0"]
+agent = ["agent-utilities[agent-runtime,logfire]>=2.0.0,<3.0.0"]
 documents = ["python-docx>=1.2.0", "python-pptx>=1.0.2"]
 cloud = ["azure-identity>=1.25.3", "httpx>=0.28.1"]
 windows = [
@@ -48,7 +48,7 @@ control-plane = [
 ]
 docs = ["mkdocs-material>=9.7.7"]
 all = [
-  "agent-utilities[mcp,agent-runtime,logfire]>=1.27.1,<2.0.0",
+  "agent-utilities[mcp,agent-runtime,logfire]>=2.0.0,<3.0.0",
   "azure-identity>=1.25.3",
   "cryptography>=49.0.0",
   "fastapi>=0.139.2",
