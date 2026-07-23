@@ -6,11 +6,9 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Microsoft Graph API + MCP Server + A2A Supervisor Agent — manage a Microsoft 365 tenant through typed tools and natural-language delegation.">
+        <meta name="description" content="Governed Microsoft Graph MCP provider and optional A2A agent.">
       
       
-      
-        <link rel="canonical" href="https://knuckles-team.github.io/microsoft-agent/overview/">
       
       
         <link rel="prev" href="..">
@@ -22,16 +20,16 @@
         
       
       
-      <link rel="icon" href="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/material/templates/assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Overview - microsoft-agent</title>
+        <title>Architecture - microsoft-agent</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -78,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#microsoft-agent-concept-overview" class="md-skip">
+        <a href="#architecture-overview" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Architecture
             
           </span>
         </div>
@@ -210,18 +208,6 @@
       
     
     
-      <div class="md-header__source">
-        <a href="https://github.com/Knuckles-Team/microsoft-agent" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-  </div>
-  <div class="md-source__repository">
-    Knuckles-Team/microsoft-agent
-  </div>
-</a>
-      </div>
-    
   </nav>
   
     
@@ -263,7 +249,7 @@
   
     
   
-  Overview
+  Architecture
 
       </a>
     </li>
@@ -275,17 +261,18 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../installation/" class="md-tabs__link">
-        
-  
-  
     
+    
+      <li class="md-tabs__item">
+        <a href="../installation/" class="md-tabs__link">
+          
   
-  Installation
+  
+  Install and configure
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -294,17 +281,18 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../deployment/" class="md-tabs__link">
-        
-  
-  
     
+    
+      <li class="md-tabs__item">
+        <a href="../usage/" class="md-tabs__link">
+          
   
-  Deployment
+  
+  Operate
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -313,17 +301,18 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../usage/" class="md-tabs__link">
-        
-  
-  
     
+    
+      <li class="md-tabs__item">
+        <a href="../integrations/" class="md-tabs__link">
+          
   
-  Usage (API / CLI / MCP)
+  
+  Integrations
 
-      </a>
-    </li>
+        </a>
+      </li>
+    
   
 
       
@@ -383,18 +372,6 @@
     microsoft-agent
   </label>
   
-    <div class="md-nav__source">
-      <a href="https://github.com/Knuckles-Team/microsoft-agent" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-  </div>
-  <div class="md-source__repository">
-    Knuckles-Team/microsoft-agent
-  </div>
-</a>
-    </div>
-  
   <ul class="md-nav__list" data-md-scrollfix>
     
       
@@ -447,7 +424,7 @@
   <span class="md-ellipsis">
     
   
-    Overview
+    Architecture
   
 
     
@@ -465,7 +442,7 @@
   <span class="md-ellipsis">
     
   
-    Overview
+    Architecture
   
 
     
@@ -491,10 +468,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#description" class="md-nav__link">
+  <a href="#runtime-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Description
+        Runtime boundaries
       
     </span>
   </a>
@@ -502,10 +479,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#enterprise-readiness" class="md-nav__link">
+  <a href="#capability-flow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Enterprise Readiness
+        Capability flow
       
     </span>
   </a>
@@ -513,10 +490,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#concept-registry" class="md-nav__link">
+  <a href="#source-layout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concept Registry
+        Source layout
       
     </span>
   </a>
@@ -524,10 +501,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
+  <a href="#security-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Architecture
+        Security model
       
     </span>
   </a>
@@ -535,41 +512,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-configuration" class="md-nav__link">
+  <a href="#extension-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Configuration
+        Extension model
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MCP Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#stdio-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        stdio Mode
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#streamable-http-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Streamable HTTP Mode
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -583,6 +532,58 @@
     
       
       
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install and configure
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Install and configure
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
   
@@ -607,9 +608,181 @@
     </li>
   
 
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enrollment-checklist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enrollment checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
   
   
   
@@ -634,6 +807,14 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
     
       
       
@@ -641,15 +822,67 @@
   
   
   
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
+      <a href="../integrations/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Usage (API / CLI / MCP)
+    Microsoft services
   
 
     
@@ -658,6 +891,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../office-addin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Office add-in
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../windows-companion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows companion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -716,10 +1013,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#description" class="md-nav__link">
+  <a href="#runtime-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Description
+        Runtime boundaries
       
     </span>
   </a>
@@ -727,10 +1024,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#enterprise-readiness" class="md-nav__link">
+  <a href="#capability-flow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Enterprise Readiness
+        Capability flow
       
     </span>
   </a>
@@ -738,10 +1035,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#concept-registry" class="md-nav__link">
+  <a href="#source-layout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concept Registry
+        Source layout
       
     </span>
   </a>
@@ -749,10 +1046,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
+  <a href="#security-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Architecture
+        Security model
       
     </span>
   </a>
@@ -760,41 +1057,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-configuration" class="md-nav__link">
+  <a href="#extension-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Configuration
+        Extension model
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MCP Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#stdio-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        stdio Mode
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#streamable-http-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Streamable HTTP Mode
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -814,131 +1083,104 @@
                   
 
 
-  
-  
 
-
-<h1 id="microsoft-agent-concept-overview">microsoft-agent — Concept Overview<a class="headerlink" href="#microsoft-agent-concept-overview" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>Category</strong>: Enterprise | <strong>Ecosystem Role</strong>: MCP Server + A2A Agent
-Built on <a href="https://github.com/Knuckles-Team/agent-utilities"><code>agent-utilities</code></a> — the unified AGI Harness.</p>
-</blockquote>
-<h2 id="description">Description<a class="headerlink" href="#description" title="Permanent link">&para;</a></h2>
-<p>Microsoft Graph Agent MCP Server</p>
-<h2 id="enterprise-readiness">Enterprise Readiness<a class="headerlink" href="#enterprise-readiness" title="Permanent link">&para;</a></h2>
-<p>All agents in the ecosystem inherit enterprise-grade infrastructure from <code>agent-utilities</code>:</p>
+<h1 id="architecture-overview">Architecture overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h1>
+<p>Microsoft Agent is a governed Microsoft Graph provider for the Agent Utilities and
+Epistemic Graph ecosystem. It contributes one MCP server, one modular Graph client,
+one authentication authority, optional integration adapters, a consolidated skill,
+and a provider-owned connector capability bundle.</p>
+<h2 id="runtime-boundaries">Runtime boundaries<a class="headerlink" href="#runtime-boundaries" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Feature</th>
-<th style="text-align: left;">Status</th>
-<th style="text-align: left;">Source</th>
+<th>Boundary</th>
+<th>Authority</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><strong>JWT/OIDC Authentication</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;"><code>agent-utilities[auth]</code> — Authlib JWKS + API key middleware</td>
+<td>MCP server and session</td>
+<td>Agent Utilities server factory and verified caller session</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>OpenTelemetry Instrumentation</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;"><code>agent-utilities[logfire]</code> — OTLP export, FastAPI auto-instrumentation</td>
+<td>Microsoft Graph client</td>
+<td><code>MicrosoftGraphApi</code> composed from <code>microsoft_agent/api/</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>HashiCorp Vault Integration</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;"><code>agent-utilities[vault]</code> — <code>secret://</code>, <code>env://</code>, <code>vault://</code> URI schemes</td>
+<td>Microsoft authentication</td>
+<td><code>microsoft_agent/auth.py</code> and validated <code>MicrosoftSettings</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>Audit Logging</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">Append-only compliance trail with 30+ action types (CONCEPT:AU-OS.governance.wasm-micro-agent-sandbox)</td>
+<td>Action authorization</td>
+<td><code>MicrosoftToolPolicy</code> applied to the routed action</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>Token Usage Analytics</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">4-bucket tracking with budget alerting (CONCEPT:AU-OS.governance.wasm-micro-agent-sandbox)</td>
+<td>Agent delegation</td>
+<td>Agent Utilities A2A/GraphOS runtime</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>Prompt Injection Defense</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">25+ pattern scanner + jailbreak taxonomy (CONCEPT:AU-OS.config.secrets-authentication)</td>
+<td>Knowledge ingestion</td>
+<td>governed connector manifest, ontology, mapping, and quarantine</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>Guardrail Engine</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">Input/output interception with block/redact/warn (CONCEPT:AU-OS.governance.reactive-multi-axis-budget)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Action Execution Pipeline</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">Token, cost, duration, and node transition limits Dry-run / commit / rollback phases (CONCEPT:AU-ORCH.adapter.kg-graph-materialization)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Resource Scheduling</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">Priority queuing + preemption limits (CONCEPT:AU-OS.state.cognitive-scheduler-preemption)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Session Concurrency</strong></td>
-<td style="text-align: left;">✅ Built-in</td>
-<td style="text-align: left;">Enqueue/reject/interrupt/rollback (CONCEPT:AU-OS.governance.reactive-multi-axis-budget)</td>
+<td>Observability</td>
+<td>deployment-configured metadata-only Agent Utilities telemetry</td>
 </tr>
 </tbody>
 </table>
-<h2 id="concept-registry">Concept Registry<a class="headerlink" href="#concept-registry" title="Permanent link">&para;</a></h2>
-<p>This project implements or inherits the following ecosystem concepts:</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Concept ID</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: left;">Source</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;">ECO-4.1</td>
-<td style="text-align: left;">MCP &amp; Universal Skills</td>
-<td style="text-align: left;"><code>agent-utilities</code> (inherited)</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>📖 <strong>Full Registry</strong>: See <a href="https://github.com/Knuckles-Team/agent-utilities/blob/main/docs/overview.md"><code>agent-utilities/docs/overview.md</code></a> for the complete 5-Pillar concept index.</p>
-</blockquote>
-<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<p>This project follows the standardized agent-package pattern:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>microsoft-agent/
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── microsoft_agent/        # Source code
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── __init__.py
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── agent_server.py      # Entry point (create_graph_agent_server)
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── api_client.py        # REST/GraphQL API wrapper
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   └── mcp_server.py        # FastMCP tool definitions
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├── tests/                   # Test suite
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── docs/                    # Documentation
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── pyproject.toml           # Package metadata
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── mcp_config.json          # MCP server configuration
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── main_agent.json          # Agent identity &amp; system prompt
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>└── Dockerfile               # Container deployment
+<p>There is no second API wrapper, raw-token fallback, plaintext token cache, bundled
+database, bundled MCP profile, or alternate agent execution plane.</p>
+<h2 id="capability-flow">Capability flow<a class="headerlink" href="#capability-flow" title="Permanent link">&para;</a></h2>
+<ol>
+<li>The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
+   an explicit optional-capability profile.</li>
+<li>The MCP server creates a verified Agent Utilities session and exposes the
+   configured action families through the selected tool mode.</li>
+<li>The tool policy classifies the routed action. Reads are allowed by default;
+   writes and destructive actions require separate explicit approvals.</li>
+<li>The single Graph client acquires a token through the selected Microsoft identity
+   mode and performs the bounded provider request.</li>
+<li>Governed ingestion converts approved records into quarantined change envelopes
+   carrying tenant, ACL, provenance, schema, checkpoint, and privacy metadata.</li>
+<li>Metadata-only telemetry links the MCP/delegation outcome to its Langfuse trace
+   and governed parent graph record.</li>
+</ol>
+<h2 id="source-layout">Source layout<a class="headerlink" href="#source-layout" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>microsoft_agent/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  api/                    domain Graph client mixins
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  connectors/             provider source presets and schema fingerprints
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ontology/               ontology, shapes, mappings, fixtures, and migrations
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  skills/                 consolidated Microsoft operations skill
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  api_client.py           sole Graph API client
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  auth.py                 token acquisition and secure-cache authority
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  settings.py             validated identity and policy configuration
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  mcp_server.py           condensed/action-routed MCP server
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>  tool_policy.py          fail-closed action policy
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>  integration_tools.py    optional native connection points
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>  agent_server.py         optional Agent Utilities A2A entry point
 </span></code></pre></div>
-<h2 id="mcp-configuration">MCP Configuration<a class="headerlink" href="#mcp-configuration" title="Permanent link">&para;</a></h2>
-<h3 id="stdio-mode">stdio Mode<a class="headerlink" href="#stdio-mode" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;microsoft-agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uv&quot;</span><span class="p">,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--with&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;microsoft-agent&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;microsoft-mcp&quot;</span><span class="p">],</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span>
-</span></code></pre></div>
-<h3 id="streamable-http-mode">Streamable HTTP Mode<a class="headerlink" href="#streamable-http-mode" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>microsoft-mcp<span class="w"> </span>--transport<span class="w"> </span>streamable-http<span class="w"> </span>--port<span class="w"> </span><span class="m">8001</span>
-</span></code></pre></div>
+<p>Deployment and Office add-in assets define generic schemas and packaging only.
+Environment URLs, credentials, device inventories, filesystem roots, trust bundles,
+and customized ontologies stay outside the repository.</p>
+<h2 id="security-model">Security model<a class="headerlink" href="#security-model" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Microsoft Graph identity and MCP caller identity are independently verified.</li>
+<li>Unknown routed actions fail closed as writes.</li>
+<li>Side-effecting and destructive actions use separate enablement controls.</li>
+<li>Secure OS-backed storage is the only persistent delegated-token cache.</li>
+<li>Certificate verification remains enabled and trust is deployment-configured.</li>
+<li>Provider results are bounded, policy-checked, and privacy-sanitized before
+  persistence or observability.</li>
+<li>Connector records remain quarantined until their governance contract passes.</li>
+</ul>
+<h2 id="extension-model">Extension model<a class="headerlink" href="#extension-model" title="Permanent link">&para;</a></h2>
+<p>New provider operations belong in the relevant domain client and action family.
+New optional systems belong behind a native adapter registered only when its
+package extra and external configuration are both present. New ingestion semantics
+extend the provider ontology and mapping, followed by regeneration of schema
+fingerprints and certification artifacts.</p>
+<p>Do not add per-operation compatibility tools, alternate authentication managers,
+hardcoded endpoints, local profiles, or provider-specific execution runtimes.</p>
 
 
 
@@ -1016,40 +1258,13 @@ Built on <a href="https://github.com/Knuckles-Team/agent-utilities"><code>agent-
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; Knuckles-Team — MIT licensed
+      Copyright &copy; Project contributors — MIT licensed
     </div>
   
   
     Made with
     <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
       Material for MkDocs
-    </a>
-  
-</div>
-      
-        
-<div class="md-social">
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://github.com/Knuckles-Team/microsoft-agent" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-    </a>
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://pypi.org/project/microsoft-agent/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
     </a>
   
 </div>
@@ -1072,7 +1287,7 @@ Built on <a href="https://github.com/Knuckles-Team/agent-utilities"><code>agent-
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

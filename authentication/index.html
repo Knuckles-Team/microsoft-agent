@@ -11,26 +11,28 @@
       
       
       
+        <link rel="prev" href="../configuration/">
       
-        <link rel="next" href="overview/">
+      
+        <link rel="next" href="../enrollment-checklist/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>microsoft-agent</title>
+        <title>Authentication - microsoft-agent</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +51,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#microsoft-agent" class="md-skip">
+        <a href="#authentication-and-permissions" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +92,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="microsoft-agent" class="md-header__button md-logo" aria-label="microsoft-agent" data-md-component="logo">
+    <a href=".." title="microsoft-agent" class="md-header__button md-logo" aria-label="microsoft-agent" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.5 17c-.14 0-.26 0-.39.04L17.5 13.8c.45-.45.75-1.09.75-1.8a2.5 2.5 0 0 0-2.5-2.5c-.14 0-.25 0-.4.04L13.74 6.3c.47-.46.76-1.09.76-1.8a2.5 2.5 0 0 0-5 0c0 .7.29 1.34.76 1.79L8.65 9.54c-.15-.04-.26-.04-.4-.04a2.5 2.5 0 0 0-2.5 2.5c0 .71.29 1.34.75 1.79l-1.61 3.25C4.76 17 4.64 17 4.5 17a2.5 2.5 0 0 0 0 5A2.5 2.5 0 0 0 7 19.5c0-.7-.29-1.34-.76-1.79l1.62-3.25c.14.04.26.04.39.04s.25 0 .38-.04l1.63 3.25c-.47.45-.76 1.09-.76 1.79a2.5 2.5 0 0 0 5 0A2.5 2.5 0 0 0 12 17c-.13 0-.26 0-.39.04L10 13.8c.45-.45.75-1.09.75-1.8 0-.7-.29-1.33-.75-1.79l1.61-3.25c.13.04.26.04.39.04s.26 0 .39-.04L14 10.21a2.5 2.5 0 0 0 1.75 4.29c.13 0 .25 0 .38-.04l1.63 3.25c-.47.45-.76 1.09-.76 1.79a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0-2.5-2.5m-15 3.5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m8.5-1c0 .55-.45 1-1 1s-1-.45-1-1 .45-1 1-1 1 .45 1 1M7.25 12c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1M11 4.5c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1m3.75 7.5c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1m4.75 8.5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1"/></svg>
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Authentication
             
           </span>
         </div>
@@ -218,11 +220,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -241,7 +241,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="overview/" class="md-tabs__link">
+      <a href="../overview/" class="md-tabs__link">
         
   
   
@@ -258,11 +258,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="installation/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../installation/" class="md-tabs__link">
           
   
   
@@ -282,7 +284,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="usage/" class="md-tabs__link">
+        <a href="../usage/" class="md-tabs__link">
           
   
   
@@ -302,7 +304,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="integrations/" class="md-tabs__link">
+        <a href="../integrations/" class="md-tabs__link">
           
   
   
@@ -320,7 +322,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="concepts/" class="md-tabs__link">
+      <a href="../concepts/" class="md-tabs__link">
         
   
   
@@ -361,7 +363,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="microsoft-agent" class="md-nav__button md-logo" aria-label="microsoft-agent" data-md-component="logo">
+    <a href=".." title="microsoft-agent" class="md-nav__button md-logo" aria-label="microsoft-agent" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.5 17c-.14 0-.26 0-.39.04L17.5 13.8c.45-.45.75-1.09.75-1.8a2.5 2.5 0 0 0-2.5-2.5c-.14 0-.25 0-.4.04L13.74 6.3c.47-.46.76-1.09.76-1.8a2.5 2.5 0 0 0-5 0c0 .7.29 1.34.76 1.79L8.65 9.54c-.15-.04-.26-.04-.4-.04a2.5 2.5 0 0 0-2.5 2.5c0 .71.29 1.34.75 1.79l-1.61 3.25C4.76 17 4.64 17 4.5 17a2.5 2.5 0 0 0 0 5A2.5 2.5 0 0 0 7 19.5c0-.7-.29-1.34-.76-1.79l1.62-3.25c.14.04.26.04.39.04s.25 0 .38-.04l1.63 3.25c-.47.45-.76 1.09-.76 1.79a2.5 2.5 0 0 0 5 0A2.5 2.5 0 0 0 12 17c-.13 0-.26 0-.39.04L10 13.8c.45-.45.75-1.09.75-1.8 0-.7-.29-1.33-.75-1.79l1.61-3.25c.13.04.26.04.39.04s.26 0 .39-.04L14 10.21a2.5 2.5 0 0 0 1.75 4.29c.13 0 .25 0 .38-.04l1.63 3.25c-.47.45-.76 1.09-.76 1.79a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0-2.5-2.5m-15 3.5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m8.5-1c0 .55-.45 1-1 1s-1-.45-1-1 .45-1 1-1 1 .45 1 1M7.25 12c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1M11 4.5c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1m3.75 7.5c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1m4.75 8.5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1"/></svg>
@@ -376,37 +378,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -422,48 +397,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#start-here" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Start here
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimal-stdio-launch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimal stdio launch
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -475,7 +408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="overview/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -499,26 +432,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -536,7 +474,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -554,7 +492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="installation/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
@@ -582,7 +520,7 @@
   
   
     <li class="md-nav__item">
-      <a href="configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -607,10 +545,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="authentication/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -626,6 +591,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#choose-one-identity-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose one identity mode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permission-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permission profiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#two-independent-authorization-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two independent authorization gates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remote-mcp-transport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote MCP transport
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -638,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="enrollment-checklist/" class="md-nav__link">
+      <a href="../enrollment-checklist/" class="md-nav__link">
         
   
   
@@ -725,7 +754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/" class="md-nav__link">
+      <a href="../usage/" class="md-nav__link">
         
   
   
@@ -753,7 +782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="deployment/" class="md-nav__link">
+      <a href="../deployment/" class="md-nav__link">
         
   
   
@@ -840,7 +869,7 @@
   
   
     <li class="md-nav__item">
-      <a href="integrations/" class="md-nav__link">
+      <a href="../integrations/" class="md-nav__link">
         
   
   
@@ -868,7 +897,7 @@
   
   
     <li class="md-nav__item">
-      <a href="office-addin/" class="md-nav__link">
+      <a href="../office-addin/" class="md-nav__link">
         
   
   
@@ -896,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="windows-companion/" class="md-nav__link">
+      <a href="../windows-companion/" class="md-nav__link">
         
   
   
@@ -931,7 +960,7 @@
   
   
     <li class="md-nav__item">
-      <a href="concepts/" class="md-nav__link">
+      <a href="../concepts/" class="md-nav__link">
         
   
   
@@ -978,10 +1007,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#start-here" class="md-nav__link">
+  <a href="#choose-one-identity-mode" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Start here
+        Choose one identity mode
       
     </span>
   </a>
@@ -989,10 +1018,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#minimal-stdio-launch" class="md-nav__link">
+  <a href="#permission-profiles" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Minimal stdio launch
+        Permission profiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#two-independent-authorization-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two independent authorization gates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remote-mcp-transport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote MCP transport
       
     </span>
   </a>
@@ -1016,44 +1067,157 @@
 
 
 
-<h1 id="microsoft-agent">Microsoft Agent<a class="headerlink" href="#microsoft-agent" title="Permanent link">&para;</a></h1>
-<p>Microsoft Agent is a governed Microsoft Graph MCP provider and optional A2A agent
-for the Agent Utilities and Epistemic Graph ecosystem.</p>
-<p>It supplies:</p>
-<ul>
-<li>one modular asynchronous Graph client;</li>
-<li>a compact intent-oriented MCP surface backed by action-routed provider tools;</li>
-<li>delegated, application, on-behalf-of, external-token, managed-identity, and
-  workload-identity authentication;</li>
-<li>fail-closed read, write, and destructive action policy;</li>
-<li>optional document, Office bridge, Power Platform, Intune, and Windows companion
-  connection points;</li>
-<li>governed Epistemic Graph ingestion with provider-owned ontology, mappings,
-  provenance, schema fingerprints, and quarantine; and</li>
-<li>one consolidated <code>microsoft-agent-operations</code> skill.</li>
-</ul>
-<p>The package contains no tenant profile, credentials, token cache, database, local
-filesystem configuration, endpoint inventory, or customized ontology.</p>
-<h2 id="start-here">Start here<a class="headerlink" href="#start-here" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="overview/">Architecture</a> explains runtime authorities and data flow.</li>
-<li><a href="installation/">Installation</a> lists package extras and verification.</li>
-<li><a href="configuration/">Configuration</a> defines AgentConfig, trust, and privacy rules.</li>
-<li><a href="authentication/">Authentication</a> covers identity modes and permission profiles.</li>
-<li><a href="usage/">Usage</a> documents the current MCP, Python, and A2A interfaces.</li>
-<li><a href="deployment/">Deployment</a> gives environment-neutral process and container
-  patterns.</li>
-<li><a href="integrations/">Integrations</a> describes optional native connection points.</li>
-</ul>
-<h2 id="minimal-stdio-launch">Minimal stdio launch<a class="headerlink" href="#minimal-stdio-launch" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;microsoft-agent[mcp]&quot;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">MICROSOFT_TENANT_ID</span><span class="o">=</span>&lt;tenant-id&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">MICROSOFT_CLIENT_ID</span><span class="o">=</span>&lt;client-id&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>microsoft-mcp<span class="w"> </span>--transport<span class="w"> </span>stdio
+<h1 id="authentication-and-permissions">Authentication and permissions<a class="headerlink" href="#authentication-and-permissions" title="Permanent link">&para;</a></h1>
+<p>Authentication is intentionally configured after installation. The server can
+start, expose health/configuration tools, generate local Office documents, and
+report integration readiness without a tenant ID or credential.</p>
+<h2 id="choose-one-identity-mode">Choose one identity mode<a class="headerlink" href="#choose-one-identity-mode" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Intended use</th>
+<th>Credential material</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>delegated</code></td>
+<td>A person using Outlook, Teams, Word, PowerPoint, OneDrive, and SharePoint from a Windows laptop</td>
+<td>Windows broker or browser session; secure OS token cache</td>
+</tr>
+<tr>
+<td><code>application</code></td>
+<td>A background service using tenant-wide or explicitly targeted resources</td>
+<td>Certificate preferred; client secret supported</td>
+</tr>
+<tr>
+<td><code>on_behalf_of</code></td>
+<td>An authenticated API calling Graph for its signed-in user</td>
+<td>Incoming user assertion plus confidential app credential</td>
+</tr>
+<tr>
+<td><code>managed_identity</code></td>
+<td>Azure-hosted service</td>
+<td>System- or user-assigned managed identity; no stored secret</td>
+</tr>
+<tr>
+<td><code>workload_identity</code></td>
+<td>Federated Kubernetes/CI workload</td>
+<td>Entra federated token file; no stored secret</td>
+</tr>
+<tr>
+<td><code>external_token</code></td>
+<td>A trusted front end already supplies a Graph token</td>
+<td>Incoming JWT must match the configured tenant and Graph audience</td>
+</tr>
+</tbody>
+</table>
+<p>Graph endpoints under <code>/me</code> require a delegated user context (delegated,
+on-behalf-of, or an equivalent delegated external token). Application, managed,
+and workload identities should use tenant-level tools or explicit-resource
+variants such as the shared-mailbox <code>/users/{id}</code> tools; the agent must not
+pretend that an app-only token has a current user.</p>
+<p>For a Windows user, start with delegated broker authentication:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">$env:MICROSOFT_TENANT_ID</span> <span class="p">=</span> <span class="s1">&#39;&lt;tenant-guid&gt;&#39;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">$env:MICROSOFT_CLIENT_ID</span> <span class="p">=</span> <span class="s1">&#39;&lt;application-client-id&gt;&#39;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">$env:MICROSOFT_AUTH_MODE</span> <span class="p">=</span> <span class="s1">&#39;delegated&#39;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">$env:MICROSOFT_LOGIN_METHOD</span> <span class="p">=</span> <span class="s1">&#39;auto&#39;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nv">$env:MICROSOFT_ENABLE_BROKER</span> <span class="p">=</span> <span class="s1">&#39;true&#39;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">microsoft-mcp</span> <span class="p">-</span><span class="n">-transport</span> <span class="n">stdio</span>
 </span></code></pre></div>
-<p>All runtime identity, trust, model, graph, observability, and optional integration
-values are deployment-owned. See <a href="configuration/">Configuration</a> before enabling
-writes or a network listener.</p>
+<p><code>auto</code> prefers the Windows Web Account Manager broker on native Windows and the
+system browser elsewhere. Device-code login is disabled unless both
+<code>MICROSOFT_ALLOW_DEVICE_CODE=true</code> and <code>MICROSOFT_LOGIN_METHOD=device_code</code> are
+set. Tokens are never written to plaintext files; delegated cache persistence
+uses the platform keyring and otherwise remains memory-only.</p>
+<p>For an Azure managed identity:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>MICROSOFT_AUTH_MODE=managed_identity
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>MICROSOFT_MANAGED_IDENTITY_CLIENT_ID=&lt;optional-user-assigned-client-id&gt;
+</span></code></pre></div>
+<p>For a federated workload identity:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>MICROSOFT_AUTH_MODE=workload_identity
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>MICROSOFT_TENANT_ID=&lt;tenant-guid&gt;
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>MICROSOFT_CLIENT_ID=&lt;application-client-id&gt;
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>AZURE_FEDERATED_TOKEN_FILE=/var/run/secrets/entra/tokens/identity-token
+</span></code></pre></div>
+<p>For certificate-backed application authentication, configure the tenant,
+client ID, PEM private-key/certificate path, and thumbprint. Keep the PEM and
+optional passphrase in a secret mount; do not commit them.</p>
+<h2 id="permission-profiles">Permission profiles<a class="headerlink" href="#permission-profiles" title="Permanent link">&para;</a></h2>
+<p>Profiles are additive and resolve to delegated scopes in interactive mode. The
+default is <code>productivity,collaboration</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Main capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>read_only</code></td>
+<td>Read mail, calendars, files, selected sites, chats, tasks, notes, and contacts</td>
+</tr>
+<tr>
+<td><code>productivity</code></td>
+<td>Send/update mail, calendars, files, tasks, notes, and contacts</td>
+</tr>
+<tr>
+<td><code>collaboration</code></td>
+<td>Teams chats/channels, membership, meetings, groups, and presence</td>
+</tr>
+<tr>
+<td><code>device_read</code></td>
+<td>Intune and Entra device inventory</td>
+</tr>
+<tr>
+<td><code>device_admin</code></td>
+<td>Intune updates and privileged remote device actions</td>
+</tr>
+<tr>
+<td><code>tenant_admin</code></td>
+<td>Directory/application/policy/security administration; never a default</td>
+</tr>
+</tbody>
+</table>
+<p>Set profiles with <code>MICROSOFT_PERMISSION_PROFILES</code>. Use
+<code>MICROSOFT_GRAPH_SCOPES</code> only for a reviewed scope that is not represented by a
+profile. Application and workload identities always request Graph's <code>.default</code>
+scope, so their app roles must be consented in Entra.</p>
+<p>Dataverse and the Windows companion API are separate OAuth resources. After
+the normal <code>login</code> succeeds in delegated mode, call <code>login_power_platform</code> and
+<code>login_windows_companion</code> once for the integrations you configured. Those
+tools request consent only for resource audiences already allowlisted in the
+protected integration configuration; ordinary tool calls never open an
+interactive prompt or choose an arbitrary audience. Application, managed, and
+workload identities instead require the corresponding application role on
+each resource and continue to use non-interactive <code>.default</code> acquisition.
+For the companion API, clients configure the resource as
+<code>api://&lt;control-plane-api-client-id&gt;</code>, while the control-plane service validates
+the v2 token's bare client-ID GUID <code>aud</code> claim. Configure
+<code>api.requestedAccessTokenVersion=2</code> on that resource application.</p>
+<p>The enrollment helper in <code>deployment/entra</code> resolves current permission IDs
+from the tenant rather than hardcoding GUIDs. It does not create secrets or
+grant admin consent. <code>Sites.Selected</code> additionally needs an explicit grant on
+each SharePoint site. Dataverse and the companion control plane are separate
+resource audiences and need their own API permissions/roles.</p>
+<h2 id="two-independent-authorization-gates">Two independent authorization gates<a class="headerlink" href="#two-independent-authorization-gates" title="Permanent link">&para;</a></h2>
+<p>Graph consent says what the identity may do. Runtime policy says what this
+server is currently allowed to invoke:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>MICROSOFT_ALLOW_WRITES=false
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>MICROSOFT_ALLOW_DESTRUCTIVE=false
+</span></code></pre></div>
+<p>Reads work with both flags disabled. Sends, creates, edits, uploads, flow runs,
+and remote actions require writes. Deletes, wipes, retirements, immediate
+reboots, shutdowns, and other destructive tools require both flags. Intune and
+Windows companion actions also enforce per-device/action allowlists and
+time-bound confirmation evidence inside their service layer.</p>
+<h2 id="remote-mcp-transport">Remote MCP transport<a class="headerlink" href="#remote-mcp-transport" title="Permanent link">&para;</a></h2>
+<p>Use <code>stdio</code> for a local client. Before binding HTTP outside loopback, configure
+the MCP transport's OIDC/JWT authentication, TLS at the server or reverse proxy,
+an exact issuer and audience, and narrow network access. Microsoft Graph login
+does not authenticate callers to the MCP server; these are separate boundaries.</p>
 
 
 
@@ -1090,15 +1254,31 @@ writes or a network listener.</p>
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Configuration
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="overview/" class="md-footer__link md-footer__link--next" aria-label="Next: Architecture">
+          <a href="../enrollment-checklist/" class="md-footer__link md-footer__link--next" aria-label="Next: Enrollment checklist">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Architecture
+                Enrollment checklist
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1141,10 +1321,10 @@ writes or a network listener.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
