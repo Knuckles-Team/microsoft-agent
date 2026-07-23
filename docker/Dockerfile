@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-# The digest pins the multi-platform Python 3.12 slim image. Refresh it only as
+# The digest pins the multi-platform Python 3.14 slim image. Refresh it only as
 # part of an audited dependency update.
 ARG PYTHON_IMAGE=python:3.14-slim@sha256:cea0e6040540fb2b965b6e7fb5ffa00871e632eef63719f0ea54bca189ce14a6
 
