@@ -3,7 +3,7 @@ connector: microsoft-agent
 ontology_source: microsoft
 sync:
 - preset: microsoft-event-structure
-  server: microsoft-agent
+  server: microsoft-mcp
   tool: list_microsoft_ingestion_projection
   action: null
   records_path: records
@@ -14,7 +14,7 @@ sync:
   doc_type: microsoft-event-reference
   tool_schema_sha256: aed3830a8e60658aa10f9b7bc680226e9ac3a76a43ccdca813161211cea57e15
 - preset: microsoft-message-structure
-  server: microsoft-agent
+  server: microsoft-mcp
   tool: list_microsoft_ingestion_projection
   action: null
   records_path: records
@@ -25,7 +25,7 @@ sync:
   doc_type: microsoft-message-reference
   tool_schema_sha256: aed3830a8e60658aa10f9b7bc680226e9ac3a76a43ccdca813161211cea57e15
 - preset: microsoft-user-structure
-  server: microsoft-agent
+  server: microsoft-mcp
   tool: list_microsoft_ingestion_projection
   action: null
   records_path: records

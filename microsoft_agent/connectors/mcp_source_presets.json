@@ -1,7 +1,7 @@
 {
   "_comment": "Keyed zero-PII source projections. Raw Microsoft values never cross this tool boundary; materialization remains quarantined until tenant, ACL, provenance, signature, and privacy policy pass.",
   "microsoft-message-structure": {
-    "server": "microsoft-agent",
+    "server": "microsoft-mcp",
     "tool": "list_microsoft_ingestion_projection",
     "params_style": "args",
     "params": {
@@ -13,7 +13,7 @@
     "doc_type": "microsoft-message-reference"
   },
   "microsoft-event-structure": {
-    "server": "microsoft-agent",
+    "server": "microsoft-mcp",
     "tool": "list_microsoft_ingestion_projection",
     "params_style": "args",
     "params": {
@@ -25,7 +25,7 @@
     "doc_type": "microsoft-event-reference"
   },
   "microsoft-user-structure": {
-    "server": "microsoft-agent",
+    "server": "microsoft-mcp",
     "tool": "list_microsoft_ingestion_projection",
     "params_style": "args",
     "params": {
