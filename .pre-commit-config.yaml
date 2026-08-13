@@ -174,7 +174,7 @@ repos:
     always_run: true
   - id: security-contract
     name: validate repository security contract
-    entry: python scripts/security_contract.py --contract .security/security-contract.json validate
+    entry: python scripts/run_agent_utilities_gate.py --script scripts/security_contract.py -- --contract .security/security-contract.json validate
     language: system
     pass_filenames: false
     always_run: true
