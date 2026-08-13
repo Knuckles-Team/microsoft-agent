@@ -2,7 +2,7 @@
   "api_version": "graphos.io/v1",
   "artifacts": {
     "a2a.json": "55fa894be689f3ff455e6068871a8903b2c26f5eab26193bdb45d526fc8560bf",
-    "connector_manifest.yml": "6963083a9bc5006165fe95192e65b33009aa305eadfa3150bce7aa905586aa05",
+    "connector_manifest.yml": "1f44dc26f2f1f9528aa50d86027672d4843a4e9089f80d3059bafccc83e8cc6c",
     "microsoft_agent/connectors/mcp_source_presets.json": "8df44d60caf12342309f7dccc92bd106027f1b7196de845e247600a2ab6d4aa8",
     "microsoft_agent/connectors/tool_schema_fingerprints.json": "e9f369d877aa2d1b7bd0bbbbfb1a7304e1c882e5552b068a5df79ce2b45aea70",
     "microsoft_agent/ontology/fixtures/records.json": "b29cde0f53b0625dc50c3941d745092f2712044bfd31b9565301c6a314f60adc",
@@ -19,7 +19,7 @@
     "synthetic_fixture_contract": "passed"
   },
   "compatibility": {
-    "agent_utilities": ">=1.27.1,<2",
+    "agent_utilities": ">=2.1.0,<3",
     "bundle_schema": "2",
     "epistemic_graph": ">=2.23.1,<3"
   },
@@ -28,10 +28,10 @@
   "live_certified": false,
   "mode": "offline-source",
   "schema_version": "2",
-  "signature": "Vls6R60Adu9lPvz9iNYQBEKx3vtLtMck1lSomh-M_OiNAzt6E7x1-AbYU6scqXsiRdWGd_j8d7iGlga6OKvVDQ",
+  "signature": "gDGeKtxKSORqn0_Wm6qbBN2Y5b-xeHgPE7N5fnJ5Q2qayOmtMlBcg32H1Rmn1CtGqLLcKzHHANKYIdA3aSNrCw",
   "signature_algorithm": "ed25519",
   "signer": "ontology-manifest-generator",
-  "signing_public_key": "q0Cp7bmQMqJhbofGKKw8xXC6KbFzukBDDke0UYVi8y4",
+  "signing_public_key": "QkigdPNpcUU7x7NcSkwCsUXIQpaFncMQbYSoiSgI2SY",
   "status": "source-validated",
-  "validated_at": "2026-07-18T14:21:05Z"
+  "validated_at": "2026-07-28T10:14:00Z"
 }
