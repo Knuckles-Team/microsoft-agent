@@ -107,6 +107,9 @@ dev = [
   "ruff>=0.15,<1",
 ]
 
+[tool.uv.workspace]
+members = ["."]
+
 [tool.setuptools]
 include-package-data = false
 
