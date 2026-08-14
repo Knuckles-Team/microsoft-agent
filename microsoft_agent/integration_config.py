@@ -62,9 +62,7 @@ class IntegrationRuntimeSettings(BaseModel):
         dataverse_url = _configured_value(env, "MICROSOFT_DATAVERSE_ENVIRONMENT_URL")
         if not raw.get("power_platform") and dataverse_url:
             named_flows = _json_env_object(
-                _configured_value(
-                    env, "MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON"
-                ),
+                _configured_value(env, "MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON"),
                 "MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON",
             )
             raw["power_platform"] = {

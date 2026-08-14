@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import UUID
 
+from agent_utilities.security.cli_secrets import resolve_runtime_secret_reference
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -35,8 +36,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
-from agent_utilities.security.cli_secrets import resolve_runtime_secret_reference
 
 from microsoft_agent.integration_auth import normalize_audience
 from microsoft_agent.windows_companion import (
