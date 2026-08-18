@@ -1119,11 +1119,11 @@ and workload identities should use tenant-level tools or explicit-resource
 variants such as the shared-mailbox <code>/users/{id}</code> tools; the agent must not
 pretend that an app-only token has a current user.</p>
 <p>For a Windows user, start with delegated broker authentication:</p>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">$env:MICROSOFT_TENANT_ID</span> <span class="p">=</span> <span class="s1">&#39;&lt;tenant-guid&gt;&#39;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">$env:MICROSOFT_CLIENT_ID</span> <span class="p">=</span> <span class="s1">&#39;&lt;application-client-id&gt;&#39;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">$env:MICROSOFT_AUTH_MODE</span> <span class="p">=</span> <span class="s1">&#39;delegated&#39;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">$env:MICROSOFT_LOGIN_METHOD</span> <span class="p">=</span> <span class="s1">&#39;auto&#39;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nv">$env:MICROSOFT_ENABLE_BROKER</span> <span class="p">=</span> <span class="s1">&#39;true&#39;</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">$env:MICROSOFT_TENANT_ID</span> <span class="p">=</span> <span class="s1">'&lt;tenant-guid&gt;'</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">$env:MICROSOFT_CLIENT_ID</span> <span class="p">=</span> <span class="s1">'&lt;application-client-id&gt;'</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">$env:MICROSOFT_AUTH_MODE</span> <span class="p">=</span> <span class="s1">'delegated'</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">$env:MICROSOFT_LOGIN_METHOD</span> <span class="p">=</span> <span class="s1">'auto'</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nv">$env:MICROSOFT_ENABLE_BROKER</span> <span class="p">=</span> <span class="s1">'true'</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">microsoft-mcp</span> <span class="p">-</span><span class="n">-transport</span> <span class="n">stdio</span>
 </span></code></pre></div>
 <p><code>auto</code> prefers the Windows Web Account Manager broker on native Windows and the

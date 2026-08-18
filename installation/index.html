@@ -1114,10 +1114,10 @@ groups required by the deployment.</p>
 </tbody>
 </table>
 <p>Install the MCP server:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;microsoft-agent[mcp]&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"microsoft-agent[mcp]"</span>
 </span></code></pre></div>
 <p>Install a broader approved profile when required:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;microsoft-agent[agent,documents,cloud]&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"microsoft-agent[agent,documents,cloud]"</span>
 </span></code></pre></div>
 <p>Agent Utilities resolves Epistemic Graph with the <code>full</code> feature set, including the
 folded numeric ABI. Do not substitute a minimal or numeric-only engine artifact.</p>
@@ -1140,7 +1140,7 @@ references, configuration, and writable storage at deployment time.</p>
 <h2 id="verify-the-installation">Verify the installation<a class="headerlink" href="#verify-the-installation" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>microsoft-mcp<span class="w"> </span>--help
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>microsoft-agent<span class="w"> </span>--help
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import microsoft_agent; print(microsoft_agent.__version__)&quot;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import microsoft_agent; print(microsoft_agent.__version__)"</span>
 </span></code></pre></div>
 <p>Then run the Agent Utilities doctor against the deployment-owned AgentConfig
 profile. Installation is not release-ready until the doctor confirms engine,
