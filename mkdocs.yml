@@ -1,4 +1,5 @@
 site_name: "microsoft-agent"
+site_url: "https://knuckles-team.github.io/microsoft-agent/"
 site_description: "Governed Microsoft Graph MCP provider and optional A2A agent."
 copyright: "Copyright &copy; Project contributors — MIT licensed"
 
