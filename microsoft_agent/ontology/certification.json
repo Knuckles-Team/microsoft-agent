@@ -1,7 +1,7 @@
 {
   "api_version": "graphos.io/v1",
   "artifacts": {
-    "connector_manifest.yml": "cc1cbaf83d21b05eb61c28acc296c499916b1089dfaaba0fb49380a5c1738469",
+    "connector_manifest.yml": "d99f29a0630e1b23526c4b7019c2ef14e9bde01777b24d167bcd8c254e2ae5aa",
     "microsoft_agent/connectors/mcp_source_presets.json": "62d90f36250ff984665e62862566d0b2be2ffca69b35ebc394a1a5bce074cc32",
     "microsoft_agent/connectors/tool_schema_fingerprints.json": "e9f369d877aa2d1b7bd0bbbbfb1a7304e1c882e5552b068a5df79ce2b45aea70",
     "microsoft_agent/ontology/fixtures/records.json": "b29cde0f53b0625dc50c3941d745092f2712044bfd31b9565301c6a314f60adc",
@@ -18,9 +18,9 @@
     "synthetic_fixture_contract": "passed"
   },
   "compatibility": {
-    "agent_utilities": ">=2.4.0,<3",
+    "agent_utilities": ">=2.5.0,<3",
     "bundle_schema": "2",
-    "epistemic_graph": ">=2.26.0,<3"
+    "epistemic_graph": ">=2.27.0,<3"
   },
   "connector": "microsoft-agent",
   "kind": "ConnectorSourceAttestation",
@@ -32,5 +32,5 @@
   "signer": "UNSIGNED-PREVIEW",
   "signing_public_key": "",
   "status": "source-validated",
-  "validated_at": "2026-08-21T04:30:39Z"
+  "validated_at": "2026-08-26T13:42:55Z"
 }
