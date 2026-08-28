@@ -40,7 +40,7 @@ def register_devices_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft devices operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

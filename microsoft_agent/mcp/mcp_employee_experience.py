@@ -34,7 +34,7 @@ def register_employee_experience_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft employee experience operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

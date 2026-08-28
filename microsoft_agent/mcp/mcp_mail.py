@@ -59,7 +59,7 @@ def register_mail_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft mail operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

@@ -4,7 +4,7 @@ CONCEPT:AU-ECO.mcp.fastmcp-middleware
 """
 
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -35,7 +35,7 @@ async def test_list_actions_returns_action_names():
     assert len(action_tools) < len(tools), "expected a mixed MCP tool surface"
 
     client = MagicMock()
-    ctx = MagicMock()
+    ctx = AsyncMock()
 
     for tool in action_tools:
         result = await tool.fn(
@@ -64,5 +64,5 @@ async def test_unknown_action_raises_with_discovery_hint():
             action="definitely_not_a_real_action",
             params_json="{}",
             client=MagicMock(),
-            ctx=MagicMock(),
+            ctx=AsyncMock(),
         )

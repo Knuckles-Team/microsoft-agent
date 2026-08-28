@@ -43,7 +43,7 @@ def register_directory_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft directory operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

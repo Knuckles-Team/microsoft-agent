@@ -1,6 +1,6 @@
 import json
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -84,7 +84,7 @@ async def test_all_mcp_tools_and_actions():
     assert dedicated_tools, "expected dedicated tools alongside action-routed tools"
 
     mock_client = MagicMock()
-    mock_ctx = MagicMock()
+    mock_ctx = AsyncMock()
     for tool in action_tools:
         discovery = await tool.fn(
             action="list_actions",

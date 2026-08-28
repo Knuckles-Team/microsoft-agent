@@ -44,7 +44,7 @@ def register_calendar_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft calendar operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:
