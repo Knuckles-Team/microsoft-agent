@@ -52,18 +52,4 @@ def register_domains_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_domains":
-            return await invoke_client_method(client.list_domains, **kwargs)
-        if action == "get_domain":
-            return await invoke_client_method(client.get_domain, **kwargs)
-        if action == "create_domain":
-            return await invoke_client_method(client.create_domain, **kwargs)
-        if action == "delete_domain":
-            return await invoke_client_method(client.delete_domain, **kwargs)
-        if action == "verify_domain":
-            return await invoke_client_method(client.verify_domain, **kwargs)
-        if action == "list_domain_service_configuration_records":
-            return await invoke_client_method(
-                client.list_domain_service_configuration_records, **kwargs
-            )
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

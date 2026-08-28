@@ -60,30 +60,4 @@ def register_applications_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_applications":
-            return await invoke_client_method(client.list_applications, **kwargs)
-        if action == "get_application":
-            return await invoke_client_method(client.get_application, **kwargs)
-        if action == "create_application":
-            return await invoke_client_method(client.create_application, **kwargs)
-        if action == "update_application":
-            return await invoke_client_method(client.update_application, **kwargs)
-        if action == "delete_application":
-            return await invoke_client_method(client.delete_application, **kwargs)
-        if action == "add_application_password":
-            return await invoke_client_method(client.add_application_password, **kwargs)
-        if action == "remove_application_password":
-            return await invoke_client_method(
-                client.remove_application_password, **kwargs
-            )
-        if action == "list_service_principals":
-            return await invoke_client_method(client.list_service_principals, **kwargs)
-        if action == "get_service_principal":
-            return await invoke_client_method(client.get_service_principal, **kwargs)
-        if action == "create_service_principal":
-            return await invoke_client_method(client.create_service_principal, **kwargs)
-        if action == "update_service_principal":
-            return await invoke_client_method(client.update_service_principal, **kwargs)
-        if action == "delete_service_principal":
-            return await invoke_client_method(client.delete_service_principal, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

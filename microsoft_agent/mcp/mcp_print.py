@@ -54,22 +54,4 @@ def register_print_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_printers":
-            return await invoke_client_method(client.list_printers, **kwargs)
-        if action == "get_printer":
-            return await invoke_client_method(client.get_printer, **kwargs)
-        if action == "list_print_jobs":
-            return await invoke_client_method(client.list_print_jobs, **kwargs)
-        if action == "create_print_job":
-            return await invoke_client_method(client.create_print_job, **kwargs)
-        if action == "create_print_document_upload_session":
-            return await invoke_client_method(
-                client.create_print_document_upload_session, **kwargs
-            )
-        if action == "start_print_job":
-            return await invoke_client_method(client.start_print_job, **kwargs)
-        if action == "submit_print_document":
-            return await invoke_client_method(client.submit_print_document, **kwargs)
-        if action == "list_print_shares":
-            return await invoke_client_method(client.list_print_shares, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

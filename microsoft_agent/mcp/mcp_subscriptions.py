@@ -53,14 +53,4 @@ def register_subscriptions_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_subscriptions":
-            return await invoke_client_method(client.list_subscriptions, **kwargs)
-        if action == "get_subscription":
-            return await invoke_client_method(client.get_subscription, **kwargs)
-        if action == "create_subscription":
-            return await invoke_client_method(client.create_subscription, **kwargs)
-        if action == "update_subscription":
-            return await invoke_client_method(client.update_subscription, **kwargs)
-        if action == "delete_subscription":
-            return await invoke_client_method(client.delete_subscription, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

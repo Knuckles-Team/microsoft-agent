@@ -55,26 +55,4 @@ def register_devices_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_devices":
-            return await invoke_client_method(client.list_devices, **kwargs)
-        if action == "get_device":
-            return await invoke_client_method(client.get_device, **kwargs)
-        if action == "delete_device":
-            return await invoke_client_method(client.delete_device, **kwargs)
-        if action == "list_managed_devices":
-            return await invoke_client_method(client.list_managed_devices, **kwargs)
-        if action == "get_managed_device":
-            return await invoke_client_method(client.get_managed_device, **kwargs)
-        if action == "list_device_compliance_policies":
-            return await invoke_client_method(
-                client.list_device_compliance_policies, **kwargs
-            )
-        if action == "list_device_configurations":
-            return await invoke_client_method(
-                client.list_device_configurations, **kwargs
-            )
-        if action == "wipe_managed_device":
-            return await invoke_client_method(client.wipe_managed_device, **kwargs)
-        if action == "retire_managed_device":
-            return await invoke_client_method(client.retire_managed_device, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

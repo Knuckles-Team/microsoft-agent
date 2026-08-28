@@ -56,36 +56,4 @@ def register_identity_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "create_invitation":
-            return await invoke_client_method(client.create_invitation, **kwargs)
-        if action == "list_conditional_access_policies":
-            return await invoke_client_method(
-                client.list_conditional_access_policies, **kwargs
-            )
-        if action == "get_conditional_access_policy":
-            return await invoke_client_method(
-                client.get_conditional_access_policy, **kwargs
-            )
-        if action == "create_conditional_access_policy":
-            return await invoke_client_method(
-                client.create_conditional_access_policy, **kwargs
-            )
-        if action == "update_conditional_access_policy":
-            return await invoke_client_method(
-                client.update_conditional_access_policy, **kwargs
-            )
-        if action == "delete_conditional_access_policy":
-            return await invoke_client_method(
-                client.delete_conditional_access_policy, **kwargs
-            )
-        if action == "list_access_reviews":
-            return await invoke_client_method(client.list_access_reviews, **kwargs)
-        if action == "get_access_review":
-            return await invoke_client_method(client.get_access_review, **kwargs)
-        if action == "list_entitlement_access_packages":
-            return await invoke_client_method(
-                client.list_entitlement_access_packages, **kwargs
-            )
-        if action == "list_lifecycle_workflows":
-            return await invoke_client_method(client.list_lifecycle_workflows, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

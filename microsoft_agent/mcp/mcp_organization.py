@@ -53,14 +53,4 @@ def register_organization_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_organization":
-            return await invoke_client_method(client.list_organization, **kwargs)
-        if action == "get_organization":
-            return await invoke_client_method(client.get_organization, **kwargs)
-        if action == "update_organization":
-            return await invoke_client_method(client.update_organization, **kwargs)
-        if action == "get_org_branding":
-            return await invoke_client_method(client.get_org_branding, **kwargs)
-        if action == "update_org_branding":
-            return await invoke_client_method(client.update_org_branding, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

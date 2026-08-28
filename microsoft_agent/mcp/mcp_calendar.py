@@ -59,40 +59,4 @@ def register_calendar_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_calendar_events":
-            return await invoke_client_method(client.list_calendar_events, **kwargs)
-        if action == "get_calendar_event":
-            return await invoke_client_method(client.get_calendar_event, **kwargs)
-        if action == "create_calendar_event":
-            return await invoke_client_method(client.create_calendar_event, **kwargs)
-        if action == "update_calendar_event":
-            return await invoke_client_method(client.update_calendar_event, **kwargs)
-        if action == "delete_calendar_event":
-            return await invoke_client_method(client.delete_calendar_event, **kwargs)
-        if action == "list_specific_calendar_events":
-            return await invoke_client_method(
-                client.list_specific_calendar_events, **kwargs
-            )
-        if action == "get_specific_calendar_event":
-            return await invoke_client_method(
-                client.get_specific_calendar_event, **kwargs
-            )
-        if action == "create_specific_calendar_event":
-            return await invoke_client_method(
-                client.create_specific_calendar_event, **kwargs
-            )
-        if action == "update_specific_calendar_event":
-            return await invoke_client_method(
-                client.update_specific_calendar_event, **kwargs
-            )
-        if action == "delete_specific_calendar_event":
-            return await invoke_client_method(
-                client.delete_specific_calendar_event, **kwargs
-            )
-        if action == "get_calendar_view":
-            return await invoke_client_method(client.get_calendar_view, **kwargs)
-        if action == "list_calendars":
-            return await invoke_client_method(client.list_calendars, **kwargs)
-        if action == "find_meeting_times":
-            return await invoke_client_method(client.find_meeting_times, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

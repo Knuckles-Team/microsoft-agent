@@ -52,18 +52,4 @@ def register_education_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_education_classes":
-            return await invoke_client_method(client.list_education_classes, **kwargs)
-        if action == "get_education_class":
-            return await invoke_client_method(client.get_education_class, **kwargs)
-        if action == "list_education_schools":
-            return await invoke_client_method(client.list_education_schools, **kwargs)
-        if action == "get_education_school":
-            return await invoke_client_method(client.get_education_school, **kwargs)
-        if action == "list_education_users":
-            return await invoke_client_method(client.list_education_users, **kwargs)
-        if action == "list_education_assignments":
-            return await invoke_client_method(
-                client.list_education_assignments, **kwargs
-            )
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

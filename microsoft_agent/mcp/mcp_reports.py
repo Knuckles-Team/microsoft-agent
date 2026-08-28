@@ -52,24 +52,4 @@ def register_reports_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "get_email_activity_report":
-            return await invoke_client_method(
-                client.get_email_activity_report, **kwargs
-            )
-        if action == "get_mailbox_usage_report":
-            return await invoke_client_method(client.get_mailbox_usage_report, **kwargs)
-        if action == "get_office365_active_users":
-            return await invoke_client_method(
-                client.get_office365_active_users, **kwargs
-            )
-        if action == "get_sharepoint_activity_report":
-            return await invoke_client_method(
-                client.get_sharepoint_activity_report, **kwargs
-            )
-        if action == "get_teams_user_activity":
-            return await invoke_client_method(client.get_teams_user_activity, **kwargs)
-        if action == "get_onedrive_usage_report":
-            return await invoke_client_method(
-                client.get_onedrive_usage_report, **kwargs
-            )
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

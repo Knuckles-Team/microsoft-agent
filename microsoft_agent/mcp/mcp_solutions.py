@@ -51,18 +51,4 @@ def register_solutions_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_booking_businesses":
-            return await invoke_client_method(client.list_booking_businesses, **kwargs)
-        if action == "get_booking_business":
-            return await invoke_client_method(client.get_booking_business, **kwargs)
-        if action == "list_booking_appointments":
-            return await invoke_client_method(
-                client.list_booking_appointments, **kwargs
-            )
-        if action == "create_booking_appointment":
-            return await invoke_client_method(
-                client.create_booking_appointment, **kwargs
-            )
-        if action == "list_virtual_events":
-            return await invoke_client_method(client.list_virtual_events, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

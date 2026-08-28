@@ -63,42 +63,4 @@ def register_security_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_security_alerts":
-            return await invoke_client_method(client.list_security_alerts, **kwargs)
-        if action == "get_security_alert":
-            return await invoke_client_method(client.get_security_alert, **kwargs)
-        if action == "update_security_alert":
-            return await invoke_client_method(client.update_security_alert, **kwargs)
-        if action == "list_security_incidents":
-            return await invoke_client_method(client.list_security_incidents, **kwargs)
-        if action == "get_security_incident":
-            return await invoke_client_method(client.get_security_incident, **kwargs)
-        if action == "update_security_incident":
-            return await invoke_client_method(client.update_security_incident, **kwargs)
-        if action == "list_secure_scores":
-            return await invoke_client_method(client.list_secure_scores, **kwargs)
-        if action == "list_threat_intelligence_hosts":
-            return await invoke_client_method(
-                client.list_threat_intelligence_hosts, **kwargs
-            )
-        if action == "get_threat_intelligence_host":
-            return await invoke_client_method(
-                client.get_threat_intelligence_host, **kwargs
-            )
-        if action == "run_hunting_query":
-            return await invoke_client_method(client.run_hunting_query, **kwargs)
-        if action == "list_risk_detections":
-            return await invoke_client_method(client.list_risk_detections, **kwargs)
-        if action == "get_risk_detection":
-            return await invoke_client_method(client.get_risk_detection, **kwargs)
-        if action == "list_risky_users":
-            return await invoke_client_method(client.list_risky_users, **kwargs)
-        if action == "get_risky_user":
-            return await invoke_client_method(client.get_risky_user, **kwargs)
-        if action == "dismiss_risky_user":
-            return await invoke_client_method(client.dismiss_risky_user, **kwargs)
-        if action == "list_sensitivity_labels":
-            return await invoke_client_method(client.list_sensitivity_labels, **kwargs)
-        if action == "get_sensitivity_label":
-            return await invoke_client_method(client.get_sensitivity_label, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

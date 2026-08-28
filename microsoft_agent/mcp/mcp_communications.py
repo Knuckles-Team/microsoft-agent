@@ -58,24 +58,4 @@ def register_communications_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_online_meetings":
-            return await invoke_client_method(client.list_online_meetings, **kwargs)
-        if action == "get_online_meeting":
-            return await invoke_client_method(client.get_online_meeting, **kwargs)
-        if action == "create_online_meeting":
-            return await invoke_client_method(client.create_online_meeting, **kwargs)
-        if action == "update_online_meeting":
-            return await invoke_client_method(client.update_online_meeting, **kwargs)
-        if action == "delete_online_meeting":
-            return await invoke_client_method(client.delete_online_meeting, **kwargs)
-        if action == "list_call_records":
-            return await invoke_client_method(client.list_call_records, **kwargs)
-        if action == "get_call_record":
-            return await invoke_client_method(client.get_call_record, **kwargs)
-        if action == "list_presences":
-            return await invoke_client_method(client.list_presences, **kwargs)
-        if action == "get_presence":
-            return await invoke_client_method(client.get_presence, **kwargs)
-        if action == "get_my_presence":
-            return await invoke_client_method(client.get_my_presence, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

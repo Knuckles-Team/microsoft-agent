@@ -56,34 +56,4 @@ def register_admin_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_service_health":
-            return await invoke_client_method(client.list_service_health, **kwargs)
-        if action == "get_service_health":
-            return await invoke_client_method(client.get_service_health, **kwargs)
-        if action == "list_service_health_issues":
-            return await invoke_client_method(
-                client.list_service_health_issues, **kwargs
-            )
-        if action == "get_service_health_issue":
-            return await invoke_client_method(client.get_service_health_issue, **kwargs)
-        if action == "list_service_update_messages":
-            return await invoke_client_method(
-                client.list_service_update_messages, **kwargs
-            )
-        if action == "get_service_update_message":
-            return await invoke_client_method(
-                client.get_service_update_message, **kwargs
-            )
-        if action == "get_admin_sharepoint":
-            return await invoke_client_method(client.get_admin_sharepoint, **kwargs)
-        if action == "update_admin_sharepoint":
-            return await invoke_client_method(client.update_admin_sharepoint, **kwargs)
-        if action == "list_delegated_admin_relationships":
-            return await invoke_client_method(
-                client.list_delegated_admin_relationships, **kwargs
-            )
-        if action == "get_delegated_admin_relationship":
-            return await invoke_client_method(
-                client.get_delegated_admin_relationship, **kwargs
-            )
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

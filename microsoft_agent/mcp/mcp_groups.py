@@ -57,26 +57,4 @@ def register_groups_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_groups":
-            return await invoke_client_method(client.list_groups, **kwargs)
-        if action == "get_group":
-            return await invoke_client_method(client.get_group, **kwargs)
-        if action == "create_group":
-            return await invoke_client_method(client.create_group, **kwargs)
-        if action == "update_group":
-            return await invoke_client_method(client.update_group, **kwargs)
-        if action == "delete_group":
-            return await invoke_client_method(client.delete_group, **kwargs)
-        if action == "list_group_members":
-            return await invoke_client_method(client.list_group_members, **kwargs)
-        if action == "add_group_member":
-            return await invoke_client_method(client.add_group_member, **kwargs)
-        if action == "remove_group_member":
-            return await invoke_client_method(client.remove_group_member, **kwargs)
-        if action == "list_group_owners":
-            return await invoke_client_method(client.list_group_owners, **kwargs)
-        if action == "list_group_conversations":
-            return await invoke_client_method(client.list_group_conversations, **kwargs)
-        if action == "list_group_drives":
-            return await invoke_client_method(client.list_group_drives, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

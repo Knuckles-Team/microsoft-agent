@@ -51,14 +51,4 @@ def register_audit_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_directory_audits":
-            return await invoke_client_method(client.list_directory_audits, **kwargs)
-        if action == "get_directory_audit":
-            return await invoke_client_method(client.get_directory_audit, **kwargs)
-        if action == "list_sign_in_logs":
-            return await invoke_client_method(client.list_sign_in_logs, **kwargs)
-        if action == "get_sign_in_log":
-            return await invoke_client_method(client.get_sign_in_log, **kwargs)
-        if action == "list_provisioning_logs":
-            return await invoke_client_method(client.list_provisioning_logs, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

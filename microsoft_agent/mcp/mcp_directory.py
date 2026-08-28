@@ -58,30 +58,4 @@ def register_directory_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "list_directory_objects":
-            return await invoke_client_method(client.list_directory_objects, **kwargs)
-        if action == "get_directory_object":
-            return await invoke_client_method(client.get_directory_object, **kwargs)
-        if action == "list_directory_roles":
-            return await invoke_client_method(client.list_directory_roles, **kwargs)
-        if action == "get_directory_role":
-            return await invoke_client_method(client.get_directory_role, **kwargs)
-        if action == "list_directory_role_templates":
-            return await invoke_client_method(
-                client.list_directory_role_templates, **kwargs
-            )
-        if action == "list_deleted_items":
-            return await invoke_client_method(client.list_deleted_items, **kwargs)
-        if action == "restore_deleted_item":
-            return await invoke_client_method(client.restore_deleted_item, **kwargs)
-        if action == "list_role_definitions":
-            return await invoke_client_method(client.list_role_definitions, **kwargs)
-        if action == "get_role_definition":
-            return await invoke_client_method(client.get_role_definition, **kwargs)
-        if action == "list_role_assignments":
-            return await invoke_client_method(client.list_role_assignments, **kwargs)
-        if action == "get_role_assignment":
-            return await invoke_client_method(client.get_role_assignment, **kwargs)
-        if action == "create_role_assignment":
-            return await invoke_client_method(client.create_role_assignment, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)

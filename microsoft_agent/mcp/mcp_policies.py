@@ -51,20 +51,4 @@ def register_policies_tools(mcp: FastMCP):
             return resolved
         action = resolved
 
-        if action == "get_authorization_policy":
-            return await invoke_client_method(client.get_authorization_policy, **kwargs)
-        if action == "list_token_lifetime_policies":
-            return await invoke_client_method(
-                client.list_token_lifetime_policies, **kwargs
-            )
-        if action == "list_token_issuance_policies":
-            return await invoke_client_method(
-                client.list_token_issuance_policies, **kwargs
-            )
-        if action == "list_permission_grant_policies":
-            return await invoke_client_method(
-                client.list_permission_grant_policies, **kwargs
-            )
-        if action == "get_admin_consent_policy":
-            return await invoke_client_method(client.get_admin_consent_policy, **kwargs)
-        raise ValueError(f"Unknown action: {action}")
+        return await invoke_client_method(getattr(client, action), **kwargs)
