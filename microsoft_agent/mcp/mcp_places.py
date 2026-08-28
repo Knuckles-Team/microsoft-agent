@@ -30,7 +30,7 @@ def register_places_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft places operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

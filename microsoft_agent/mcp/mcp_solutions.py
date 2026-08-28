@@ -36,7 +36,7 @@ def register_solutions_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft solutions operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

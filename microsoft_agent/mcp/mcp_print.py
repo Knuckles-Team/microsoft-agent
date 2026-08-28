@@ -39,7 +39,7 @@ def register_print_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft print operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

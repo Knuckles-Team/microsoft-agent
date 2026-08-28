@@ -35,7 +35,7 @@ def register_sites_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft sites operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:

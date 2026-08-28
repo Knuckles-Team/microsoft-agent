@@ -37,7 +37,7 @@ def register_education_tools(mcp: FastMCP):
     ) -> dict:
         """Manage microsoft education operations."""
         if ctx:
-            ctx.info("Executing tool...")
+            await ctx.info("Executing tool...")
         import json
 
         try:
