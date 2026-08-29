@@ -2,7 +2,7 @@ import time
 from unittest.mock import MagicMock, patch
 
 import pytest
-from agent_utilities.exceptions import AuthError, UnauthorizedError
+from agent_utilities.core.exceptions import AuthError, UnauthorizedError
 from azure.core.credentials import AccessToken
 
 import microsoft_agent.auth as auth_mod
