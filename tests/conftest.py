@@ -3,10 +3,10 @@
 CONCEPT:AU-ECO.mcp.fastmcp-middleware
 """
 
-import atexit
 import os
+from collections.abc import Callable
 from datetime import datetime
-from typing import Any
+from typing import Any, ParamSpec, TypeVar
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -14,10 +14,18 @@ from msgraph import GraphServiceClient
 
 # Globally disable atexit hook registration during tests to prevent real keyring
 # calls during interpreter exit.
-atexit.register = lambda fn, *args, **kwargs: fn
+_P = ParamSpec("_P")
+_T = TypeVar("_T")
 
-# Set TESTING environment variable to prevent global auth_manager creation
-os.environ["TESTING"] = "1"
+
+def _ignore_atexit_registration(
+    fn: Callable[_P, _T], *args: _P.args, **kwargs: _P.kwargs
+) -> Callable[_P, _T]:
+    return fn
+
+
+_ATEXIT_PATCHER = patch("atexit.register", new=_ignore_atexit_registration)
+_ATEXIT_PATCHER.start()
 
 
 @pytest.fixture(autouse=True, scope="session")

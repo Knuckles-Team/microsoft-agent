@@ -1,4 +1,9 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from microsoft_agent.power_platform import AsyncHttpTransport
 
 from microsoft_agent.api._graph_models import (
     decode_graph_base64,
@@ -2024,7 +2029,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
         printer_id: str,
         submission: Any,
         *,
-        upload_transport: Any | None = None,
+        upload_transport: AsyncHttpTransport | None = None,
     ) -> dict[str, Any]:
         """Create, upload, and start one print job without exposing its upload URL."""
         from microsoft_agent.power_platform import HttpxAsyncHttpTransport
@@ -2077,13 +2082,15 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
         owned_transport: HttpxAsyncHttpTransport | None = None
         try:
             upload_url = validate_print_upload_url(session.get("uploadUrl"))
-            if upload_transport is None:
+            transport = upload_transport
+            if transport is None:
                 owned_transport = HttpxAsyncHttpTransport(
                     service="microsoft_graph",
                     tls_profile=self.auth_manager.graph_tls_profile,
                     tls_profile_ref=self.auth_manager.graph_tls_profile_ref,
                 )
-            uploader = UniversalPrintUploader(upload_transport or owned_transport)
+                transport = owned_transport
+            uploader = UniversalPrintUploader(transport)
             uploaded = await uploader.upload(upload_url, content)
         except (TypeError, ValueError, RuntimeError) as exc:
             return {"error": str(exc), "stage": "upload_document"}

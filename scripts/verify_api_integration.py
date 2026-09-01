@@ -3,6 +3,7 @@ import ast
 import glob
 import os
 import sys
+import tomllib
 from pathlib import Path
 
 BASELINES = {
@@ -63,6 +64,8 @@ class MethodCallVisitor(ast.NodeVisitor):
     def __init__(self):
         self.called_methods = set()
         self.action_literals = set()
+        self.action_catalogs = set()
+        self.dynamic_client_dispatch = False
 
     def visit_Attribute(self, node):
         # E.g. client.get_repositories
@@ -79,6 +82,23 @@ class MethodCallVisitor(ast.NodeVisitor):
                 if node.args[0].id in ("client", "api"):
                     if isinstance(node.args[1], ast.Constant):
                         self.called_methods.add(node.args[1].value)
+                    else:
+                        self.dynamic_client_dispatch = True
+        # Condensed routers validate a dynamic action against a module-level
+        # ``*_ACTIONS`` catalog before dispatching it with ``getattr(client,
+        # action)``. The catalog is the integration map in that shape.
+        if (
+            isinstance(node.func, (ast.Name, ast.Attribute))
+            and (
+                isinstance(node.func, ast.Name)
+                and node.func.id == "resolve_action"
+                or isinstance(node.func, ast.Attribute)
+                and node.func.attr == "resolve_action"
+            )
+            and len(node.args) >= 2
+            and isinstance(node.args[1], ast.Name)
+        ):
+            self.action_catalogs.add(node.args[1].id)
         self.generic_visit(node)
 
     def visit_Compare(self, node):
@@ -90,6 +110,34 @@ class MethodCallVisitor(ast.NodeVisitor):
                 ):
                     self.action_literals.add(comparator.value)
         self.generic_visit(node)
+
+
+def _module_action_catalogs(tree):
+    """Return literal module-level ``*_ACTIONS`` catalogs by constant name."""
+    catalogs = {}
+    for node in tree.body:
+        value: ast.expr | None
+        if isinstance(node, ast.Assign):
+            names = [
+                target.id for target in node.targets if isinstance(target, ast.Name)
+            ]
+            value = node.value
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            names = [node.target.id]
+            value = node.value
+        else:
+            continue
+        if not isinstance(value, (ast.Tuple, ast.List, ast.Set)):
+            continue
+        values = {
+            item.value
+            for item in value.elts
+            if isinstance(item, ast.Constant) and isinstance(item.value, str)
+        }
+        for name in names:
+            if name.endswith("_ACTIONS") and len(values) == len(value.elts):
+                catalogs[name] = values
+    return catalogs
 
 
 def parse_mcp_server(filepaths, api_methods):
@@ -104,6 +152,7 @@ def parse_mcp_server(filepaths, api_methods):
     for filepath in filepaths:
         with open(filepath, encoding="utf-8") as f:
             tree = ast.parse(f.read(), filename=filepath)
+        action_catalogs = _module_action_catalogs(tree)
 
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -126,11 +175,24 @@ def parse_mcp_server(filepaths, api_methods):
                 ):
                     visitor = MethodCallVisitor()
                     visitor.visit(node)
-                    # Find which of the visited methods are in our api_methods list
-                    mapped = visitor.called_methods.intersection(api_methods.keys())
+                    catalog_methods = (
+                        set().union(
+                            *(
+                                action_catalogs.get(name, set())
+                                for name in visitor.action_catalogs
+                            )
+                        )
+                        if visitor.dynamic_client_dispatch
+                        else set()
+                    )
+                    # Find direct client calls plus allowlisted dynamic dispatches.
+                    mapped = (visitor.called_methods | catalog_methods).intersection(
+                        api_methods.keys()
+                    )
                     tool_mappings[node.name] = {
                         "methods": list(mapped),
                         "actions": list(visitor.action_literals),
+                        "catalogs": sorted(visitor.action_catalogs),
                     }
                     all_mapped_methods.update(mapped)
 
@@ -149,12 +211,22 @@ def verify_agent(agent_dir):
     if not api_clients or not mcp_servers:
         return None
 
-    api_clients = sorted(
-        path
-        for path in api_clients
-        if not any(part.startswith(".") for part in Path(path).parts)
-        and "site-packages" not in Path(path).parts
-    )
+    agent_root = Path(agent_dir).resolve()
+
+    def runtime_source(path):
+        candidate = Path(path).resolve()
+        try:
+            relative = candidate.relative_to(agent_root)
+        except ValueError:
+            return False
+        return not any(part.startswith(".") for part in relative.parts) and (
+            "site-packages" not in relative.parts
+        )
+
+    api_clients = sorted(path for path in api_clients if runtime_source(path))
+    mcp_servers = sorted(path for path in mcp_servers if runtime_source(path))
+    if not api_clients or not mcp_servers:
+        return None
     mcp_server_path = mcp_servers[0]
 
     # Fleet api/ + mcp/ convention: a monolith's tool registrars may live in a
@@ -178,8 +250,20 @@ def verify_agent(agent_dir):
 
     unmapped = set(api_methods.keys()) - mapped_methods
 
+    agent_name = os.path.basename(agent_dir)
+    pyproject = agent_root / "pyproject.toml"
+    if pyproject.is_file():
+        try:
+            project = tomllib.loads(pyproject.read_text(encoding="utf-8")).get(
+                "project", {}
+            )
+        except (OSError, tomllib.TOMLDecodeError):
+            project = {}
+        if isinstance(project, dict) and isinstance(project.get("name"), str):
+            agent_name = project["name"]
+
     return {
-        "agent_name": os.path.basename(agent_dir),
+        "agent_name": agent_name,
         "api_clients": api_clients,
         "mcp_server": mcp_server_path,
         "total_methods": total_methods,

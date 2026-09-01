@@ -17,7 +17,8 @@ services:
         max-file: "3"
     restart: always
     env_file:
-      - ../.env
+      - path: ../.env
+        required: false
     environment:
       - "HOST=0.0.0.0"
       - "PORT=8026"
@@ -64,7 +65,8 @@ services:
         max-file: "3"
     restart: always
     env_file:
-      - ../.env
+      - path: ../.env
+        required: false
     environment:
       - "HOST=0.0.0.0"
       - "PORT=9026"

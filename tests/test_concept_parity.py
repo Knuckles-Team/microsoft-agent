@@ -1,13 +1,18 @@
+import importlib.util
 import os
 import re
+from pathlib import Path
 
 import pytest
 
-# Paths
+# Paths.  Resolve the registry from the installed agent-utilities source instead
+# of assuming this checkout lives at a fixed depth inside the workspace.  Native
+# git worktrees intentionally have arbitrary directory names and locations.
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-WORKSPACE_DIR = os.path.dirname(os.path.dirname(ROOT_DIR))
-MASTER_OVERVIEW_PATH = os.path.join(
-    WORKSPACE_DIR, "agent-utilities", "docs", "overview.md"
+_AU_SPEC = importlib.util.find_spec("agent_utilities")
+assert _AU_SPEC is not None and _AU_SPEC.origin is not None
+MASTER_OVERVIEW_PATH = str(
+    Path(_AU_SPEC.origin).resolve().parent.parent / "docs" / "overview.md"
 )
 
 

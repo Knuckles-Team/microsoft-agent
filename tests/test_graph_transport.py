@@ -28,7 +28,9 @@ def test_graph_transport_uses_shared_tls_profile_without_redirects(monkeypatch) 
     profile = MagicMock()
     profile.httpx_kwargs.return_value = {
         "verify": MagicMock(name="ssl-context"),
-        "trust_env": False,
+        # Pinned Graph egress must override a profile that otherwise permits
+        # ambient proxy inheritance.
+        "trust_env": True,
     }
     resolver = MagicMock(return_value=profile)
     client = MagicMock()

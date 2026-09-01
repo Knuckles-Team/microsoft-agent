@@ -1,14 +1,27 @@
 """Static supply-chain contract for provider container targets."""
 
+import re
+import tomllib
 from pathlib import Path
 
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
+
 DOCKERFILE = Path(__file__).resolve().parents[1] / "docker" / "Dockerfile"
+PYPROJECT = DOCKERFILE.parents[1] / "pyproject.toml"
 
 
 def test_container_builds_local_source_from_a_digest_pinned_base() -> None:
     content = DOCKERFILE.read_text(encoding="utf-8")
 
-    assert "python:3.12-slim@sha256:" in content
+    image = re.search(
+        r"^ARG PYTHON_IMAGE=python:(\d+\.\d+)-slim@sha256:([0-9a-f]{64})$",
+        content,
+        re.MULTILINE,
+    )
+    assert image is not None
+    project = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))["project"]
+    assert Version(image.group(1)) in SpecifierSet(project["requires-python"])
     assert "COPY pyproject.toml README.md LICENSE MANIFEST.in ./" in content
     assert '".[mcp]"' in content
     assert '".[agent]"' in content
