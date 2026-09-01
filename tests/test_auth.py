@@ -26,6 +26,18 @@ class TestAuthManager:
         assert real_auth_manager.scopes == ["User.Read", "Mail.ReadWrite"]
         assert real_auth_manager.access_token is None
 
+    def test_init_always_registers_secure_cache_save(self, monkeypatch):
+        """Test-only environment state must not alter production persistence wiring."""
+        monkeypatch.setenv("TESTING", "1")
+        with (
+            patch("microsoft_agent.auth.atexit.register") as register,
+            patch("microsoft_agent.auth.keyring.get_password", return_value=None),
+            patch("microsoft_agent.auth.msal.PublicClientApplication"),
+        ):
+            manager = AuthManager("client-id", "authority", ["User.Read"])
+
+        register.assert_called_once_with(manager.save_token_cache)
+
     def test_managed_identity_credential_acquires_default_scope(self):
         credential = MagicMock()
         credential.get_token.return_value = MagicMock(

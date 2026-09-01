@@ -8,13 +8,12 @@ import json
 import logging
 import sys
 import time
-from collections.abc import AsyncIterator, Callable, Sequence
+from collections.abc import AsyncGenerator, Callable, Sequence
 from pathlib import Path
 from typing import Any
 
 import keyring
 import msal
-from agent_utilities.core.config import setting
 from agent_utilities.core.exceptions import AuthError, UnauthorizedError
 from keyring.errors import KeyringError
 
@@ -137,8 +136,7 @@ class AuthManager:
         if self.mode is AuthenticationMode.DELEGATED:
             self.load_token_cache()
         self.msal_app = self._create_msal_application(client_credential)
-        if setting("TESTING") != "1":
-            atexit.register(self.save_token_cache)
+        atexit.register(self.save_token_cache)
 
     def _create_msal_application(
         self, client_credential: str | dict[str, Any] | None
@@ -677,7 +675,7 @@ async def get_client() -> Any:
         ) from exc
 
 
-async def get_client_dependency() -> AsyncIterator[Any]:
+async def get_client_dependency() -> AsyncGenerator[Any, None]:
     """Yield one request-scoped Graph client and always release its transport."""
 
     client = await get_client()

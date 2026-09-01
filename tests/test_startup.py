@@ -4,18 +4,10 @@ import pytest
 @pytest.mark.concept("ECO-4.1")
 def test_server_startup(monkeypatch):
     """Validates that the server module can start successfully."""
-    import os
     import sys
     from unittest.mock import MagicMock
 
-    target_dir = None
-    for d in [".", "src", "agent", "microsoft_agent"]:
-        if os.path.exists(os.path.join(d, "agent_server.py")):
-            target_dir = d
-            break
-
-    if target_dir is None:
-        return
+    from microsoft_agent import agent_server as server_module
 
     monkeypatch.setattr(
         sys,
@@ -29,21 +21,11 @@ def test_server_startup(monkeypatch):
         return_value={"name": "Microsoft Agent", "description": "AI agent"}
     )
 
-    monkeypatch.setattr("agent_utilities.create_agent_server", mock_create_agent_server)
-    monkeypatch.setattr(
-        "agent_utilities.initialize_workspace", mock_initialize_workspace
-    )
-    monkeypatch.setattr("agent_utilities.load_identity", mock_load_identity)
+    monkeypatch.setattr(server_module, "create_agent_server", mock_create_agent_server)
+    monkeypatch.setattr(server_module, "initialize_workspace", mock_initialize_workspace)
+    monkeypatch.setattr(server_module, "load_identity", mock_load_identity)
 
-    original_path = list(sys.path)
-    sys.path.insert(0, os.path.abspath(target_dir))
-
-    try:
-        import runpy
-
-        runpy.run_module("agent_server", run_name="__main__")
-    finally:
-        sys.path = original_path
+    server_module.agent_server()
 
     assert mock_create_agent_server.called
     print("Startup tests handled correctly.")

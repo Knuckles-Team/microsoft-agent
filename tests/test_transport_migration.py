@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 from types import SimpleNamespace
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
@@ -127,8 +128,8 @@ def test_integration_cache_clear_closes_owned_transports(monkeypatch) -> None:
     transport.close.assert_called_once_with()
 
 
-def _print_api() -> MicrosoftGraphApi:
-    api = object.__new__(MicrosoftGraphApi)
+def _print_api() -> Any:
+    api: Any = object.__new__(MicrosoftGraphApi)
     api.auth_manager = SimpleNamespace(
         graph_tls_profile="private-ca",
         graph_tls_profile_ref=None,

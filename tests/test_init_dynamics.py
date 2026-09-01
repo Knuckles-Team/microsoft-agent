@@ -8,12 +8,15 @@ PKG_NAME = __name__.rsplit(".", 1)[0] if "." in __name__ else None
 
 
 def _get_pkg_name():
-    """Derive package name from test location."""
+    """Derive the import package from project metadata, not checkout location."""
     import pathlib
+    import tomllib
 
     test_dir = pathlib.Path(__file__).resolve().parent
     project_dir = test_dir.parent
-    return project_dir.name.replace("-", "_")
+    with (project_dir / "pyproject.toml").open("rb") as project_file:
+        project_name = tomllib.load(project_file)["project"]["name"]
+    return project_name.replace("-", "_")
 
 
 @pytest.fixture

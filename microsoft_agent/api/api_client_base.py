@@ -44,6 +44,8 @@ class MicrosoftGraphApiBase(ABC):
                 scopes=auth_manager.scopes,
                 allowed_hosts=[endpoint_host],
             )
+            transport_kwargs = self.tls_profile.httpx_kwargs()
+            transport_kwargs["trust_env"] = False
             self._http_client = create_async_http_client(
                 follow_redirects=False,
                 timeout=httpx.Timeout(30.0),
@@ -53,7 +55,7 @@ class MicrosoftGraphApiBase(ABC):
                 ),
                 pin_egress=True,
                 allowed_private_hosts=(),
-                **self.tls_profile.httpx_kwargs(),
+                **transport_kwargs,
             )
         except Exception:
             self.tls_profile.cleanup()

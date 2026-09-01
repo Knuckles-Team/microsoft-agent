@@ -69,6 +69,8 @@ tokens remain in memory and are not written to plaintext files.
 |----------|---------|-------------|
 | `MICROSOFT_TENANT_ID` | — | Microsoft identity (values intentionally blank; supply them after app enrollment) |
 | `MICROSOFT_CLIENT_ID` | — |  |
+| `MICROSOFT_AUTHORITY_HOST` | `https://login.microsoftonline.com` |  |
+| `MICROSOFT_GRAPH_BASE_URL` | `https://graph.microsoft.com/v1.0` |  |
 | `MICROSOFT_GRAPH_TLS_PROFILE` | — |  |
 | `MICROSOFT_GRAPH_TLS_PROFILE_REF` | — |  |
 | `MICROSOFT_AUTH_MODE` | `delegated` | delegated \| application \| on_behalf_of \| external_token \| managed_identity \| workload_identity |
@@ -96,6 +98,50 @@ tokens remain in memory and are not written to plaintext files.
 | `MICROSOFT_CLIENT_SECRET_REF` | — |  |
 | `MICROSOFT_MANAGED_IDENTITY_CLIENT_ID` | — |  |
 | `MICROSOFT_WORKLOAD_IDENTITY_TOKEN_FILE` | secret-injected |  |
+| `AZURE_FEDERATED_TOKEN_FILE` | secret-injected |  |
+| `MICROSOFT_COMPANION_TLS_PROFILE` | — | Companion relay TLS uses the same deployment-owned trust-profile contract. |
+| `MICROSOFT_COMPANION_TLS_PROFILE_REF` | — |  |
+| `ADMINTOOL` | `true` | Per-domain tool registration toggles. Set false to suppress a domain. |
+| `AGREEMENTSTOOL` | `true` |  |
+| `APPLICATIONSTOOL` | `true` |  |
+| `AUDITTOOL` | `true` |  |
+| `AUTHTOOL` | `true` |  |
+| `CALENDARTOOL` | `true` |  |
+| `CHATTOOL` | `true` |  |
+| `COMMUNICATIONSTOOL` | `true` |  |
+| `CONNECTIONSTOOL` | `true` |  |
+| `CONTACTSTOOL` | `true` |  |
+| `DEVICESTOOL` | `true` |  |
+| `DIRECTORYTOOL` | `true` |  |
+| `DOCUMENTTOOL` | `true` |  |
+| `DOMAINSTOOL` | `true` |  |
+| `EDUCATIONTOOL` | `true` |  |
+| `EMPLOYEE_EXPERIENCETOOL` | `true` |  |
+| `FILESTOOL` | `true` |  |
+| `GROUPSTOOL` | `true` |  |
+| `IDENTITYTOOL` | `true` |  |
+| `INTUNETOOL` | `true` |  |
+| `KGTOOL` | `true` |  |
+| `MAILTOOL` | `true` |  |
+| `METATOOL` | `true` |  |
+| `NOTESTOOL` | `true` |  |
+| `ORGANIZATIONTOOL` | `true` |  |
+| `PLACESTOOL` | `true` |  |
+| `POLICIESTOOL` | `true` |  |
+| `POWER_PLATFORMTOOL` | `true` |  |
+| `PRINTTOOL` | `true` |  |
+| `PRIVACYTOOL` | `true` |  |
+| `REPORTSTOOL` | `true` |  |
+| `SEARCHTOOL` | `true` |  |
+| `SECURITYTOOL` | `true` |  |
+| `SITESTOOL` | `true` |  |
+| `SOLUTIONSTOOL` | `true` |  |
+| `STORAGETOOL` | `true` |  |
+| `SUBSCRIPTIONSTOOL` | `true` |  |
+| `TASKSTOOL` | `true` |  |
+| `TEAMSTOOL` | `true` |  |
+| `USERTOOL` | `true` |  |
+| `WINDOWS_COMPANIONTOOL` | `true` |  |
 | `TRANSPORT` | `stdio` | Local MCP defaults. Require an authenticated transport before non-loopback use. |
 | `HOST` | `127.0.0.1` |  |
 | `PORT` | `8000` |  |
@@ -127,7 +173,7 @@ tokens remain in memory and are not written to plaintext files.
 | `MODEL_ID` | `gpt-4o` | Model id for the agent |
 | `ENABLE_WEB_UI` | `True` | Serve the AG-UI web interface |
 
-_33 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared agent-utilities set — do not edit._
+_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared agent-utilities set — do not edit._
 <!-- ENV-VARS-TABLE:END -->
 
 ## Run the MCP server
@@ -541,7 +587,61 @@ default; unknown actions are treated as writes. Writes require
         "microsoft-mcp"
       ],
       "env": {
-        "MCP_TOOL_MODE": "intent"
+        "MCP_TOOL_MODE": "intent",
+        "ADMINTOOL": "true",
+        "AGREEMENTSTOOL": "true",
+        "APPLICATIONSTOOL": "true",
+        "AUDITTOOL": "true",
+        "AUTHTOOL": "true",
+        "CALENDARTOOL": "true",
+        "CHATTOOL": "true",
+        "COMMUNICATIONSTOOL": "true",
+        "CONNECTIONSTOOL": "true",
+        "CONTACTSTOOL": "true",
+        "DEVICESTOOL": "true",
+        "DIRECTORYTOOL": "true",
+        "DOCUMENTTOOL": "true",
+        "DOMAINSTOOL": "true",
+        "EDUCATIONTOOL": "true",
+        "EMPLOYEE_EXPERIENCETOOL": "true",
+        "FILESTOOL": "true",
+        "GROUPSTOOL": "true",
+        "IDENTITYTOOL": "true",
+        "INTUNETOOL": "true",
+        "KGTOOL": "true",
+        "MAILTOOL": "true",
+        "METATOOL": "true",
+        "MICROSOFT_ALLOW_DESTRUCTIVE": "false",
+        "MICROSOFT_ALLOW_DEVICE_CODE": "false",
+        "MICROSOFT_ALLOW_WRITES": "false",
+        "MICROSOFT_AUTHORITY_HOST": "https://login.microsoftonline.com",
+        "MICROSOFT_AUTH_MODE": "delegated",
+        "MICROSOFT_ENABLED_TOOL_GROUPS": "misc,auth,meta,mail,files,calendar,notes,tasks,contacts,user,chat,teams,sites,search,groups,communications,documents,power_platform,windows,intune",
+        "MICROSOFT_ENABLE_BROKER": "true",
+        "MICROSOFT_GRAPH_BASE_URL": "https://graph.microsoft.com/v1.0",
+        "MICROSOFT_LOGIN_METHOD": "auto",
+        "MICROSOFT_PERMISSION_PROFILES": "productivity,collaboration",
+        "MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON": "{}",
+        "MICROSOFT_POWER_PLATFORM_ALLOW_LIFECYCLE_CHANGES": "false",
+        "MICROSOFT_REQUIRE_SECURE_CACHE": "true",
+        "NOTESTOOL": "true",
+        "ORGANIZATIONTOOL": "true",
+        "PLACESTOOL": "true",
+        "POLICIESTOOL": "true",
+        "POWER_PLATFORMTOOL": "true",
+        "PRINTTOOL": "true",
+        "PRIVACYTOOL": "true",
+        "REPORTSTOOL": "true",
+        "SEARCHTOOL": "true",
+        "SECURITYTOOL": "true",
+        "SITESTOOL": "true",
+        "SOLUTIONSTOOL": "true",
+        "STORAGETOOL": "true",
+        "SUBSCRIPTIONSTOOL": "true",
+        "TASKSTOOL": "true",
+        "TEAMSTOOL": "true",
+        "USERTOOL": "true",
+        "WINDOWS_COMPANIONTOOL": "true"
       }
     }
   }
@@ -572,7 +672,61 @@ own runtime secret boundary.
         "TRANSPORT": "streamable-http",
         "HOST": "127.0.0.1",
         "PORT": "8000",
-        "MCP_TOOL_MODE": "intent"
+        "MCP_TOOL_MODE": "intent",
+        "ADMINTOOL": "true",
+        "AGREEMENTSTOOL": "true",
+        "APPLICATIONSTOOL": "true",
+        "AUDITTOOL": "true",
+        "AUTHTOOL": "true",
+        "CALENDARTOOL": "true",
+        "CHATTOOL": "true",
+        "COMMUNICATIONSTOOL": "true",
+        "CONNECTIONSTOOL": "true",
+        "CONTACTSTOOL": "true",
+        "DEVICESTOOL": "true",
+        "DIRECTORYTOOL": "true",
+        "DOCUMENTTOOL": "true",
+        "DOMAINSTOOL": "true",
+        "EDUCATIONTOOL": "true",
+        "EMPLOYEE_EXPERIENCETOOL": "true",
+        "FILESTOOL": "true",
+        "GROUPSTOOL": "true",
+        "IDENTITYTOOL": "true",
+        "INTUNETOOL": "true",
+        "KGTOOL": "true",
+        "MAILTOOL": "true",
+        "METATOOL": "true",
+        "MICROSOFT_ALLOW_DESTRUCTIVE": "false",
+        "MICROSOFT_ALLOW_DEVICE_CODE": "false",
+        "MICROSOFT_ALLOW_WRITES": "false",
+        "MICROSOFT_AUTHORITY_HOST": "https://login.microsoftonline.com",
+        "MICROSOFT_AUTH_MODE": "delegated",
+        "MICROSOFT_ENABLED_TOOL_GROUPS": "misc,auth,meta,mail,files,calendar,notes,tasks,contacts,user,chat,teams,sites,search,groups,communications,documents,power_platform,windows,intune",
+        "MICROSOFT_ENABLE_BROKER": "true",
+        "MICROSOFT_GRAPH_BASE_URL": "https://graph.microsoft.com/v1.0",
+        "MICROSOFT_LOGIN_METHOD": "auto",
+        "MICROSOFT_PERMISSION_PROFILES": "productivity,collaboration",
+        "MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON": "{}",
+        "MICROSOFT_POWER_PLATFORM_ALLOW_LIFECYCLE_CHANGES": "false",
+        "MICROSOFT_REQUIRE_SECURE_CACHE": "true",
+        "NOTESTOOL": "true",
+        "ORGANIZATIONTOOL": "true",
+        "PLACESTOOL": "true",
+        "POLICIESTOOL": "true",
+        "POWER_PLATFORMTOOL": "true",
+        "PRINTTOOL": "true",
+        "PRIVACYTOOL": "true",
+        "REPORTSTOOL": "true",
+        "SEARCHTOOL": "true",
+        "SECURITYTOOL": "true",
+        "SITESTOOL": "true",
+        "SOLUTIONSTOOL": "true",
+        "STORAGETOOL": "true",
+        "SUBSCRIPTIONSTOOL": "true",
+        "TASKSTOOL": "true",
+        "TEAMSTOOL": "true",
+        "USERTOOL": "true",
+        "WINDOWS_COMPANIONTOOL": "true"
       }
     }
   }
@@ -603,6 +757,60 @@ docker run -i --rm \
   --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
   -e TRANSPORT=stdio \
   -e MCP_TOOL_MODE=intent \
+  -e ADMINTOOL=true \
+  -e AGREEMENTSTOOL=true \
+  -e APPLICATIONSTOOL=true \
+  -e AUDITTOOL=true \
+  -e AUTHTOOL=true \
+  -e CALENDARTOOL=true \
+  -e CHATTOOL=true \
+  -e COMMUNICATIONSTOOL=true \
+  -e CONNECTIONSTOOL=true \
+  -e CONTACTSTOOL=true \
+  -e DEVICESTOOL=true \
+  -e DIRECTORYTOOL=true \
+  -e DOCUMENTTOOL=true \
+  -e DOMAINSTOOL=true \
+  -e EDUCATIONTOOL=true \
+  -e EMPLOYEE_EXPERIENCETOOL=true \
+  -e FILESTOOL=true \
+  -e GROUPSTOOL=true \
+  -e IDENTITYTOOL=true \
+  -e INTUNETOOL=true \
+  -e KGTOOL=true \
+  -e MAILTOOL=true \
+  -e METATOOL=true \
+  -e MICROSOFT_ALLOW_DESTRUCTIVE=false \
+  -e MICROSOFT_ALLOW_DEVICE_CODE=false \
+  -e MICROSOFT_ALLOW_WRITES=false \
+  -e MICROSOFT_AUTHORITY_HOST=https://login.microsoftonline.com \
+  -e MICROSOFT_AUTH_MODE=delegated \
+  -e MICROSOFT_ENABLED_TOOL_GROUPS=misc,auth,meta,mail,files,calendar,notes,tasks,contacts,user,chat,teams,sites,search,groups,communications,documents,power_platform,windows,intune \
+  -e MICROSOFT_ENABLE_BROKER=true \
+  -e MICROSOFT_GRAPH_BASE_URL=https://graph.microsoft.com/v1.0 \
+  -e MICROSOFT_LOGIN_METHOD=auto \
+  -e MICROSOFT_PERMISSION_PROFILES=productivity,collaboration \
+  -e MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON={} \
+  -e MICROSOFT_POWER_PLATFORM_ALLOW_LIFECYCLE_CHANGES=false \
+  -e MICROSOFT_REQUIRE_SECURE_CACHE=true \
+  -e NOTESTOOL=true \
+  -e ORGANIZATIONTOOL=true \
+  -e PLACESTOOL=true \
+  -e POLICIESTOOL=true \
+  -e POWER_PLATFORMTOOL=true \
+  -e PRINTTOOL=true \
+  -e PRIVACYTOOL=true \
+  -e REPORTSTOOL=true \
+  -e SEARCHTOOL=true \
+  -e SECURITYTOOL=true \
+  -e SITESTOOL=true \
+  -e SOLUTIONSTOOL=true \
+  -e STORAGETOOL=true \
+  -e SUBSCRIPTIONSTOOL=true \
+  -e TASKSTOOL=true \
+  -e TEAMSTOOL=true \
+  -e USERTOOL=true \
+  -e WINDOWS_COMPANIONTOOL=true \
   registry.example.invalid/microsoft-agent@sha256:<digest> microsoft-mcp
 ```
 
