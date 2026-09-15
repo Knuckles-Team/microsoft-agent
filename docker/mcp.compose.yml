@@ -1,7 +1,7 @@
 ---
 services:
   microsoft-mcp:
-    # image: docker.io/knucklessg1/microsoft-agent:latest
+    # image: docker.io/knucklessg1/microsoft-agent@sha256:<digest>  # resolve via `docker manifest inspect` or your release process
     build:
       context: .. # Debug
       dockerfile: docker/debug.Dockerfile
@@ -47,7 +47,7 @@ services:
       start_period: 10s
 
   microsoft-agent:
-    # image: docker.io/knucklessg1/microsoft-agent:latest
+    # image: docker.io/knucklessg1/microsoft-agent@sha256:<digest>  # resolve via `docker manifest inspect` or your release process
     build:
       context: .. # Debug
       dockerfile: docker/debug.Dockerfile
