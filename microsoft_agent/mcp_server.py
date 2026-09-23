@@ -222,7 +222,18 @@ def register_kg_tools(mcp: FastMCP):
         response = await invoke_client_method(lister, params=params)
         return kg_ingest._records(response)
 
-    @mcp.tool(tags={"kg", "read"})
+    @mcp.tool(
+        tags={"kg", "read"},
+        annotations={
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": True,
+        },
+        meta={
+            "eg.annotations": {"modalities_in": ["text"], "modalities_out": ["text"]}
+        },
+    )
     async def list_microsoft_ingestion_projection(
         kind: str = Field(
             default="messages",
