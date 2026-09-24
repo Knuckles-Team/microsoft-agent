@@ -33,7 +33,6 @@ python -m pip install "microsoft-agent[mcp]"
 Useful extras:
 
 ```bash
-python -m pip install "microsoft-agent[agent]"        # A2A agent runtime
 python -m pip install "microsoft-agent[documents]"    # Word and PowerPoint
 python -m pip install "microsoft-agent[cloud]"        # managed/workload identity
 python -m pip install "microsoft-agent[windows]"      # Windows companion
@@ -571,8 +570,6 @@ default; unknown actions are treated as writes. Writes require
 
 > **Install the connector-focused `[mcp]` extra.** Examples use `microsoft-agent[mcp]` to add
 > FastMCP / FastAPI through `agent-utilities[mcp]`; the required Agent Utilities core
-> still carries `epistemic-graph[full]`. The `[agent-runtime]` extra additionally
-> enables model orchestration.
 
 #### stdio Transport (local IDEs — Cursor, Claude Desktop, VS Code)
 
@@ -822,12 +819,6 @@ does not emit an unauthenticated non-loopback listener.
 _Auto-generated from the code-read env surface (`MCP_TOOL_MODE` + package vars) — do not edit._
 <!-- MCP-CONFIG-EXAMPLES:END -->
 
-## A2A agent
-
-```bash
-microsoft-agent --mcp-url <mcp-url> --provider <provider> --model-id <model-id>
-```
-
 The agent uses the Agent Utilities model/configuration boundary. Provider keys,
 model endpoints, Langfuse configuration, and TLS profiles are supplied externally.
 
@@ -863,7 +854,6 @@ environments, device lists, URLs, or ontologies.
 
 ```bash
 docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<version>-mcp .
-docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
 Deployment-owned Compose or Kubernetes configuration supplies identity, trust,
@@ -898,7 +888,6 @@ uv run mkdocs build --strict
 
 See `AGENTS.md` for current-only, privacy, security, and change-discipline rules.
 
-
 <!-- BEGIN agent-utilities-deployment (generated; do not edit between markers) -->
 
 ## Deploy with `agent-utilities-deployment`
@@ -912,7 +901,7 @@ to **"deploy `microsoft-agent` with agent-utilities-deployment"**.
 | Install mode | Command |
 |------|---------|
 | Installed package | `uv tool install "microsoft-agent[mcp]"`, then run `microsoft-mcp` |
-| Editable source | `uv pip install -e ".[agent]"`, then run `microsoft-mcp` |
+| Editable source | `uv pip install -e ".[mcp]"`, then run `microsoft-mcp` |
 | Immutable container | deploy `registry.example.invalid/microsoft-agent@sha256:<digest>` through the operator-selected orchestrator |
 
 The repository embeds no deployment profile, credential value, certificate path, or

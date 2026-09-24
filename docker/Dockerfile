@@ -14,11 +14,6 @@ RUN python -m venv /opt/microsoft-agent \
     && /opt/microsoft-agent/bin/python -m pip install \
         --disable-pip-version-check --no-cache-dir ".[mcp]"
 
-FROM source AS builder-agent
-RUN python -m venv /opt/microsoft-agent \
-    && /opt/microsoft-agent/bin/python -m pip install \
-        --disable-pip-version-check --no-cache-dir ".[agent]"
-
 FROM ${PYTHON_IMAGE} AS runtime-base
 RUN groupadd --system --gid 65532 microsoft-agent \
     && useradd --system --uid 65532 --gid 65532 --no-create-home \
@@ -32,6 +27,3 @@ FROM runtime-base AS mcp
 COPY --from=builder-mcp --chown=65532:65532 /opt/microsoft-agent /opt/microsoft-agent
 ENTRYPOINT ["microsoft-mcp"]
 
-FROM runtime-base AS agent
-COPY --from=builder-agent --chown=65532:65532 /opt/microsoft-agent /opt/microsoft-agent
-ENTRYPOINT ["microsoft-agent"]

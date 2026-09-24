@@ -1,13 +1,13 @@
 ---
 services:
-  microsoft-agent:
+  microsoft-mcp:
     # image: docker.io/knucklessg1/microsoft-agent@sha256:<digest>  # resolve via `docker manifest inspect` or your release process
     build:
       context: .. # Debug
       dockerfile: docker/debug.Dockerfile
-    container_name: microsoft-agent
-    hostname: microsoft-agent
-    command: [ "microsoft-agent" ]
+    container_name: microsoft-mcp
+    hostname: microsoft-mcp
+    command: [ "microsoft-mcp" ]
     extra_hosts:
       - "host.docker.internal:host-gateway"
     logging:
