@@ -15,7 +15,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 dependencies = [
-  "agent-connector-sdk>=0.1.0,<1.0.0", "azure-core>=1.41.0",
+  "agent-connector-sdk>=0.1.0,<1.0.0", "agent-utilities[mcp]>=2.0.0,<3.0.0", "azure-core>=1.41.0",
   "httpx>=0.28.1",
   "keyring>=25.7.0",
   "msal>=1.37.0",
@@ -126,6 +126,9 @@ namespaces = false
 override-dependencies = [
     "fastmcp-slim[client,server]>=4.0.0b1",
 ]
+
+[tool.uv.sources]
+agent-utilities = { path = ".uv-workspace-siblings/agent-utilities", editable = true }
 
 [tool.ruff]
 line-length = 88

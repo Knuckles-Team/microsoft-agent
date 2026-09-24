@@ -80,9 +80,9 @@ def _get_incoming_user_token() -> str | None:
     """Read the request token captured by agent-utilities middleware."""
 
     try:
-        from agent_connector_sdk.auth.delegation import current_user_token
+        from agent_utilities.mcp.delegated_auth import get_user_token
 
-        return current_user_token()
+        return get_user_token()
     except (ImportError, AttributeError):
         return None
 
