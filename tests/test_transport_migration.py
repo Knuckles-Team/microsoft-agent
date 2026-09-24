@@ -29,9 +29,7 @@ def test_provider_transport_uses_pinned_tls_and_closes_once(monkeypatch) -> None
     resolver = MagicMock(return_value=profile)
     client = MagicMock()
     factory = MagicMock(return_value=client)
-    monkeypatch.setattr(
-        "microsoft_agent.power_platform.resolve_configured_tls_profile", resolver
-    )
+    monkeypatch.setattr("microsoft_agent.power_platform.resolve_tls_profile", resolver)
     monkeypatch.setattr("microsoft_agent.power_platform.create_http_client", factory)
 
     transport = HttpxAsyncHttpTransport(
@@ -43,12 +41,12 @@ def test_provider_transport_uses_pinned_tls_and_closes_once(monkeypatch) -> None
     resolver.assert_called_once_with(
         "microsoft_graph", profile_name="private-ca", profile_ref=None
     )
-    kwargs = factory.call_args.kwargs
-    assert kwargs["verify"] is profile.ssl_context
-    assert kwargs["pin_egress"] is True
-    assert kwargs["follow_redirects"] is False
-    assert kwargs["trust_env"] is False
-    assert kwargs["allowed_private_hosts"] == ("configured.example",)
+    # create_http_client now takes one HttpClientOptions (agent_connector_sdk bakes
+    # follow_redirects=False/trust_env=False into the governed client itself;
+    # pin_egress/allowed_private_hosts have no SDK equivalent yet -- SDK-GAPS.md #12).
+    options = factory.call_args.args[0]
+    assert options.tls is profile
+    assert options.base_url == "https://invalid.example/"
 
     transport.close()
     transport.close()
@@ -62,7 +60,7 @@ def test_companion_transport_uses_selected_tls_profile(monkeypatch) -> None:
     client = MagicMock()
     factory = MagicMock(return_value=client)
     monkeypatch.setattr(
-        "microsoft_agent.windows_companion.resolve_configured_tls_profile", resolver
+        "microsoft_agent.windows_companion.resolve_tls_profile", resolver
     )
     monkeypatch.setattr("microsoft_agent.windows_companion.create_http_client", factory)
 
@@ -76,8 +74,9 @@ def test_companion_transport_uses_selected_tls_profile(monkeypatch) -> None:
         profile_name=None,
         profile_ref="secret://transport/companion-tls",
     )
-    assert factory.call_args.kwargs["pin_egress"] is True
-    assert factory.call_args.kwargs["allowed_private_hosts"] == ("relay.example",)
+    # pin_egress/allowed_private_hosts have no SDK equivalent yet (SDK-GAPS.md #12).
+    options = factory.call_args.args[0]
+    assert options.tls is profile
     transport.close()
     client.close.assert_called_once_with()
     profile.cleanup.assert_called_once_with()

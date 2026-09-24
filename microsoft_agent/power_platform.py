@@ -26,6 +26,7 @@ from uuid import UUID, uuid4
 
 import httpx
 from agent_connector_sdk.http.client import create_http_client
+from agent_connector_sdk.http.options import HttpClientOptions
 from agent_connector_sdk.tls.profile import ResolvedTLSProfile
 from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from agent_connector_sdk.credentials.references import parse_secret_reference
@@ -140,17 +141,23 @@ class HttpxAsyncHttpTransport:
             self._tls = None
             raise ValueError("Pinned provider transport does not support a proxy")
         try:
+            # SDK-GAP: agent_connector_sdk.http has no pin_egress/allowed_private_hosts
+            # equivalent (AU's SSRF-pinning knobs) -- see SDK-GAPS.md #12.
+            # follow_redirects=False/trust_env=False are the governed client's fixed,
+            # non-configurable behavior now, so they are no longer passed explicitly.
+            # base_url is a construction-time formality only: every real call passes
+            # its own full absolute URL to .request(); RFC 2606 reserved placeholder
+            # so an accidental relative request fails loudly instead of resolving.
             self._client = create_http_client(
-                timeout=httpx.Timeout(30.0),
-                verify=self._tls.ssl_context,
-                follow_redirects=False,
-                trust_env=False,
-                pin_egress=True,
-                allowed_private_hosts=allowed_private_hosts,
-                limits=httpx.Limits(
-                    max_connections=32,
-                    max_keepalive_connections=8,
-                ),
+                HttpClientOptions(
+                    base_url="https://invalid.example/",
+                    timeout=httpx.Timeout(30.0),
+                    tls=self._tls,
+                    limits=httpx.Limits(
+                        max_connections=32,
+                        max_keepalive_connections=8,
+                    ),
+                )
             )
         except Exception:
             self._tls.cleanup()

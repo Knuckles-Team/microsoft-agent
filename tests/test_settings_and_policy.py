@@ -69,7 +69,7 @@ def test_raw_client_secret_variable_is_not_a_supported_configuration() -> None:
 
 
 def test_client_secret_reference_rejects_inline_or_unknown_schemes() -> None:
-    with pytest.raises(ValueError, match="env://, vault://, or secret://"):
+    with pytest.raises(ValueError, match="env://NAME or openbao://"):
         MicrosoftSettings.from_env(
             {"MICROSOFT_CLIENT_SECRET_REF": "inline://must-not-be-consumed"}
         )
