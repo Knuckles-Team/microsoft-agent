@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import UUID
 
-from agent_utilities.security.cli_secrets import resolve_runtime_secret_reference
+from agent_connector_sdk.credentials.resolution import resolve_secret_reference
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -345,7 +345,7 @@ def build_worker(
 def _private_key_password(certificate: CompanionCertificateSettings) -> str | None:
     if not certificate.private_key_password_ref:
         return None
-    return resolve_runtime_secret_reference(certificate.private_key_password_ref)
+    return resolve_secret_reference(certificate.private_key_password_ref)
 
 
 async def run_service(config: WindowsCompanionServiceConfig) -> None:

@@ -15,8 +15,8 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
-from agent_utilities.core.config import setting
-from agent_utilities.security.cli_secrets import resolve_runtime_secret_reference
+from agent_connector_sdk.config import setting
+from agent_connector_sdk.credentials.resolution import resolve_secret_reference
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -178,7 +178,7 @@ def _configured_bool(
 def _resolved_secret(reference: str | None) -> SecretStr | None:
     if not reference:
         return None
-    return SecretStr(resolve_runtime_secret_reference(reference))
+    return SecretStr(resolve_secret_reference(reference))
 
 
 class MicrosoftSettings(BaseModel):

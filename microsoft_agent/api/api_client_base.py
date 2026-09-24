@@ -2,12 +2,10 @@ from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
 import httpx
-from agent_utilities.core.exceptions import AuthError
-from agent_utilities.core.http_client import create_async_http_client
-from agent_utilities.core.transport_security import (
-    ResolvedTLSProfile,
-    resolve_configured_tls_profile,
-)
+from agent_connector_sdk.exceptions import AuthError
+from agent_connector_sdk.http.client import create_async_http_client
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider,
 )
@@ -33,7 +31,7 @@ class MicrosoftGraphApiBase(ABC):
         endpoint_host = urlparse(auth_manager.graph_base_url).hostname
         if endpoint_host is None:
             raise ValueError("Microsoft Graph endpoint is invalid")
-        self.tls_profile: ResolvedTLSProfile | None = resolve_configured_tls_profile(
+        self.tls_profile: ResolvedTLSProfile | None = resolve_tls_profile(
             "microsoft_graph",
             profile_name=auth_manager.graph_tls_profile,
             profile_ref=auth_manager.graph_tls_profile_ref,

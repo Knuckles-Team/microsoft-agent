@@ -25,12 +25,10 @@ from urllib.parse import urlparse
 from uuid import UUID, uuid4
 
 import httpx
-from agent_utilities.core.http_client import create_http_client
-from agent_utilities.core.transport_security import (
-    ResolvedTLSProfile,
-    resolve_configured_tls_profile,
-)
-from agent_utilities.security.cli_secrets import validate_runtime_secret_reference
+from agent_connector_sdk.http.client import create_http_client
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
+from agent_connector_sdk.credentials.references import parse_secret_reference
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -132,7 +130,7 @@ class HttpxAsyncHttpTransport:
         if client is not None:
             self._client = client
             return
-        self._tls = resolve_configured_tls_profile(
+        self._tls = resolve_tls_profile(
             service,
             profile_name=tls_profile,
             profile_ref=tls_profile_ref,
@@ -392,7 +390,7 @@ class PowerPlatformSettings(BaseModel):
     def validate_tls_profile_ref(cls, value: str | None) -> str | None:
         if value is None:
             return None
-        return validate_runtime_secret_reference(value)
+        return parse_secret_reference(value).render()
 
     @model_validator(mode="after")
     def validate_tls_selector(self) -> PowerPlatformSettings:

@@ -27,12 +27,10 @@ from urllib.parse import quote
 from uuid import UUID, uuid4
 
 import httpx
-from agent_utilities.core.http_client import create_http_client
-from agent_utilities.core.transport_security import (
-    ResolvedTLSProfile,
-    resolve_configured_tls_profile,
-)
-from agent_utilities.security.cli_secrets import validate_runtime_secret_reference
+from agent_connector_sdk.http.client import create_http_client
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
+from agent_connector_sdk.credentials.references import parse_secret_reference
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -108,7 +106,7 @@ class HttpxCompanionTransport:
         if client is not None:
             self._client = client
             return
-        self._tls = resolve_configured_tls_profile(
+        self._tls = resolve_tls_profile(
             "microsoft_companion",
             profile_name=tls_profile,
             profile_ref=tls_profile_ref,
@@ -552,7 +550,7 @@ class WindowsCompanionSettings(BaseModel):
     def validate_tls_profile_ref(cls, value: str | None) -> str | None:
         if value is None:
             return None
-        return validate_runtime_secret_reference(value)
+        return parse_secret_reference(value).render()
 
     @model_validator(mode="after")
     def require_policies_for_allowed_actions(self) -> WindowsCompanionSettings:

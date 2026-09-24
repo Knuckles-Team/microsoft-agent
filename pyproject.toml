@@ -15,8 +15,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 dependencies = [
-  "agent-utilities[mcp]>=2.0.0,<3.0.0",
-  "azure-core>=1.41.0",
+  "agent-connector-sdk>=0.1.0,<1.0.0", "azure-core>=1.41.0",
   "httpx>=0.28.1",
   "keyring>=25.7.0",
   "msal>=1.37.0",
@@ -30,8 +29,6 @@ name = "Project Maintainers"
 email = "maintainers@users.noreply.github.com"
 
 [project.optional-dependencies]
-mcp = ["agent-utilities[mcp]>=2.0.0,<3.0.0"]
-agent = ["agent-utilities[agent-runtime,logfire]>=2.0.0,<3.0.0"]
 documents = ["python-docx>=1.2.0", "python-pptx>=1.0.2"]
 cloud = ["azure-identity>=1.25.3", "httpx>=0.28.1"]
 windows = [
@@ -48,7 +45,6 @@ control-plane = [
 ]
 docs = ["mkdocs-material>=9.7.7"]
 all = [
-  "agent-utilities[mcp,agent-runtime,logfire]>=2.0.0,<3.0.0",
   "azure-identity>=1.25.3",
   "cryptography>=49.0.0",
   "fastapi>=0.139.2",
@@ -79,7 +75,6 @@ test = [
 
 [project.scripts]
 microsoft-mcp = "microsoft_agent.mcp_server:mcp_server"
-microsoft-agent = "microsoft_agent.agent_server:agent_server"
 microsoft-config = "microsoft_agent.config_cli:main"
 microsoft-windows-companion = "microsoft_agent.windows_companion_service:main"
 microsoft-windows-control-plane = "microsoft_agent.windows_control_plane_service:main"
@@ -131,9 +126,6 @@ namespaces = false
 override-dependencies = [
     "fastmcp-slim[client,server]>=4.0.0b1",
 ]
-
-[tool.uv.sources]
-agent-utilities = { path = ".uv-workspace-siblings/agent-utilities", editable = true }
 
 [tool.ruff]
 line-length = 88
