@@ -1113,7 +1113,7 @@ lists into prompts or configuration.</p>
 </ul>
 <p>Every routed action crosses the fail-closed Microsoft tool policy. Read actions are
 available by default. Unknown actions are classified as writes. Non-destructive
-writes require <code>MICROSOFT_ALLOW_WRITES=true</code>; destructive actions additionally
+writes require <code>MICROSOFT_ALLOW_WRITES=true</code>; destructive actions also
 require <code>MICROSOFT_ALLOW_DESTRUCTIVE=true</code>.</p>
 <p><code>list_microsoft_ingestion_projection</code> returns only keyed opaque node identifiers,
 types, and relationships. GraphOS validates the signed source manifest and

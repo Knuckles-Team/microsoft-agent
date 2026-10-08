@@ -1102,7 +1102,7 @@ and a provider-owned connector capability bundle.</p>
 <tbody>
 <tr>
 <td>MCP server and session</td>
-<td>Agent Utilities server factory and verified caller session</td>
+<td>Agent Utilities server factory and checked caller session</td>
 </tr>
 <tr>
 <td>Microsoft Graph client</td>
@@ -1136,7 +1136,7 @@ database, bundled MCP profile, or alternate agent execution plane.</p>
 <ol>
 <li>The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
    an explicit optional-capability profile.</li>
-<li>The MCP server creates a verified Agent Utilities session and exposes the
+<li>The MCP server creates a checked Agent Utilities session and exposes the
    configured action families through the selected tool mode.</li>
 <li>The tool policy classifies the routed action. Reads are allowed by default;
    writes and destructive actions require separate explicit approvals.</li>
@@ -1166,7 +1166,7 @@ Environment URLs, credentials, device inventories, filesystem roots, trust bundl
 and customized ontologies stay outside the repository.</p>
 <h2 id="security-model">Security model<a class="headerlink" href="#security-model" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Microsoft Graph identity and MCP caller identity are independently verified.</li>
+<li>Microsoft Graph identity and MCP caller identity are independently checked.</li>
 <li>Unknown routed actions fail closed as writes.</li>
 <li>Side-effecting and destructive actions use separate enablement controls.</li>
 <li>Secure OS-backed storage is the only persistent delegated-token cache.</li>

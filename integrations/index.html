@@ -1103,7 +1103,7 @@ configuration/capability tool before authentication.</p>
 <tr>
 <td>Power Automate cloud</td>
 <td>Supported Dataverse Web API plus named OAuth triggers</td>
-<td>list/get/activate/deactivate solution flows, run allowlisted flow</td>
+<td>list/get/enable/disable solution flows, run allowlisted flow</td>
 </tr>
 <tr>
 <td>Power Automate Desktop</td>
@@ -1168,7 +1168,7 @@ protected.</p>
 <p>Intune configuration requires at least one managed-device UUID and an explicit
 action allowlist. Every mutation requires evidence bound to the device, action,
 correlation ID, idempotency key, approver, reason, and a short expiration. Reboot
-and shutdown additionally require destructive acknowledgement.</p>
+and shutdown also require destructive acknowledgement.</p>
 <p>The service uses only Microsoft Graph v1.0. <code>rotateBitLockerKeys</code> is visible in
 the capability report as unsupported because Microsoft currently documents it
 only under Graph beta; this project does not silently cross that boundary.</p>

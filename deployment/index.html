@@ -1162,7 +1162,7 @@
 service, and an optional A2A agent. Deployment configuration supplies all identity,
 secret, endpoint, trust, storage, and network values; none are packaged.</p>
 <h2 id="local-mcp-subprocess">Local MCP subprocess<a class="headerlink" href="#local-mcp-subprocess" title="Permanent link">&para;</a></h2>
-<p>An MCP client can launch the server over stdio:</p>
+<p>An MCP client can start the server over stdio:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">"microsoft-agent"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1247,11 +1247,11 @@ GraphOS delegation.</p>
 </tr>
 <tr>
 <td><code>on_behalf_of</code></td>
-<td>confidential client material and verified incoming user token</td>
+<td>confidential client material and checked incoming user token</td>
 </tr>
 <tr>
 <td><code>external_token</code></td>
-<td>verified request token and explicitly allowed audience</td>
+<td>checked request token and explicitly allowed audience</td>
 </tr>
 <tr>
 <td><code>managed_identity</code></td>
@@ -1290,7 +1290,7 @@ lists, credentials, or customized ontologies.</p>
 <li>Validate the connector bundle, schema fingerprints, ontology, mappings, and
    quarantine policy against the installed tool schemas.</li>
 <li>Confirm metadata-only Langfuse trace linkage and governed graph read-back.</li>
-<li>Stop the service and verify that no Microsoft Agent or GraphOS process remains.</li>
+<li>Stop the service and check that no Microsoft Agent or GraphOS process remains.</li>
 </ol>
 <p>See <a href="../configuration/">Configuration</a>, <a href="../authentication/">Authentication</a>, and the
 <a href="../enrollment-checklist/">enrollment checklist</a> for the complete operator contract.</p>

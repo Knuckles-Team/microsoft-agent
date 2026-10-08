@@ -965,7 +965,7 @@ not LocalSystem, because Office COM and the clipboard live in the user session.
 The deployment assets under <code>deployment/windows</code> install a per-user Scheduled
 Task and do not open firewall ports.</p>
 <p>The control plane stores bounded action/result state in SQLite and authenticates
-both controller and device requests. Terminate TLS with a trusted certificate;
+both controller and device requests. Stop TLS with a trusted certificate;
 when a reverse proxy supplies an mTLS certificate thumbprint, accept that header
 only from an explicitly configured trusted proxy. See the deployment README for
 the exact worker command and enrollment sequence. The runnable relay entry point
