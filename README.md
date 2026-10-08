@@ -46,15 +46,15 @@ features therefore remain available when the A2A/GraphOS runtime is installed.
 
 ## Authentication
 
-Microsoft identity values are supplied by deployment configuration. There is no
+Microsoft identity values are provided by deployment configuration. There is no
 baked-in client identifier.
 
 Supported modes:
 
 - `delegated`: broker or browser login; device code is opt-in
 - `application`: certificate or referenced client secret
-- `on_behalf_of`: verified incoming user delegation
-- `external_token`: verified request token for an explicitly allowed audience
+- `on_behalf_of`: checked incoming user delegation
+- `external_token`: checked request token for an explicitly allowed audience
 - `managed_identity`: Azure managed identity
 - `workload_identity`: federated workload token file
 
@@ -562,7 +562,7 @@ _79 action-routed tool(s) · 268 verbose 1:1 tool(s). Each is enabled unless its
 
 Every routed action passes the fail-closed tool policy. Reads are permitted by
 default; unknown actions are treated as writes. Writes require
-`MICROSOFT_ALLOW_WRITES=true`, and destructive actions additionally require
+`MICROSOFT_ALLOW_WRITES=true`, and destructive actions also require
 `MICROSOFT_ALLOW_DESTRUCTIVE=true`.
 
 ## MCP client configuration
@@ -829,7 +829,7 @@ microsoft-agent --mcp-url <mcp-url> --provider <provider> --model-id <model-id>
 ```
 
 The agent uses the Agent Utilities model/configuration boundary. Provider keys,
-model endpoints, Langfuse configuration, and TLS profiles are supplied externally.
+model endpoints, Langfuse configuration, and TLS profiles are provided externally.
 
 ## Governed ingestion
 
@@ -843,7 +843,7 @@ The provider contributes:
 Microsoft source projection persists only keyed opaque identifiers, structural node
 types, and relationships. It never stores names, addresses, subjects, bodies,
 filenames, URLs, timestamps, attachment bytes, or provider identifiers. The
-pseudonymization key is supplied by AgentConfig or a secret store and is never
+pseudonymization key is provided by AgentConfig or a secret store and is never
 packaged or traced. Records remain quarantined until tenant, ACL, provenance,
 schema, signature, and privacy requirements are satisfied. Generated signatures
 and fingerprints must be regenerated whenever the tool schema or ontology changes;
@@ -866,7 +866,7 @@ docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<ve
 docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
-Deployment-owned Compose or Kubernetes configuration supplies identity, trust,
+Deployment-owned Compose or Kubernetes configuration provides identity, trust,
 storage, and network policy.
 
 ## Documentation

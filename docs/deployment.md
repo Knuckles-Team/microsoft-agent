@@ -6,7 +6,7 @@ secret, endpoint, trust, storage, and network values; none are packaged.
 
 ## Local MCP subprocess
 
-An MCP client can launch the server over stdio:
+An MCP client can start the server over stdio:
 
 ```json
 {
@@ -103,8 +103,8 @@ Select one supported mode with `MICROSOFT_AUTH_MODE`:
 |---|---|
 | `delegated` | tenant, client identifier, and approved interactive login method |
 | `application` | tenant, client identifier, and certificate or secret reference |
-| `on_behalf_of` | confidential client material and verified incoming user token |
-| `external_token` | verified request token and explicitly allowed audience |
+| `on_behalf_of` | confidential client material and checked incoming user token |
+| `external_token` | checked request token and explicitly allowed audience |
 | `managed_identity` | Azure managed-identity availability |
 | `workload_identity` | tenant, client identifier, and federated token-file reference |
 
@@ -142,7 +142,7 @@ Before promotion:
 5. Validate the connector bundle, schema fingerprints, ontology, mappings, and
    quarantine policy against the installed tool schemas.
 6. Confirm metadata-only Langfuse trace linkage and governed graph read-back.
-7. Stop the service and verify that no Microsoft Agent or GraphOS process remains.
+7. Stop the service and check that no Microsoft Agent or GraphOS process remains.
 
 See [Configuration](configuration.md), [Authentication](authentication.md), and the
 [enrollment checklist](enrollment-checklist.md) for the complete operator contract.

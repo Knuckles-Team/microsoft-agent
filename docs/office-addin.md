@@ -52,7 +52,7 @@ pane; declining it returns a typed failure and leaves the presentation intact.
 The task pane uses a strict Content Security Policy and an exact HTTPS backend
 origin allowlist from `config.json`. A bearer token, when supplied, remains in
 memory. Requests have time and response-size limits, do not follow redirects,
-and never accept a caller-selected origin. Bridge routes additionally reject
+and never accept a caller-selected origin. Bridge routes also reject
 requests without an exact configured `Origin`, keep CORS credentials disabled,
 and require the short-lived session bearer for polling and results.
 
