@@ -9,7 +9,7 @@ and a provider-owned connector capability bundle.
 
 | Boundary | Authority |
 |---|---|
-| MCP server and session | Agent Utilities server factory and verified caller session |
+| MCP server and session | Agent Utilities server factory and checked caller session |
 | Microsoft Graph client | `MicrosoftGraphApi` composed from `microsoft_agent/api/` |
 | Microsoft authentication | `microsoft_agent/auth.py` and validated `MicrosoftSettings` |
 | Action authorization | `MicrosoftToolPolicy` applied to the routed action |
@@ -24,7 +24,7 @@ database, bundled MCP profile, or alternate agent execution plane.
 
 1. The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
    an explicit optional-capability profile.
-2. The MCP server creates a verified Agent Utilities session and exposes the
+2. The MCP server creates a checked Agent Utilities session and exposes the
    configured action families through the selected tool mode.
 3. The tool policy classifies the routed action. Reads are allowed by default;
    writes and destructive actions require separate explicit approvals.
@@ -58,7 +58,7 @@ and customized ontologies stay outside the repository.
 
 ## Security model
 
-- Microsoft Graph identity and MCP caller identity are independently verified.
+- Microsoft Graph identity and MCP caller identity are independently checked.
 - Unknown routed actions fail closed as writes.
 - Side-effecting and destructive actions use separate enablement controls.
 - Secure OS-backed storage is the only persistent delegated-token cache.

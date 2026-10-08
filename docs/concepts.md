@@ -8,10 +8,10 @@ does not replace Agent Utilities or Epistemic Graph authorities.
 
 | Concept | Provider responsibility | Ecosystem authority |
 |---|---|---|
-| Microsoft identity | acquire a tenant- and audience-bound Graph token through one validated mode | Agent Utilities verifies MCP caller and delegation identity |
+| Microsoft identity | acquire a tenant- and audience-bound Graph token through one validated mode | Agent Utilities checks MCP caller and delegation identity |
 | Graph actions | execute bounded asynchronous operations through one modular client | Agent Utilities owns tool discovery, session, approval, and trace context |
-| Action policy | classify the routed action and fail closed for writes/destructive actions | permission governance supplies caller policy and approval |
-| Optional integrations | expose native document, Power Platform, Intune, Office, and Windows connection points | deployment AgentConfig supplies allowlists, endpoints, trust, and secrets |
+| Action policy | classify the routed action and fail closed for writes/destructive actions | permission governance provides caller policy and approval |
+| Optional integrations | expose native document, Power Platform, Intune, Office, and Windows connection points | deployment AgentConfig provides allowlists, endpoints, trust, and secrets |
 | Knowledge ingestion | map approved provider records into quarantined change envelopes | Epistemic Graph owns persistence, ACL, provenance, lineage, and deletion semantics |
 | Microsoft skill | provide one consolidated operational workflow and provider catalog | GraphOS owns skill discovery and direct/delegated execution |
 | Observability | attach privacy-safe provider outcome metadata | Agent Utilities and Langfuse own trace transport and retention policy |

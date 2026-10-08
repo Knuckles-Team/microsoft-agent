@@ -14,7 +14,7 @@ configuration/capability tool before authentication.
 | OneNote/Planner/To Do/contacts | Microsoft Graph | notes, tasks/plans, contacts and related resources |
 | Word | Local OOXML generation, Graph upload, paired Office.js bridge, optional Windows COM | create/fill `.docx`, upload, agent-driven current-selection/placeholders, open/export PDF |
 | PowerPoint | Local OOXML generation, Graph upload, paired Office.js bridge, optional Windows COM | create/fill `.pptx`, upload, agent-driven list/add/delete slides and text boxes, open/export PDF |
-| Power Automate cloud | Supported Dataverse Web API plus named OAuth triggers | list/get/activate/deactivate solution flows, run allowlisted flow |
+| Power Automate cloud | Supported Dataverse Web API plus named OAuth triggers | list/get/enable/disable solution flows, run allowlisted flow |
 | Power Automate Desktop | Documented Dataverse desktop-flow APIs | list/schema/run/status/outputs/cancel for configured named desktop flows |
 | Intune | Microsoft Graph v1.0 | allowlisted device/app inventory, sync, lock, reboot, shutdown, Defender scan |
 | Windows laptops | Authenticated outbound companion | inventory, bounded files, Office, services, notifications, clipboard, typed extension hook |
@@ -77,7 +77,7 @@ protected.
 Intune configuration requires at least one managed-device UUID and an explicit
 action allowlist. Every mutation requires evidence bound to the device, action,
 correlation ID, idempotency key, approver, reason, and a short expiration. Reboot
-and shutdown additionally require destructive acknowledgement.
+and shutdown also require destructive acknowledgement.
 
 The service uses only Microsoft Graph v1.0. `rotateBitLockerKeys` is visible in
 the capability report as unsupported because Microsoft currently documents it

@@ -30,7 +30,7 @@ filesystem configuration, endpoint inventory, or customized ontology.
   patterns.
 - [Integrations](integrations.md) describes optional native connection points.
 
-## Minimal stdio launch
+## Minimal stdio start
 
 ```bash
 python -m pip install "microsoft-agent[mcp]"

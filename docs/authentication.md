@@ -79,7 +79,7 @@ scope, so their app roles must be consented in Entra.
 
 Dataverse and the Windows companion API are separate OAuth resources. After
 the normal `login` succeeds in delegated mode, call `login_power_platform` and
-`login_windows_companion` once for the integrations you configured. Those
+`login_windows_companion` once for the integrations the operator configured. Those
 tools request consent only for resource audiences already allowlisted in the
 protected integration configuration; ordinary tool calls never open an
 interactive prompt or choose an arbitrary audience. Application, managed, and
@@ -92,7 +92,7 @@ the v2 token's bare client-ID GUID `aud` claim. Configure
 
 The enrollment helper in `deployment/entra` resolves current permission IDs
 from the tenant rather than hardcoding GUIDs. It does not create secrets or
-grant admin consent. `Sites.Selected` additionally needs an explicit grant on
+grant admin consent. `Sites.Selected` also needs an explicit grant on
 each SharePoint site. Dataverse and the companion control plane are separate
 resource audiences and need their own API permissions/roles.
 

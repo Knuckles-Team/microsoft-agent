@@ -57,7 +57,7 @@ docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<
 Images contain application code only. Supply identity, TLS trust, secret
 references, configuration, and writable storage at deployment time.
 
-## Verify the installation
+## Check the installation
 
 ```bash
 microsoft-mcp --help
