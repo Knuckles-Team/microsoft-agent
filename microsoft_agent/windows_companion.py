@@ -27,11 +27,14 @@ from urllib.parse import quote
 from uuid import UUID, uuid4
 
 import httpx
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
+
+# SDK gaps (SDK-CONNECTOR-CONTROL-R011), see power_platform.py for detail:
+# create_http_client's flat egress-pinning kwargs and cli_secrets' validate-
+# without-resolving/env+vault+secret-scheme contract have no SDK equivalent
+# yet. Kept on agent_utilities.
 from agent_utilities.core.http_client import create_http_client
-from agent_utilities.core.transport_security import (
-    ResolvedTLSProfile,
-    resolve_configured_tls_profile,
-)
 from agent_utilities.security.cli_secrets import validate_runtime_secret_reference
 from pydantic import (
     BaseModel,
@@ -108,7 +111,7 @@ class HttpxCompanionTransport:
         if client is not None:
             self._client = client
             return
-        self._tls = resolve_configured_tls_profile(
+        self._tls = resolve_tls_profile(
             "microsoft_companion",
             profile_name=tls_profile,
             profile_ref=tls_profile_ref,

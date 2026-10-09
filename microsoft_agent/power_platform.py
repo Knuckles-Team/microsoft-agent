@@ -25,11 +25,16 @@ from urllib.parse import urlparse
 from uuid import UUID, uuid4
 
 import httpx
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
+
+# SDK gaps (SDK-CONNECTOR-CONTROL-R011), both not yet proven in any migrated
+# connector: create_http_client takes a single HttpClientOptions object, not
+# this call site's flat pin_egress/allowed_private_hosts kwargs; cli_secrets'
+# validate-without-resolving contract and env/vault/secret scheme grammar have
+# no SDK counterpart (the SDK's credentials package is env/openbao only and
+# always resolves). Kept on agent_utilities until the SDK adds equivalents.
 from agent_utilities.core.http_client import create_http_client
-from agent_utilities.core.transport_security import (
-    ResolvedTLSProfile,
-    resolve_configured_tls_profile,
-)
 from agent_utilities.security.cli_secrets import validate_runtime_secret_reference
 from pydantic import (
     BaseModel,
@@ -132,7 +137,7 @@ class HttpxAsyncHttpTransport:
         if client is not None:
             self._client = client
             return
-        self._tls = resolve_configured_tls_profile(
+        self._tls = resolve_tls_profile(
             service,
             profile_name=tls_profile,
             profile_ref=tls_profile_ref,

@@ -2,12 +2,16 @@ from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
 import httpx
-from agent_utilities.core.exceptions import AuthError
+from agent_connector_sdk.exceptions import AuthError
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
+
+# SDK gap (SDK-CONNECTOR-CONTROL-R011): agent_connector_sdk.http.client's
+# create_http_client/create_async_http_client take a single HttpClientOptions
+# object, not the flat pin_egress/allowed_private_hosts/allow_loopback kwargs
+# this call site depends on. Kept on agent_utilities until the SDK's governed
+# client accepts the same egress-pinning controls; see the PR description.
 from agent_utilities.core.http_client import create_async_http_client
-from agent_utilities.core.transport_security import (
-    ResolvedTLSProfile,
-    resolve_configured_tls_profile,
-)
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider,
 )
@@ -33,7 +37,7 @@ class MicrosoftGraphApiBase(ABC):
         endpoint_host = urlparse(auth_manager.graph_base_url).hostname
         if endpoint_host is None:
             raise ValueError("Microsoft Graph endpoint is invalid")
-        self.tls_profile: ResolvedTLSProfile | None = resolve_configured_tls_profile(
+        self.tls_profile: ResolvedTLSProfile | None = resolve_tls_profile(
             "microsoft_graph",
             profile_name=auth_manager.graph_tls_profile,
             profile_ref=auth_manager.graph_tls_profile_ref,
