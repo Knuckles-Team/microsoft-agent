@@ -38,7 +38,7 @@ class TestMicrosoftGraphApi:
 
         with patch("microsoft_agent.api.api_client_base.GraphServiceClient"):
             with patch("microsoft_agent.api.api_client_base.AuthManagerCredential"):
-                from agent_utilities.core.exceptions import AuthError
+                from agent_connector_sdk.exceptions import AuthError
 
                 with pytest.raises(AuthError, match="Microsoft authentication failed"):
                     MicrosoftGraphApi(mock_auth_manager)

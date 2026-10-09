@@ -15,7 +15,13 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
-from agent_utilities.core.config import setting
+from agent_connector_sdk.config import setting
+
+# SDK gap (SDK-CONNECTOR-CONTROL-R011): agent_connector_sdk.credentials has no
+# validate-only counterpart to agent_utilities' two-function cli_secrets contract
+# (resolve vs. validate-without-resolving), and its scheme grammar is env/openbao
+# only, not env/vault/secret. Kept on agent_utilities until the SDK adds an
+# equivalent; see the PR description.
 from agent_utilities.security.cli_secrets import resolve_runtime_secret_reference
 from pydantic import (
     BaseModel,

@@ -30,7 +30,7 @@ def test_provider_transport_uses_pinned_tls_and_closes_once(monkeypatch) -> None
     client = MagicMock()
     factory = MagicMock(return_value=client)
     monkeypatch.setattr(
-        "microsoft_agent.power_platform.resolve_configured_tls_profile", resolver
+        "microsoft_agent.power_platform.resolve_tls_profile", resolver
     )
     monkeypatch.setattr("microsoft_agent.power_platform.create_http_client", factory)
 
@@ -62,7 +62,7 @@ def test_companion_transport_uses_selected_tls_profile(monkeypatch) -> None:
     client = MagicMock()
     factory = MagicMock(return_value=client)
     monkeypatch.setattr(
-        "microsoft_agent.windows_companion.resolve_configured_tls_profile", resolver
+        "microsoft_agent.windows_companion.resolve_tls_profile", resolver
     )
     monkeypatch.setattr("microsoft_agent.windows_companion.create_http_client", factory)
 

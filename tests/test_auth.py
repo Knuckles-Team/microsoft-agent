@@ -449,7 +449,7 @@ async def test_get_client_without_token():
 @pytest.mark.asyncio
 async def test_get_client_auth_error():
     """Test get_client with authentication error."""
-    from agent_utilities.core.exceptions import AuthError
+    from agent_connector_sdk.exceptions import AuthError
 
     mock_auth = MagicMock()
     mock_auth.get_token.return_value = "test_token"

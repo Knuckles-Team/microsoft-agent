@@ -16,6 +16,9 @@ from pathlib import PurePosixPath
 from typing import Any
 from urllib.parse import quote, urlparse
 
+# SDK gap (SDK-CONNECTOR-CONTROL-R011): agent_connector_sdk has no egress
+# allowlisting/loopback-denial equivalent to agent_utilities.security.egress
+# yet. Kept on agent_utilities; see the PR description.
 from agent_utilities.security.egress import validate_base_url
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 

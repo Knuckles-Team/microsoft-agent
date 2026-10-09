@@ -27,6 +27,8 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import UUID
 
+# SDK gap (SDK-CONNECTOR-CONTROL-R011): see power_platform.py — cli_secrets'
+# env/vault/secret resolver has no agent_connector_sdk.credentials equivalent.
 from agent_utilities.security.cli_secrets import resolve_runtime_secret_reference
 from pydantic import (
     BaseModel,

@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from agent_utilities.core.config import setting
+from agent_connector_sdk.config import setting
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from microsoft_agent.intune_service import IntuneServiceSettings
