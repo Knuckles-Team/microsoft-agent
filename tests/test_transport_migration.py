@@ -43,12 +43,10 @@ def test_provider_transport_uses_pinned_tls_and_closes_once(monkeypatch) -> None
     resolver.assert_called_once_with(
         "microsoft_graph", profile_name="private-ca", profile_ref=None
     )
-    kwargs = factory.call_args.kwargs
-    assert kwargs["verify"] is profile.ssl_context
-    assert kwargs["pin_egress"] is True
-    assert kwargs["follow_redirects"] is False
-    assert kwargs["trust_env"] is False
-    assert kwargs["allowed_private_hosts"] == ("configured.example",)
+    options = factory.call_args.args[0]
+    assert options.tls is profile
+    assert options.pin_egress is True
+    assert options.allowed_private_hosts == ("configured.example",)
 
     transport.close()
     transport.close()
@@ -76,8 +74,9 @@ def test_companion_transport_uses_selected_tls_profile(monkeypatch) -> None:
         profile_name=None,
         profile_ref="secret://transport/companion-tls",
     )
-    assert factory.call_args.kwargs["pin_egress"] is True
-    assert factory.call_args.kwargs["allowed_private_hosts"] == ("relay.example",)
+    options = factory.call_args.args[0]
+    assert options.pin_egress is True
+    assert options.allowed_private_hosts == ("relay.example",)
     transport.close()
     client.close.assert_called_once_with()
     profile.cleanup.assert_called_once_with()

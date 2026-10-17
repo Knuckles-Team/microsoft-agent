@@ -77,7 +77,7 @@ def _default_scope_audiences(scopes: Sequence[str]) -> frozenset[str]:
 
 
 def _get_incoming_user_token() -> str | None:
-    """Read the request token captured by agent-utilities middleware."""
+    """Read the request token captured by agent-connector-sdk middleware."""
 
     try:
         from agent_connector_sdk.auth.delegation import current_user_token

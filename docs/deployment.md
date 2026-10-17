@@ -40,7 +40,7 @@ microsoft-mcp \
   --port 8000
 ```
 
-Configure `AUTH_TYPE` and the corresponding Agent Utilities caller-authentication
+Configure `AUTH_TYPE` and the corresponding Agent Connector SDK caller-authentication
 settings before exposing the listener. Microsoft Graph authentication and MCP
 caller authentication are independent boundaries; both must pass.
 
@@ -91,7 +91,7 @@ microsoft-agent \
 ```
 
 The provider endpoint, model identifier, credentials, observability settings, TLS
-profile, and MCP configuration are external Agent Utilities configuration. Require
+profile, and MCP configuration are external Agent Connector SDK configuration. Require
 the same identity, authorization, retention, and network boundaries used by
 GraphOS delegation.
 
@@ -120,7 +120,7 @@ use `REQUESTS_CA_BUNDLE`; OpenSSL-compatible clients can use `SSL_CERT_FILE`; `u
 package resolution can use native platform trust with `UV_NATIVE_TLS=true`.
 
 Do not set an insecure verification mode or package a workstation-specific bundle
-path. The operator's Agent Utilities doctor must confirm the selected trust profile
+path. The operator's Agent Connector SDK doctor must confirm the selected trust profile
 before release validation.
 
 ## Optional integrations

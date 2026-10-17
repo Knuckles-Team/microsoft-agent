@@ -6,7 +6,7 @@ The Python client is available for trusted in-process extensions.
 
 ## MCP surface
 
-`MCP_TOOL_MODE=intent` exposes the compact Agent Utilities intent and control
+`MCP_TOOL_MODE=intent` exposes the compact Agent Connector SDK intent and control
 surface. It discovers the installed Microsoft action schemas at runtime and routes
 requests while preserving caller identity, approval, policy, and trace context.
 Use MCP discovery as the authority for exact schemas; do not copy generated action
@@ -89,7 +89,7 @@ microsoft-agent \
 ```
 
 Model endpoints, keys, TLS profiles, Langfuse settings, and skills remain external
-Agent Utilities configuration. The package does not ship a provider, model, API
+Agent Connector SDK configuration. The package does not ship a provider, model, API
 key, MCP URL, or local filesystem profile.
 
 ## Optional capability groups

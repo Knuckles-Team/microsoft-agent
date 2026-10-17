@@ -1,7 +1,7 @@
 # Microsoft Agent
 
 Microsoft Agent provides a governed Microsoft Graph MCP server and an optional A2A
-agent. It uses Agent Utilities for MCP, identity propagation, intent delegation,
+agent. It uses Agent Connector SDK for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
 Current package version: **2.1.0**
@@ -41,7 +41,7 @@ python -m pip install "microsoft-agent[control-plane]"
 python -m pip install "microsoft-agent[all]"
 ```
 
-Agent Utilities depends on `epistemic-graph[full]`; the full and numeric engine
+Agent Connector SDK depends on `epistemic-graph[full]`; the full and numeric engine
 features therefore remain available when the A2A/GraphOS runtime is installed.
 
 ## Authentication
@@ -147,7 +147,7 @@ tokens remain in memory and are not written to plaintext files.
 | `PORT` | `8000` |  |
 | `AUTH_TYPE` | `oidc` |  |
 
-#### Inherited agent-utilities variables (apply to every connector)
+#### Inherited agent-connector-sdk variables (apply to every connector)
 
 | Variable | Example | Description |
 |----------|---------|-------------|
@@ -173,7 +173,7 @@ tokens remain in memory and are not written to plaintext files.
 | `MODEL_ID` | — | Operator-configured model id for the agent |
 | `ENABLE_WEB_UI` | `True` | Serve the AG-UI web interface |
 
-_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared agent-utilities set — do not edit._
+_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared agent-connector-sdk set — do not edit._
 <!-- ENV-VARS-TABLE:END -->
 
 ## Run the MCP server
@@ -570,7 +570,7 @@ default; unknown actions are treated as writes. Writes require
 <!-- MCP-CONFIG-EXAMPLES:START -->
 
 > **Install the connector-focused `[mcp]` extra.** Examples use `microsoft-agent[mcp]` to add
-> FastMCP / FastAPI through `agent-utilities[mcp]`; the required Agent Utilities core
+> FastMCP / FastAPI through `agent-connector-sdk`; the required Agent Connector SDK core
 > still carries `epistemic-graph[full]`. The `[agent-runtime]` extra additionally
 > enables model orchestration.
 
@@ -828,7 +828,7 @@ _Auto-generated from the code-read env surface (`MCP_TOOL_MODE` + package vars) 
 microsoft-agent --mcp-url <mcp-url> --provider <provider> --model-id <model-id>
 ```
 
-The agent uses the Agent Utilities model/configuration boundary. Provider keys,
+The agent uses the Agent Connector SDK model/configuration boundary. Provider keys,
 model endpoints, Langfuse configuration, and TLS profiles are provided externally.
 
 ## Governed ingestion
@@ -899,15 +899,15 @@ uv run mkdocs build --strict
 See `AGENTS.md` for current-only, privacy, security, and change-discipline rules.
 
 
-<!-- BEGIN agent-utilities-deployment (generated; do not edit between markers) -->
+<!-- BEGIN agent-connector-sdk-deployment (generated; do not edit between markers) -->
 
-## Deploy with `agent-utilities-deployment`
+## Deploy with `agent-connector-sdk-deployment`
 
-Provision this package with the consolidated **`agent-utilities-deployment`**
+Provision this package with the consolidated **`agent-connector-sdk-deployment`**
 workflow. It selects an installed-package, editable-source, or immutable-container
 path; records only runtime secret and TLS-profile references in `AgentConfig`; and
 runs doctor, registration, policy, observability, and rollback gates. Ask your agent
-to **"deploy `microsoft-agent` with agent-utilities-deployment"**.
+to **"deploy `microsoft-agent` with agent-connector-sdk-deployment"**.
 
 | Install mode | Command |
 |------|---------|
@@ -919,7 +919,7 @@ The repository embeds no deployment profile, credential value, certificate path,
 environment-specific endpoint. Supply those at runtime through `AgentConfig` and the
 configured secret provider.
 
-<!-- END agent-utilities-deployment -->
+<!-- END agent-connector-sdk-deployment -->
 
 <!-- GOVERNED-CAPABILITY:START -->
 ## Governed capability contract

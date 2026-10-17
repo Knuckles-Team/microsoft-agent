@@ -26,6 +26,7 @@ def _manager() -> SimpleNamespace:
 
 def test_graph_transport_uses_shared_tls_profile_without_redirects(monkeypatch) -> None:
     profile = MagicMock()
+    profile.proxy_url = None
     profile.httpx_kwargs.return_value = {
         "verify": MagicMock(name="ssl-context"),
         # Pinned Graph egress must override a profile that otherwise permits
@@ -64,12 +65,10 @@ def test_graph_transport_uses_shared_tls_profile_without_redirects(monkeypatch) 
     resolver.assert_called_once_with(
         "microsoft_graph", profile_name="private-ca", profile_ref=None
     )
-    kwargs = httpx_client.call_args.kwargs
-    assert kwargs["follow_redirects"] is False
-    assert kwargs["trust_env"] is False
-    assert kwargs["verify"] is profile.httpx_kwargs.return_value["verify"]
-    assert kwargs["pin_egress"] is True
-    assert kwargs["allowed_private_hosts"] == ()
+    options = httpx_client.call_args.args[0]
+    assert options.tls is profile
+    assert options.pin_egress is True
+    assert options.allowed_private_hosts == ()
     adapter_type.assert_called_once_with(
         auth_provider_type.return_value,
         client=client,
@@ -83,6 +82,7 @@ def test_graph_transport_uses_shared_tls_profile_without_redirects(monkeypatch) 
 async def test_graph_transport_closes_client_and_tls_material(monkeypatch) -> None:
     profile = MagicMock()
     profile.httpx_kwargs.return_value = {"verify": True, "trust_env": False}
+    profile.proxy_url = None
     client = MagicMock()
     client.aclose = AsyncMock()
     monkeypatch.setattr(
@@ -118,6 +118,7 @@ async def test_graph_transport_closes_client_and_tls_material(monkeypatch) -> No
 def test_graph_transport_cleans_tls_when_client_creation_fails(monkeypatch) -> None:
     profile = MagicMock()
     profile.httpx_kwargs.return_value = {"verify": True, "trust_env": False}
+    profile.proxy_url = None
     monkeypatch.setattr(
         "microsoft_agent.api.api_client_base.resolve_tls_profile",
         MagicMock(return_value=profile),

@@ -1,7 +1,7 @@
 # Microsoft Agent
 
 Microsoft Agent is a governed Microsoft Graph MCP provider and optional A2A agent
-for the Agent Utilities and Epistemic Graph ecosystem.
+for the Agent Connector SDK and Epistemic Graph ecosystem.
 
 It supplies:
 

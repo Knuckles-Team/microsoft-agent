@@ -2,7 +2,7 @@
 
 This page is the operator contract for `microsoft-agent`. Package-specific identity
 and policy values are loaded through validated Microsoft settings; shared model,
-graph, MCP, trust, observability, and secret references use the Agent Utilities
+graph, MCP, trust, observability, and secret references use the Agent Connector SDK
 configuration boundary. Runtime values must be injected by the launcher or an
 external AgentConfig profile. They do not belong in source, packaged skill content,
 traces, or generated reports.
@@ -30,7 +30,7 @@ be provided as environment projections of that profile. Doctor output must repor
 only readiness, selected modes, enabled groups, and opaque configuration origins;
 it must never print values, endpoints, credentials, personal paths, or token claims.
 
-Run the Agent Utilities doctor after any configuration change and before starting a
+Run the Agent Connector SDK doctor after any configuration change and before starting a
 network listener. A missing identity coordinate, unreadable trust reference,
 unavailable optional dependency, or invalid integration profile is a failed
 readiness gate, not a reason to select a fallback mode.
@@ -54,7 +54,7 @@ production default.
 ## TLS trust
 
 Microsoft Graph transport resolves `MICROSOFT_GRAPH_TLS_PROFILE` or
-`MICROSOFT_GRAPH_TLS_PROFILE_REF` through the shared Agent Utilities TLS profile
+`MICROSOFT_GRAPH_TLS_PROFILE_REF` through the shared Agent Connector SDK TLS profile
 boundary. Power Platform and Windows companion configuration objects accept the
 same mutually exclusive `tls_profile` and `tls_profile_ref` fields. Profile names,
 secret references, trust material, and service authorities remain deployment

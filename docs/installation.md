@@ -7,8 +7,8 @@ groups required by the deployment.
 
 | Extra | Purpose |
 |---|---|
-| `mcp` | Microsoft Graph MCP server and Agent Utilities MCP runtime |
-| `agent` | optional Agent Utilities A2A agent runtime |
+| `mcp` | Microsoft Graph MCP server and Agent Connector SDK MCP runtime |
+| `agent` | optional Agent Connector SDK A2A agent runtime |
 | `documents` | Word and PowerPoint document generation |
 | `cloud` | Azure managed and workload identity support |
 | `windows` | outbound Windows companion client and service |
@@ -28,7 +28,7 @@ Install a broader approved profile when required:
 python -m pip install "microsoft-agent[agent,documents,cloud]"
 ```
 
-Agent Utilities resolves Epistemic Graph with the `full` feature set, including the
+Agent Connector SDK resolves Epistemic Graph with the `full` feature set, including the
 folded numeric ABI. Do not substitute a minimal or numeric-only engine artifact.
 
 ## Source checkout
@@ -65,7 +65,7 @@ microsoft-agent --help
 python -c "import microsoft_agent; print(microsoft_agent.__version__)"
 ```
 
-Then run the Agent Utilities doctor against the deployment-owned AgentConfig
+Then run the Agent Connector SDK doctor against the deployment-owned AgentConfig
 profile. Installation is not release-ready until the doctor confirms engine,
 identity, trust, permission, observability, and optional dependency readiness
 without exposing values.
