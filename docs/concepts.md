@@ -13,7 +13,7 @@ does not replace Agent Connector SDK or Epistemic Graph authorities.
 | Action policy | classify the routed action and fail closed for writes/destructive actions | permission governance provides caller policy and approval |
 | Optional integrations | expose native document, Power Platform, Intune, Office, and Windows connection points | deployment AgentConfig provides allowlists, endpoints, trust, and secrets |
 | Knowledge ingestion | map approved provider records into quarantined change envelopes | Epistemic Graph owns persistence, ACL, provenance, lineage, and deletion semantics |
-| Microsoft skill | provide one consolidated operational workflow and provider catalog | GraphOS owns skill discovery and direct/delegated execution |
+| Microsoft skill | provide one consolidated operational workflow and provider catalog | Arbora owns skill discovery and direct/delegated execution |
 | Observability | attach privacy-safe provider outcome metadata | Agent Connector SDK and Langfuse own trace transport and retention policy |
 
 ## Provider domains

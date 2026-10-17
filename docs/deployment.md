@@ -121,7 +121,7 @@ Before promotion:
 5. Validate the connector bundle, schema fingerprints, ontology, mappings, and
    quarantine policy against the installed tool schemas.
 6. Confirm metadata-only Langfuse trace linkage and governed graph read-back.
-7. Stop the service and check that no Microsoft Agent or GraphOS process remains.
+7. Stop the service and check that no Microsoft Agent or Arbora process remains.
 
 See [Configuration](configuration.md), [Authentication](authentication.md), and the
 [enrollment checklist](enrollment-checklist.md) for the complete operator contract.

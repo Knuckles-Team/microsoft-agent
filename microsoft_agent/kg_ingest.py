@@ -2,7 +2,7 @@
 Microsoft records are reduced in memory to opaque typed nodes and structural
 relationships. Names, addresses, subjects, bodies, filenames, URLs, timestamps,
 attachment bytes, and provider identifiers never cross the projection boundary.
-GraphOS owns validation, quarantine, and ChangeEnvelope materialization through
+Arbora owns validation, quarantine, and ChangeEnvelope materialization through
 the signed source-connector manifest; this provider exposes no graph-write plane.
 """
 

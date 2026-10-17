@@ -27,7 +27,7 @@ writes require `MICROSOFT_ALLOW_WRITES=true`; destructive actions also
 require `MICROSOFT_ALLOW_DESTRUCTIVE=true`.
 
 `list_microsoft_ingestion_projection` returns only keyed opaque node identifiers,
-types, and relationships. GraphOS validates the signed source manifest and
+types, and relationships. Arbora validates the signed source manifest and
 commits that projection through the native ChangeEnvelope seam. Projection requires a deployment-owned
 pseudonymization key; neither returns or persists Microsoft content or identity
 fields.
