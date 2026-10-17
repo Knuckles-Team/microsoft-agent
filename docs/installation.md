@@ -8,7 +8,6 @@ groups required by the deployment.
 | Extra | Purpose |
 |---|---|
 | `mcp` | Microsoft Graph MCP server and Agent Connector SDK MCP runtime |
-| `agent` | optional Agent Connector SDK A2A agent runtime |
 | `documents` | Word and PowerPoint document generation |
 | `cloud` | Azure managed and workload identity support |
 | `windows` | outbound Windows companion client and service |
@@ -50,20 +49,12 @@ caches, databases, endpoint profiles, credentials, or generated operator state.
 Build the dedicated targets from the checked-in Dockerfile:
 
 ```bash
-docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<version>-mcp .
-docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
 Images contain application code only. Supply identity, TLS trust, secret
 references, configuration, and writable storage at deployment time.
 
 ## Check the installation
-
-```bash
-microsoft-mcp --help
-microsoft-agent --help
-python -c "import microsoft_agent; print(microsoft_agent.__version__)"
-```
 
 Then run the Agent Connector SDK doctor against the deployment-owned AgentConfig
 profile. Installation is not release-ready until the doctor confirms engine,

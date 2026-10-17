@@ -1,7 +1,6 @@
 # Deployment
 
 Microsoft Agent supports an MCP subprocess, an authenticated streamable-HTTP
-service, and an optional A2A agent. Deployment configuration supplies all identity,
 secret, endpoint, trust, storage, and network values; none are packaged.
 
 ## Local MCP subprocess
@@ -64,8 +63,6 @@ caller-authentication profile:
 The repository's `docker/Dockerfile` contains separate `mcp` and `agent` targets:
 
 ```bash
-docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<version>-mcp .
-docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
 Start the MCP image with deployment-owned environment or secret references. Bind
@@ -76,24 +73,6 @@ certificate material, or tenant-specific profiles in an image or Compose file.
 The runtime must be non-root, read-only where supported, capability-minimized,
 resource-bounded, and covered by an egress allowlist for the configured identity
 authority and Graph endpoint.
-
-## A2A agent
-
-The optional A2A process consumes the authenticated MCP service:
-
-```bash
-microsoft-agent \
-  --mcp-url <mcp-url> \
-  --provider <provider> \
-  --model-id <model-id> \
-  --host 127.0.0.1 \
-  --port 9000
-```
-
-The provider endpoint, model identifier, credentials, observability settings, TLS
-profile, and MCP configuration are external Agent Connector SDK configuration. Require
-the same identity, authorization, retention, and network boundaries used by
-GraphOS delegation.
 
 ## Identity modes
 

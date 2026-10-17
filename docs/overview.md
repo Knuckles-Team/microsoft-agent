@@ -13,7 +13,6 @@ and a provider-owned connector capability bundle.
 | Microsoft Graph client | `MicrosoftGraphApi` composed from `microsoft_agent/api/` |
 | Microsoft authentication | `microsoft_agent/auth.py` and validated `MicrosoftSettings` |
 | Action authorization | `MicrosoftToolPolicy` applied to the routed action |
-| Agent delegation | Agent Connector SDK A2A/GraphOS runtime |
 | Knowledge ingestion | governed connector manifest, ontology, mapping, and quarantine |
 | Observability | deployment-configured metadata-only Agent Connector SDK telemetry |
 
@@ -36,21 +35,6 @@ database, bundled MCP profile, or alternate agent execution plane.
    and governed parent graph record.
 
 ## Source layout
-
-```text
-microsoft_agent/
-  api/                    domain Graph client mixins
-  connectors/             provider source presets and schema fingerprints
-  ontology/               ontology, shapes, mappings, fixtures, and migrations
-  skills/                 consolidated Microsoft operations skill
-  api_client.py           sole Graph API client
-  auth.py                 token acquisition and secure-cache authority
-  settings.py             validated identity and policy configuration
-  mcp_server.py           condensed/action-routed MCP server
-  tool_policy.py          fail-closed action policy
-  integration_tools.py    optional native connection points
-  agent_server.py         optional Agent Connector SDK A2A entry point
-```
 
 Deployment and Office add-in assets define generic schemas and packaging only.
 Environment URLs, credentials, device inventories, filesystem roots, trust bundles,

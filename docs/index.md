@@ -1,6 +1,5 @@
 # Microsoft Agent
 
-Microsoft Agent is a governed Microsoft Graph MCP provider and optional A2A agent
 for the Agent Connector SDK and Epistemic Graph ecosystem.
 
 It supplies:
@@ -25,7 +24,6 @@ filesystem configuration, endpoint inventory, or customized ontology.
 - [Installation](installation.md) lists package extras and verification.
 - [Configuration](configuration.md) defines AgentConfig, trust, and privacy rules.
 - [Authentication](authentication.md) covers identity modes and permission profiles.
-- [Usage](usage.md) documents the current MCP, Python, and A2A interfaces.
 - [Deployment](deployment.md) gives environment-neutral process and container
   patterns.
 - [Integrations](integrations.md) describes optional native connection points.

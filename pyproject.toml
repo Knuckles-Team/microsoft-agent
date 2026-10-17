@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=80.9.0", "wheel"]
+requires = ["setuptools>=84.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -14,7 +14,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
 ]
-dependencies = [ "agent-connector-sdk>=0.2.0,<1.0.0", "azure-core>=1.41.0", "httpx>=0.28.1", "keyring>=25.7.0", "msal>=1.37.0", "msgraph-sdk>=1.59.2", "pydantic>=2.13.4",]
+dependencies = [ "agent-connector-sdk>=0.2.0,<1.0.0", "azure-core>=1.41.0", "httpx>=0.28.1", "keyring>=25.7.0", "msal>=1.39.0", "msgraph-sdk>=1.64.0", "pydantic>=2.14.1",]
 license = "MIT"
 
 [[project.authors]]
@@ -24,43 +24,43 @@ email = "maintainers@users.noreply.github.com"
 [project.optional-dependencies]
 mcp = [ "agent-connector-sdk>=0.2.0,<1.0.0",]
 documents = ["python-docx>=1.2.0", "python-pptx>=1.0.2"]
-cloud = ["azure-identity>=1.25.3", "httpx>=0.28.1"]
+cloud = ["azure-identity>=1.26.0", "httpx>=0.28.1"]
 windows = [
-  "cryptography>=49.0.0",
-  "msal[broker]>=1.31,<2.0; sys_platform == 'win32'",
-  "pywin32>=308; sys_platform == 'win32'",
+  "cryptography>=50.0.2",
+  "msal[broker]>=1.39.0,<2.0; sys_platform == 'win32'",
+  "pywin32>=312; sys_platform == 'win32'",
   "win10toast>=0.9; sys_platform == 'win32'",
 ]
 control-plane = [
-  "cryptography>=49.0.0",
-  "fastapi>=0.139.2",
-  "PyJWT[crypto]>=2.13.0",
-  "uvicorn>=0.51.0",
+  "cryptography>=50.0.2",
+  "fastapi>=0.143.3",
+  "PyJWT[crypto]>=2.15.1",
+  "uvicorn>=0.54.0",
 ]
 docs = ["mkdocs-material>=9.7.7"]
 all = [
-  "azure-identity>=1.25.3",
-  "cryptography>=49.0.0",
-  "fastapi>=0.139.2",
+  "azure-identity>=1.26.0",
+  "cryptography>=50.0.2",
+  "fastapi>=0.143.3",
   "httpx>=0.28.1",
   "mkdocs-material>=9.7.7",
-  "PyJWT[crypto]>=2.13.0",
+  "PyJWT[crypto]>=2.15.1",
   "python-docx>=1.2.0",
   "python-pptx>=1.0.2",
-  "uvicorn>=0.51.0",
-  "msal[broker]>=1.31,<2.0; sys_platform == 'win32'",
-  "pywin32>=308; sys_platform == 'win32'",
+  "uvicorn>=0.54.0",
+  "msal[broker]>=1.39.0,<2.0; sys_platform == 'win32'",
+  "pywin32>=312; sys_platform == 'win32'",
   "win10toast>=0.9; sys_platform == 'win32'",
 ]
 test = [
-  "cryptography>=49.0.0",
-  "fastapi>=0.139.2",
+  "cryptography>=50.0.2",
+  "fastapi>=0.143.3",
   "httpx>=0.28.1",
-  "PyJWT[crypto]>=2.13.0",
+  "PyJWT[crypto]>=2.15.1",
   "pytest>=9.1.1",
   "pytest-asyncio>=1.4.0",
   "pytest-cov>=7.1.0",
-  "pytest-env>=1.7.0",
+  "pytest-env>=1.8.0",
   "pytest-timeout>=2.4.0",
   "python-docx>=1.2.0",
   "python-pptx>=1.0.2",
@@ -87,13 +87,13 @@ microsoft-agent = "microsoft_agent.prompts"
 
 [dependency-groups]
 dev = [
-  "mypy>=1.15,<3",
-  "pytest>=8,<10",
-  "pytest-asyncio>=0.24,<2",
-  "pytest-cov>=6,<8",
-  "pytest-env>=1.1,<2",
+  "mypy>=2.4.0,<3",
+  "pytest>=9.1.1,<10",
+  "pytest-asyncio>=1.4.0,<2",
+  "pytest-cov>=7.1.0,<8",
+  "pytest-env>=1.8.0,<2",
   "pytest-timeout>=2.4,<3",
-  "ruff>=0.15,<1",
+  "ruff>=0.17.1,<1",
 ]
 
 [tool.uv.workspace]
@@ -118,7 +118,7 @@ namespaces = false
 
 [tool.uv]
 override-dependencies = [
-    "fastmcp-slim[client,server]>=4.0.0b1",
+    "fastmcp-slim[client,server]>=4.1.0",
 ]
 
 

@@ -1,7 +1,6 @@
 # Usage
 
 Microsoft Agent exposes one governed Microsoft Graph client through an MCP server
-and, when installed, an A2A agent. The MCP server is the normal integration point.
 The Python client is available for trusted in-process extensions.
 
 ## MCP surface
@@ -61,13 +60,11 @@ import asyncio
 
 from microsoft_agent.auth import get_client
 
-
 async def main() -> None:
     graph = await get_client()
     users = await graph.list_users(params={"$top": 25})
     events = await graph.list_calendar_events(params={"$top": 25})
     print(len(users.get("value", [])), len(events.get("value", [])))
-
 
 asyncio.run(main())
 ```
@@ -75,22 +72,6 @@ asyncio.run(main())
 Authentication settings are validated immediately before token acquisition. Do
 not construct a second token client or persist access tokens outside the supplied
 secure authentication boundary.
-
-## A2A agent
-
-Install the `agent` extra, then point the agent at an authenticated MCP endpoint or
-an external MCP configuration:
-
-```bash
-microsoft-agent \
-  --mcp-url <mcp-url> \
-  --provider <provider> \
-  --model-id <model-id>
-```
-
-Model endpoints, keys, TLS profiles, Langfuse settings, and skills remain external
-Agent Connector SDK configuration. The package does not ship a provider, model, API
-key, MCP URL, or local filesystem profile.
 
 ## Optional capability groups
 

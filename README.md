@@ -1,6 +1,5 @@
 # Microsoft Agent
 
-Microsoft Agent provides a governed Microsoft Graph MCP server and an optional A2A
 agent. It uses Agent Connector SDK for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
@@ -33,7 +32,6 @@ python -m pip install "microsoft-agent[mcp]"
 Useful extras:
 
 ```bash
-python -m pip install "microsoft-agent[agent]"        # A2A agent runtime
 python -m pip install "microsoft-agent[documents]"    # Word and PowerPoint
 python -m pip install "microsoft-agent[cloud]"        # managed/workload identity
 python -m pip install "microsoft-agent[windows]"      # Windows companion
@@ -42,7 +40,6 @@ python -m pip install "microsoft-agent[all]"
 ```
 
 Agent Connector SDK depends on `epistemic-graph[full]`; the full and numeric engine
-features therefore remain available when the A2A/GraphOS runtime is installed.
 
 ## Authentication
 
@@ -171,7 +168,6 @@ tokens remain in memory and are not written to plaintext files.
 | `MCP_URL` | `http://localhost:8000/mcp` | URL of the MCP server the agent connects to |
 | `PROVIDER` | — | Operator-configured LLM provider for the agent |
 | `MODEL_ID` | — | Operator-configured model id for the agent |
-| `ENABLE_WEB_UI` | `True` | Serve the AG-UI web interface |
 
 _79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared agent-connector-sdk set — do not edit._
 <!-- ENV-VARS-TABLE:END -->
@@ -822,15 +818,6 @@ does not emit an unauthenticated non-loopback listener.
 _Auto-generated from the code-read env surface (`MCP_TOOL_MODE` + package vars) — do not edit._
 <!-- MCP-CONFIG-EXAMPLES:END -->
 
-## A2A agent
-
-```bash
-microsoft-agent --mcp-url <mcp-url> --provider <provider> --model-id <model-id>
-```
-
-The agent uses the Agent Connector SDK model/configuration boundary. Provider keys,
-model endpoints, Langfuse configuration, and TLS profiles are provided externally.
-
 ## Governed ingestion
 
 The provider contributes:
@@ -862,8 +849,6 @@ environments, device lists, URLs, or ontologies.
 `docker/Dockerfile` has `mcp` and `agent` targets:
 
 ```bash
-docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<version>-mcp .
-docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
 Deployment-owned Compose or Kubernetes configuration provides identity, trust,
@@ -898,7 +883,6 @@ uv run mkdocs build --strict
 
 See `AGENTS.md` for current-only, privacy, security, and change-discipline rules.
 
-
 <!-- BEGIN agent-connector-sdk-deployment (generated; do not edit between markers) -->
 
 ## Deploy with `agent-connector-sdk-deployment`
@@ -912,7 +896,6 @@ to **"deploy `microsoft-agent` with agent-connector-sdk-deployment"**.
 | Install mode | Command |
 |------|---------|
 | Installed package | `uv tool install "microsoft-agent[mcp]"`, then run `microsoft-mcp` |
-| Editable source | `uv pip install -e ".[agent]"`, then run `microsoft-mcp` |
 | Immutable container | deploy `registry.example.invalid/microsoft-agent@sha256:<digest>` through the operator-selected orchestrator |
 
 The repository embeds no deployment profile, credential value, certificate path, or
