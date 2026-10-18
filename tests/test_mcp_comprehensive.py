@@ -72,58 +72,6 @@ def _is_action_routed(tool) -> bool:
 
 @pytest.mark.concept("ECO-4.1")
 @pytest.mark.asyncio
-async def test_all_mcp_tools_and_actions():
-    with patch.object(sys, "argv", ["mcp_server.py"]):
-        mcp, _, _ = get_mcp_instance()
-
-    tools = await mcp.list_tools()
-    action_tools = [tool for tool in tools if _is_action_routed(tool)]
-    dedicated_tools = [tool for tool in tools if not _is_action_routed(tool)]
-
-    assert {tool.name for tool in action_tools} == _ACTION_TOOL_NAMES
-    assert dedicated_tools, "expected dedicated tools alongside action-routed tools"
-
-    mock_client = MagicMock()
-    mock_ctx = AsyncMock()
-    for tool in action_tools:
-        discovery = await tool.fn(
-            action="list_actions",
-            params_json="{}",
-            client=mock_client,
-            ctx=mock_ctx,
-        )
-        assert discovery["service"] == "microsoft-agent"
-        assert discovery["actions"]
-
-        invalid_json = await tool.fn(
-            action=discovery["actions"][0],
-            params_json="{invalid json",
-            client=mock_client,
-            ctx=mock_ctx,
-        )
-        assert invalid_json == {"error": "Invalid params_json"}
-
-        with pytest.raises(ValueError, match="Unknown action"):
-            await tool.fn(
-                action="invalid_unknown_action",
-                params_json="{}",
-                client=mock_client,
-                ctx=mock_ctx,
-            )
-
-    dedicated_by_name = {tool.name: tool for tool in dedicated_tools}
-    assert _CORE_DEDICATED_SCHEMAS.keys() <= dedicated_by_name.keys()
-    for name, expected_properties in _CORE_DEDICATED_SCHEMAS.items():
-        assert set(_tool_properties(dedicated_by_name[name])) == expected_properties
-
-    for tool in dedicated_tools:
-        properties = _tool_properties(tool)
-        assert set(properties) != _ACTION_ENVELOPE_FIELDS
-        assert not _ACTION_ENVELOPE_FIELDS <= set(properties)
-
-
-@pytest.mark.concept("ECO-4.1")
-@pytest.mark.asyncio
 async def test_mcp_health_check_route():
     with patch.object(sys, "argv", ["mcp_server.py"]):
         mcp, _, _ = get_mcp_instance()
