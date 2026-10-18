@@ -6,8 +6,6 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Governed Microsoft Graph MCP provider and optional A2A agent.">
-      
       
       
         <link rel="canonical" href="https://knuckles-team.github.io/microsoft-agent/overview/">
@@ -1087,7 +1085,7 @@
 
 
 <h1 id="architecture-overview">Architecture overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h1>
-<p>Microsoft Agent is a governed Microsoft Graph provider for the Agent Utilities and
+<p>Microsoft Agent is a governed Microsoft Graph provider for the Agent Connector SDK and
 Epistemic Graph ecosystem. It contributes one MCP server, one modular Graph client,
 one authentication authority, optional integration adapters, a consolidated skill,
 and a provider-owned connector capability bundle.</p>
@@ -1102,7 +1100,7 @@ and a provider-owned connector capability bundle.</p>
 <tbody>
 <tr>
 <td>MCP server and session</td>
-<td>Agent Utilities server factory and checked caller session</td>
+<td>Agent Connector SDK server factory and checked caller session</td>
 </tr>
 <tr>
 <td>Microsoft Graph client</td>
@@ -1117,16 +1115,12 @@ and a provider-owned connector capability bundle.</p>
 <td><code>MicrosoftToolPolicy</code> applied to the routed action</td>
 </tr>
 <tr>
-<td>Agent delegation</td>
-<td>Agent Utilities A2A/GraphOS runtime</td>
-</tr>
-<tr>
 <td>Knowledge ingestion</td>
 <td>governed connector manifest, ontology, mapping, and quarantine</td>
 </tr>
 <tr>
 <td>Observability</td>
-<td>deployment-configured metadata-only Agent Utilities telemetry</td>
+<td>deployment-configured metadata-only Agent Connector SDK telemetry</td>
 </tr>
 </tbody>
 </table>
@@ -1136,7 +1130,7 @@ database, bundled MCP profile, or alternate agent execution plane.</p>
 <ol>
 <li>The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
    an explicit optional-capability profile.</li>
-<li>The MCP server creates a checked Agent Utilities session and exposes the
+<li>The MCP server creates a checked Agent Connector SDK session and exposes the
    configured action families through the selected tool mode.</li>
 <li>The tool policy classifies the routed action. Reads are allowed by default;
    writes and destructive actions require separate explicit approvals.</li>
@@ -1148,19 +1142,6 @@ database, bundled MCP profile, or alternate agent execution plane.</p>
    and governed parent graph record.</li>
 </ol>
 <h2 id="source-layout">Source layout<a class="headerlink" href="#source-layout" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>microsoft_agent/
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  api/                    domain Graph client mixins
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  connectors/             provider source presets and schema fingerprints
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ontology/               ontology, shapes, mappings, fixtures, and migrations
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  skills/                 consolidated Microsoft operations skill
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  api_client.py           sole Graph API client
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  auth.py                 token acquisition and secure-cache authority
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  settings.py             validated identity and policy configuration
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  mcp_server.py           condensed/action-routed MCP server
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>  tool_policy.py          fail-closed action policy
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>  integration_tools.py    optional native connection points
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>  agent_server.py         optional Agent Utilities A2A entry point
-</span></code></pre></div>
 <p>Deployment and Office add-in assets define generic schemas and packaging only.
 Environment URLs, credentials, device inventories, filesystem roots, trust bundles,
 and customized ontologies stay outside the repository.</p>

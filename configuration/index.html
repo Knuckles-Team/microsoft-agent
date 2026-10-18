@@ -6,8 +6,6 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Governed Microsoft Graph MCP provider and optional A2A agent.">
-      
       
       
         <link rel="canonical" href="https://knuckles-team.github.io/microsoft-agent/configuration/">
@@ -1116,7 +1114,7 @@
 <h1 id="configuration-trust-and-privacy">Configuration, trust, and privacy<a class="headerlink" href="#configuration-trust-and-privacy" title="Permanent link">&para;</a></h1>
 <p>This page is the operator contract for <code>microsoft-agent</code>. Package-specific identity
 and policy values are loaded through validated Microsoft settings; shared model,
-graph, MCP, trust, observability, and secret references use the Agent Utilities
+graph, MCP, trust, observability, and secret references use the Agent Connector SDK
 configuration boundary. Runtime values must be injected by the launcher or an
 external AgentConfig profile. They do not belong in source, packaged skill content,
 traces, or generated reports.</p>
@@ -1139,7 +1137,7 @@ and MCP caller authentication. Microsoft-specific identity and capability keys m
 be provided as environment projections of that profile. Doctor output must report
 only readiness, selected modes, enabled groups, and opaque configuration origins;
 it must never print values, endpoints, credentials, personal paths, or token claims.</p>
-<p>Run the Agent Utilities doctor after any configuration change and before starting a
+<p>Run the Agent Connector SDK doctor after any configuration change and before starting a
 network listener. A missing identity coordinate, unreadable trust reference,
 unavailable optional dependency, or invalid integration profile is a failed
 readiness gate, not a reason to select a fallback mode.</p>
@@ -1160,7 +1158,7 @@ readiness gate, not a reason to select a fallback mode.</p>
 production default.</p>
 <h2 id="tls-trust">TLS trust<a class="headerlink" href="#tls-trust" title="Permanent link">&para;</a></h2>
 <p>Microsoft Graph transport resolves <code>MICROSOFT_GRAPH_TLS_PROFILE</code> or
-<code>MICROSOFT_GRAPH_TLS_PROFILE_REF</code> through the shared Agent Utilities TLS profile
+<code>MICROSOFT_GRAPH_TLS_PROFILE_REF</code> through the shared Agent Connector SDK TLS profile
 boundary. Power Platform and Windows companion configuration objects accept the
 same mutually exclusive <code>tls_profile</code> and <code>tls_profile_ref</code> fields. Profile names,
 secret references, trust material, and service authorities remain deployment

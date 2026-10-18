@@ -6,8 +6,6 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Governed Microsoft Graph MCP provider and optional A2A agent.">
-      
       
       
         <link rel="canonical" href="https://knuckles-team.github.io/microsoft-agent/usage/">
@@ -758,17 +756,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a2a-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A2A agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#optional-capability-groups" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1053,17 +1040,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a2a-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A2A agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#optional-capability-groups" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1093,10 +1069,9 @@
 
 <h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h1>
 <p>Microsoft Agent exposes one governed Microsoft Graph client through an MCP server
-and, when installed, an A2A agent. The MCP server is the normal integration point.
 The Python client is available for trusted in-process extensions.</p>
 <h2 id="mcp-surface">MCP surface<a class="headerlink" href="#mcp-surface" title="Permanent link">&para;</a></h2>
-<p><code>MCP_TOOL_MODE=intent</code> exposes the compact Agent Utilities intent and control
+<p><code>MCP_TOOL_MODE=intent</code> exposes the compact Agent Connector SDK intent and control
 surface. It discovers the installed Microsoft action schemas at runtime and routes
 requests while preserving caller identity, approval, policy, and trace context.
 Use MCP discovery as the authority for exact schemas; do not copy generated action
@@ -1116,7 +1091,7 @@ available by default. Unknown actions are classified as writes. Non-destructive
 writes require <code>MICROSOFT_ALLOW_WRITES=true</code>; destructive actions also
 require <code>MICROSOFT_ALLOW_DESTRUCTIVE=true</code>.</p>
 <p><code>list_microsoft_ingestion_projection</code> returns only keyed opaque node identifiers,
-types, and relationships. GraphOS validates the signed source manifest and
+types, and relationships. Arbora validates the signed source manifest and
 commits that projection through the native ChangeEnvelope seam. Projection requires a deployment-owned
 pseudonymization key; neither returns or persists Microsoft content or identity
 fields.</p>
@@ -1150,17 +1125,6 @@ methods are asynchronous.</p>
 <p>Authentication settings are validated immediately before token acquisition. Do
 not construct a second token client or persist access tokens outside the supplied
 secure authentication boundary.</p>
-<h2 id="a2a-agent">A2A agent<a class="headerlink" href="#a2a-agent" title="Permanent link">&para;</a></h2>
-<p>Install the <code>agent</code> extra, then point the agent at an authenticated MCP endpoint or
-an external MCP configuration:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>microsoft-agent<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>--mcp-url<span class="w"> </span>&lt;mcp-url&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--provider<span class="w"> </span>&lt;provider&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>--model-id<span class="w"> </span>&lt;model-id&gt;
-</span></code></pre></div>
-<p>Model endpoints, keys, TLS profiles, Langfuse settings, and skills remain external
-Agent Utilities configuration. The package does not ship a provider, model, API
-key, MCP URL, or local filesystem profile.</p>
 <h2 id="optional-capability-groups">Optional capability groups<a class="headerlink" href="#optional-capability-groups" title="Permanent link">&para;</a></h2>
 <p>Set <code>MICROSOFT_ENABLED_TOOL_GROUPS</code> to the explicit families approved for the
 deployment. Optional document, Office bridge, Power Platform, Intune, and Windows

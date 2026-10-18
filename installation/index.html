@@ -6,8 +6,6 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Governed Microsoft Graph MCP provider and optional A2A agent.">
-      
       
       
         <link rel="canonical" href="https://knuckles-team.github.io/microsoft-agent/installation/">
@@ -1083,11 +1081,7 @@ groups required by the deployment.</p>
 <tbody>
 <tr>
 <td><code>mcp</code></td>
-<td>Microsoft Graph MCP server and Agent Utilities MCP runtime</td>
-</tr>
-<tr>
-<td><code>agent</code></td>
-<td>optional Agent Utilities A2A agent runtime</td>
+<td>Microsoft Graph MCP server and Agent Connector SDK MCP runtime</td>
 </tr>
 <tr>
 <td><code>documents</code></td>
@@ -1121,7 +1115,7 @@ groups required by the deployment.</p>
 <p>Install a broader approved profile when required:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"microsoft-agent[agent,documents,cloud]"</span>
 </span></code></pre></div>
-<p>Agent Utilities resolves Epistemic Graph with the <code>full</code> feature set, including the
+<p>Agent Connector SDK resolves Epistemic Graph with the <code>full</code> feature set, including the
 folded numeric ABI. Do not substitute a minimal or numeric-only engine artifact.</p>
 <h2 id="source-checkout">Source checkout<a class="headerlink" href="#source-checkout" title="Permanent link">&para;</a></h2>
 <p>For development:</p>
@@ -1134,17 +1128,12 @@ filesystem with adequate capacity. Source checkouts must not contain runtime tok
 caches, databases, endpoint profiles, credentials, or generated operator state.</p>
 <h2 id="containers">Containers<a class="headerlink" href="#containers" title="Permanent link">&para;</a></h2>
 <p>Build the dedicated targets from the checked-in Dockerfile:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>docker/Dockerfile<span class="w"> </span>--target<span class="w"> </span>mcp<span class="w"> </span>-t<span class="w"> </span>&lt;registry&gt;/microsoft-agent:&lt;version&gt;-mcp<span class="w"> </span>.
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>docker<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>docker/Dockerfile<span class="w"> </span>--target<span class="w"> </span>agent<span class="w"> </span>-t<span class="w"> </span>&lt;registry&gt;/microsoft-agent:&lt;version&gt;<span class="w"> </span>.
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>
 </span></code></pre></div>
 <p>Images contain application code only. Supply identity, TLS trust, secret
 references, configuration, and writable storage at deployment time.</p>
 <h2 id="check-the-installation">Check the installation<a class="headerlink" href="#check-the-installation" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>microsoft-mcp<span class="w"> </span>--help
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>microsoft-agent<span class="w"> </span>--help
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import microsoft_agent; print(microsoft_agent.__version__)"</span>
-</span></code></pre></div>
-<p>Then run the Agent Utilities doctor against the deployment-owned AgentConfig
+<p>Then run the Agent Connector SDK doctor against the deployment-owned AgentConfig
 profile. Installation is not release-ready until the doctor confirms engine,
 identity, trust, permission, observability, and optional dependency readiness
 without exposing values.</p>
