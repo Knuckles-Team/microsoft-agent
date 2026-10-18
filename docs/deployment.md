@@ -1,7 +1,6 @@
 # Deployment
 
 Microsoft Agent supports an MCP subprocess, an authenticated streamable-HTTP
-service, and an optional A2A agent. Deployment configuration supplies all identity,
 secret, endpoint, trust, storage, and network values; none are packaged.
 
 ## Local MCP subprocess
@@ -40,7 +39,7 @@ microsoft-mcp \
   --port 8000
 ```
 
-Configure `AUTH_TYPE` and the corresponding Agent Utilities caller-authentication
+Configure `AUTH_TYPE` and the corresponding Agent Connector SDK caller-authentication
 settings before exposing the listener. Microsoft Graph authentication and MCP
 caller authentication are independent boundaries; both must pass.
 
@@ -64,8 +63,6 @@ caller-authentication profile:
 The repository's `docker/Dockerfile` contains separate `mcp` and `agent` targets:
 
 ```bash
-docker build -f docker/Dockerfile --target mcp -t <registry>/microsoft-agent:<version>-mcp .
-docker build -f docker/Dockerfile --target agent -t <registry>/microsoft-agent:<version> .
 ```
 
 Start the MCP image with deployment-owned environment or secret references. Bind
@@ -76,24 +73,6 @@ certificate material, or tenant-specific profiles in an image or Compose file.
 The runtime must be non-root, read-only where supported, capability-minimized,
 resource-bounded, and covered by an egress allowlist for the configured identity
 authority and Graph endpoint.
-
-## A2A agent
-
-The optional A2A process consumes the authenticated MCP service:
-
-```bash
-microsoft-agent \
-  --mcp-url <mcp-url> \
-  --provider <provider> \
-  --model-id <model-id> \
-  --host 127.0.0.1 \
-  --port 9000
-```
-
-The provider endpoint, model identifier, credentials, observability settings, TLS
-profile, and MCP configuration are external Agent Utilities configuration. Require
-the same identity, authorization, retention, and network boundaries used by
-GraphOS delegation.
 
 ## Identity modes
 
@@ -120,7 +99,7 @@ use `REQUESTS_CA_BUNDLE`; OpenSSL-compatible clients can use `SSL_CERT_FILE`; `u
 package resolution can use native platform trust with `UV_NATIVE_TLS=true`.
 
 Do not set an insecure verification mode or package a workstation-specific bundle
-path. The operator's Agent Utilities doctor must confirm the selected trust profile
+path. The operator's Agent Connector SDK doctor must confirm the selected trust profile
 before release validation.
 
 ## Optional integrations
@@ -142,7 +121,7 @@ Before promotion:
 5. Validate the connector bundle, schema fingerprints, ontology, mappings, and
    quarantine policy against the installed tool schemas.
 6. Confirm metadata-only Langfuse trace linkage and governed graph read-back.
-7. Stop the service and check that no Microsoft Agent or GraphOS process remains.
+7. Stop the service and check that no Microsoft Agent or Arbora process remains.
 
 See [Configuration](configuration.md), [Authentication](authentication.md), and the
 [enrollment checklist](enrollment-checklist.md) for the complete operator contract.

@@ -31,6 +31,6 @@ from the installed MCP server before using any family.
 2. Use `list_microsoft_ingestion_projection` to inspect only opaque nodes and
    structural relationships.
 3. Confirm no provider identifier or content appears in the result.
-4. Delegate manifest validation and ChangeEnvelope materialization to GraphOS.
+4. Delegate manifest validation and ChangeEnvelope materialization to Arbora.
 5. Read back the governed parent record and verify tenant, ACL, provenance,
    quarantine, signature, and privacy metadata without revealing values.

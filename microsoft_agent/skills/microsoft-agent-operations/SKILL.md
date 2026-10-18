@@ -2,12 +2,12 @@
 name: microsoft-agent-operations
 skill_type: skill
 description: >-
-  Operate microsoft-agent through its governed MCP and GraphOS capabilities, including discovery, governed operations, ingestion, and verification. Use when a request requires this provider's read, change, automation, ingestion, troubleshooting, or evidence workflows.
+  Operate microsoft-agent through its governed MCP and Arbora capabilities, including discovery, governed operations, ingestion, and verification. Use when a request requires this provider's read, change, automation, ingestion, troubleshooting, or evidence workflows.
 ---
 
 # Microsoft Agent Operations
 
-Use the provider's governed MCP tools through GraphOS delegation.
+Use the provider's governed MCP tools through Arbora delegation.
 
 ## Workflow
 
@@ -29,7 +29,7 @@ Use the provider's governed MCP tools through GraphOS delegation.
   Intune, and the outbound Windows companion. Use them only when their dependency,
   external profile, and doctor readiness gate all pass.
 - Knowledge projection: `list_microsoft_ingestion_projection` for a read-only keyed
-  projection; let GraphOS validate the signed source manifest and commit it
+  projection; let Arbora validate the signed source manifest and commit it
   through the native ChangeEnvelope authority.
 
 The installed MCP schema is authoritative. Route the discovered action through its

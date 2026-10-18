@@ -1,9 +1,8 @@
 # syntax=docker/dockerfile:1.7
-
-# The digest pins the multi-platform Python 3.14 slim image. Refresh it only as
-# part of an audited dependency update.
+# MCP-only image: ships the MCP server and nothing else (no agent mode).
+#   docker build --target mcp -t <name>:mcp .
+# The digest pins the multi-platform Python 3.14 slim image.
 ARG PYTHON_IMAGE=python:3.14-slim@sha256:cea0e6040540fb2b965b6e7fb5ffa00871e632eef63719f0ea54bca189ce14a6
-
 FROM ${PYTHON_IMAGE} AS source
 WORKDIR /build
 COPY pyproject.toml README.md LICENSE MANIFEST.in ./
@@ -12,12 +11,7 @@ COPY microsoft_agent ./microsoft_agent
 FROM source AS builder-mcp
 RUN python -m venv /opt/microsoft-agent \
     && /opt/microsoft-agent/bin/python -m pip install \
-        --disable-pip-version-check --no-cache-dir ".[mcp]"
-
-FROM source AS builder-agent
-RUN python -m venv /opt/microsoft-agent \
-    && /opt/microsoft-agent/bin/python -m pip install \
-        --disable-pip-version-check --no-cache-dir ".[agent]"
+        --disable-pip-version-check --no-cache-dir microsoft-agent[mcp]==2.2.0
 
 FROM ${PYTHON_IMAGE} AS runtime-base
 RUN groupadd --system --gid 65532 microsoft-agent \
@@ -31,7 +25,3 @@ USER 65532:65532
 FROM runtime-base AS mcp
 COPY --from=builder-mcp --chown=65532:65532 /opt/microsoft-agent /opt/microsoft-agent
 ENTRYPOINT ["microsoft-mcp"]
-
-FROM runtime-base AS agent
-COPY --from=builder-agent --chown=65532:65532 /opt/microsoft-agent /opt/microsoft-agent
-ENTRYPOINT ["microsoft-agent"]

@@ -27,15 +27,14 @@ from urllib.parse import quote
 from uuid import UUID, uuid4
 
 import httpx
+from agent_connector_sdk.credentials.runtime_references import (
+    validate_runtime_secret_reference,
+)
+from agent_connector_sdk.http.client import create_http_client
+from agent_connector_sdk.http.options import HttpClientOptions
+from agent_connector_sdk.http.retry import RetryPolicy
 from agent_connector_sdk.tls.profile import ResolvedTLSProfile
 from agent_connector_sdk.tls.resolve import resolve_tls_profile
-
-# SDK gaps (SDK-CONNECTOR-CONTROL-R011), see power_platform.py for detail:
-# create_http_client's flat egress-pinning kwargs and cli_secrets' validate-
-# without-resolving/env+vault+secret-scheme contract have no SDK equivalent
-# yet. Kept on agent_utilities.
-from agent_utilities.core.http_client import create_http_client
-from agent_utilities.security.cli_secrets import validate_runtime_secret_reference
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -122,16 +121,19 @@ class HttpxCompanionTransport:
             raise ValueError("Pinned provider transport does not support a proxy")
         try:
             self._client = create_http_client(
-                timeout=httpx.Timeout(30.0),
-                verify=self._tls.ssl_context,
-                follow_redirects=False,
-                trust_env=False,
-                pin_egress=True,
-                allowed_private_hosts=allowed_private_hosts,
-                limits=httpx.Limits(
-                    max_connections=32,
-                    max_keepalive_connections=8,
-                ),
+                HttpClientOptions(
+                    # Requests carry absolute URLs; the base is never dialed.
+                    base_url="https://pinned.invalid",
+                    timeout=httpx.Timeout(30.0),
+                    retry=RetryPolicy(max_attempts=1),
+                    tls=self._tls,
+                    limits=httpx.Limits(
+                        max_connections=32,
+                        max_keepalive_connections=8,
+                    ),
+                    pin_egress=True,
+                    allowed_private_hosts=allowed_private_hosts,
+                )
             )
         except Exception:
             self._tls.cleanup()

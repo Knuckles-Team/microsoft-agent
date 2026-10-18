@@ -17,7 +17,7 @@
 
 ## Functional Requirements
 
-- **FR-001**: Minor update: agent-utilities 0.2.40 (installed) -> 0.16.0
+- **FR-001**: Minor update: agent-connector-sdk 0.2.40 (installed) -> 0.16.0
 - **FR-002**: Minor update: msgraph-sdk 1.54.0 (constraint — not installed) -> 1.58.0
 - **FR-003**: Minor update: msal 1.31.0 (constraint — not installed) -> 1.36.0
 - **FR-004**: 35 functions exceed 50 lines
@@ -57,7 +57,7 @@
 - **FR-038**: Partial env var documentation: 37% coverage
 - **FR-039**: Undocumented env vars: ADMINTOOL, AGREEMENTSTOOL, APPLICATIONSTOOL, AUDITTOOL, AUTHTOOL, CALENDARTOOL, CHATTOOL, COMMUNICATIONSTOOL, CONNECTIONSTOOL, CONTACTSTOOL
 - **FR-040**: 5 Python env vars not in .env.example: AUDIENCE, MICROSOFT_ENDPOINTS_JSON, TESTING, USER, XDG_DATA_HOME
-- **FR-041**: Analysis error: No module named 'agent_utilities.knowledge_graph'
+- **FR-041**: Analysis error: No module named 'agent_connector_sdk.knowledge_graph'
 
 ## Success Criteria
 

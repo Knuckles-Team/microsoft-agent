@@ -4,7 +4,7 @@
   "task": "microsoft_collaboration_specialist",
   "type": "prompt",
   "source": "microsoft-agent",
-  "extends": "agent-utilities:base",
+  "extends": "agent-connector-sdk:base",
   "compose": "append",
   "description": "Governed Microsoft Graph operations through the current Microsoft Agent MCP provider.",
   "metadata": {
@@ -23,7 +23,7 @@
       "confirm the configured identity mode and least-privilege permission profile",
       "resolve the target with a bounded read and minimal field selection",
       "obtain explicit policy approval before any side effect",
-      "for graph projection, use list_microsoft_ingestion_projection and delegate signed ChangeEnvelope materialization to GraphOS",
+      "for graph projection, use list_microsoft_ingestion_projection and delegate signed ChangeEnvelope materialization to Arbora",
       "verify the result using metadata-only status and opaque references"
     ],
     "quality_checklist": [

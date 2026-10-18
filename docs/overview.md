@@ -1,6 +1,6 @@
 # Architecture overview
 
-Microsoft Agent is a governed Microsoft Graph provider for the Agent Utilities and
+Microsoft Agent is a governed Microsoft Graph provider for the Agent Connector SDK and
 Epistemic Graph ecosystem. It contributes one MCP server, one modular Graph client,
 one authentication authority, optional integration adapters, a consolidated skill,
 and a provider-owned connector capability bundle.
@@ -9,13 +9,12 @@ and a provider-owned connector capability bundle.
 
 | Boundary | Authority |
 |---|---|
-| MCP server and session | Agent Utilities server factory and checked caller session |
+| MCP server and session | Agent Connector SDK server factory and checked caller session |
 | Microsoft Graph client | `MicrosoftGraphApi` composed from `microsoft_agent/api/` |
 | Microsoft authentication | `microsoft_agent/auth.py` and validated `MicrosoftSettings` |
 | Action authorization | `MicrosoftToolPolicy` applied to the routed action |
-| Agent delegation | Agent Utilities A2A/GraphOS runtime |
 | Knowledge ingestion | governed connector manifest, ontology, mapping, and quarantine |
-| Observability | deployment-configured metadata-only Agent Utilities telemetry |
+| Observability | deployment-configured metadata-only Agent Connector SDK telemetry |
 
 There is no second API wrapper, raw-token fallback, plaintext token cache, bundled
 database, bundled MCP profile, or alternate agent execution plane.
@@ -24,7 +23,7 @@ database, bundled MCP profile, or alternate agent execution plane.
 
 1. The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
    an explicit optional-capability profile.
-2. The MCP server creates a checked Agent Utilities session and exposes the
+2. The MCP server creates a checked Agent Connector SDK session and exposes the
    configured action families through the selected tool mode.
 3. The tool policy classifies the routed action. Reads are allowed by default;
    writes and destructive actions require separate explicit approvals.
@@ -36,21 +35,6 @@ database, bundled MCP profile, or alternate agent execution plane.
    and governed parent graph record.
 
 ## Source layout
-
-```text
-microsoft_agent/
-  api/                    domain Graph client mixins
-  connectors/             provider source presets and schema fingerprints
-  ontology/               ontology, shapes, mappings, fixtures, and migrations
-  skills/                 consolidated Microsoft operations skill
-  api_client.py           sole Graph API client
-  auth.py                 token acquisition and secure-cache authority
-  settings.py             validated identity and policy configuration
-  mcp_server.py           condensed/action-routed MCP server
-  tool_policy.py          fail-closed action policy
-  integration_tools.py    optional native connection points
-  agent_server.py         optional Agent Utilities A2A entry point
-```
 
 Deployment and Office add-in assets define generic schemas and packaging only.
 Environment URLs, credentials, device inventories, filesystem roots, trust bundles,

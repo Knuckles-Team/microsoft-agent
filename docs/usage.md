@@ -1,12 +1,11 @@
 # Usage
 
 Microsoft Agent exposes one governed Microsoft Graph client through an MCP server
-and, when installed, an A2A agent. The MCP server is the normal integration point.
 The Python client is available for trusted in-process extensions.
 
 ## MCP surface
 
-`MCP_TOOL_MODE=intent` exposes the compact Agent Utilities intent and control
+`MCP_TOOL_MODE=intent` exposes the compact Agent Connector SDK intent and control
 surface. It discovers the installed Microsoft action schemas at runtime and routes
 requests while preserving caller identity, approval, policy, and trace context.
 Use MCP discovery as the authority for exact schemas; do not copy generated action
@@ -28,7 +27,7 @@ writes require `MICROSOFT_ALLOW_WRITES=true`; destructive actions also
 require `MICROSOFT_ALLOW_DESTRUCTIVE=true`.
 
 `list_microsoft_ingestion_projection` returns only keyed opaque node identifiers,
-types, and relationships. GraphOS validates the signed source manifest and
+types, and relationships. Arbora validates the signed source manifest and
 commits that projection through the native ChangeEnvelope seam. Projection requires a deployment-owned
 pseudonymization key; neither returns or persists Microsoft content or identity
 fields.
@@ -75,22 +74,6 @@ asyncio.run(main())
 Authentication settings are validated immediately before token acquisition. Do
 not construct a second token client or persist access tokens outside the supplied
 secure authentication boundary.
-
-## A2A agent
-
-Install the `agent` extra, then point the agent at an authenticated MCP endpoint or
-an external MCP configuration:
-
-```bash
-microsoft-agent \
-  --mcp-url <mcp-url> \
-  --provider <provider> \
-  --model-id <model-id>
-```
-
-Model endpoints, keys, TLS profiles, Langfuse settings, and skills remain external
-Agent Utilities configuration. The package does not ship a provider, model, API
-key, MCP URL, or local filesystem profile.
 
 ## Optional capability groups
 
