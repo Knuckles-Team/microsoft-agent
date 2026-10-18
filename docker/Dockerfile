@@ -22,7 +22,7 @@ FROM builder-base AS builder-mcp
 RUN --mount=type=cache,target=/root/.cache/uv \
     for attempt in 1 2 3 4 5 6 7 8 9 10; do \
         uv pip install --system --break-system-packages --only-binary :all: \
-            --refresh-package microsoft-agent "microsoft-agent[mcp]==2.3.0" && exit 0; \
+            --refresh-package microsoft-agent "microsoft-agent[mcp]==2.3.1" && exit 0; \
         echo "wheel not installable yet (attempt ${attempt}); retrying in 30s"; \
         sleep 30; \
     done; \
@@ -44,14 +44,14 @@ ENV HOST=${HOST} \
     XDG_CACHE_HOME=/tmp/.cache \
     XDG_STATE_HOME=/tmp/.local/state
 # Fixed non-root identity for least-privilege runtime and stable volume ownership.
-RUN groupadd --system --gid 65532 app \
-    && useradd --system --uid 65532 --gid 65532 --no-create-home \
+RUN groupadd --system --gid 10001 app \
+    && useradd --system --uid 10001 --gid 10001 --no-create-home \
         --home-dir /tmp --shell /usr/sbin/nologin app \
-    && install -d -o 65532 -g 65532 -m 0700 \
+    && install -d -o 10001 -g 10001 -m 0700 \
         /tmp/.config /tmp/.cache /tmp/.local/state
 
 # mcp: MCP server only.
 FROM runtime-base AS mcp
 COPY --from=builder-mcp /usr/local /usr/local
-USER 65532:65532
+USER 10001:10001
 ENTRYPOINT ["microsoft-mcp"]
