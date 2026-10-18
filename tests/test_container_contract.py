@@ -23,10 +23,7 @@ def test_container_builds_local_source_from_a_digest_pinned_base() -> None:
     project = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))["project"]
     assert Version(image.group(1)) in SpecifierSet(project["requires-python"])
     assert "COPY pyproject.toml README.md LICENSE MANIFEST.in ./" in content
-    assert '".[mcp]"' in content
-    assert '".[agent]"' in content
-    assert "microsoft-agent[mcp]>=" not in content
-    assert "microsoft-agent[agent]>=" not in content
+    assert "microsoft-agent[mcp]==" in content
     assert "--prerelease" not in content
     assert "ghcr.io/" not in content
 
@@ -38,4 +35,4 @@ def test_container_runtime_is_unprivileged_and_has_no_auth_bypass_default() -> N
     assert "--no-create-home" in content
     assert "AUTH_TYPE" not in content
     assert 'ENTRYPOINT ["microsoft-mcp"]' in content
-    assert 'ENTRYPOINT ["microsoft-agent"]' in content
+    assert 'ENTRYPOINT ["microsoft-mcp"]' in content

@@ -27,7 +27,9 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import UUID
 
-from agent_connector_sdk.credentials.runtime_references import resolve_runtime_secret_reference
+from agent_connector_sdk.credentials.runtime_references import (
+    resolve_runtime_secret_reference,
+)
 from pydantic import (
     BaseModel,
     ConfigDict,

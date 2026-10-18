@@ -3,12 +3,11 @@ from urllib.parse import urlparse
 
 import httpx
 from agent_connector_sdk.exceptions import AuthError
-from agent_connector_sdk.tls.profile import ResolvedTLSProfile
-from agent_connector_sdk.tls.resolve import resolve_tls_profile
-
 from agent_connector_sdk.http.client import create_async_http_client
 from agent_connector_sdk.http.options import HttpClientOptions
 from agent_connector_sdk.http.retry import RetryPolicy
+from agent_connector_sdk.tls.profile import ResolvedTLSProfile
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider,
 )

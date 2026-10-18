@@ -60,11 +60,13 @@ import asyncio
 
 from microsoft_agent.auth import get_client
 
+
 async def main() -> None:
     graph = await get_client()
     users = await graph.list_users(params={"$top": 25})
     events = await graph.list_calendar_events(params={"$top": 25})
     print(len(users.get("value", [])), len(events.get("value", [])))
+
 
 asyncio.run(main())
 ```
