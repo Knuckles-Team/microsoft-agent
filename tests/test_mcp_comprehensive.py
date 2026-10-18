@@ -112,7 +112,12 @@ def test_mcp_server_entrypoints():
             "8555",
         ],
     ):
-        with patch("fastmcp.FastMCP.run") as mock_run:
+        # The served-security profile (SDK >=0.3.6) refuses a network transport
+        # without an auth provider; this test covers argument routing only.
+        with (
+            patch("fastmcp.FastMCP.run") as mock_run,
+            patch("agent_connector_sdk.mcp.server.apply_served_security_profile"),
+        ):
             mcp_server()
             mock_run.assert_called_once_with(
                 transport="streamable-http", host="127.0.0.1", port=8555
