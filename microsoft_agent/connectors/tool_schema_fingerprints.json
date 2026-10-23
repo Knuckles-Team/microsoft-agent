@@ -1,6 +1,6 @@
 {
   "algorithm": "agent-connector-sdk:mcp-tool-contract-compat:v2",
-  "connector": "microsoft-agent",
+  "connector": "microsoft-mcp",
   "schema_version": "1",
   "tools": {
     "list_microsoft_ingestion_projection": "828d3116067086b5bfc4aae2794b99f13adb50c15644a3d9eb15bd60ba0ba14b"
