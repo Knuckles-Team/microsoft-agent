@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Any, TypeVar
+from typing import Any, TypeAlias, TypeVar
 from urllib.parse import urlparse
 from uuid import UUID
 
+from agent_connector_sdk.http.retry import RetryPolicy
 from fastmcp import FastMCP
 from pydantic import Field
 
@@ -41,6 +42,7 @@ from microsoft_agent.power_platform import (
     FlowState,
     HttpxAsyncHttpTransport,
     PowerPlatformClient,
+    upload_retry_policy,
 )
 from microsoft_agent.settings import get_settings
 from microsoft_agent.windows_companion import (
@@ -52,7 +54,7 @@ from microsoft_agent.windows_companion import (
     WindowsCompanionClient,
 )
 
-_ManagedTransport = HttpxAsyncHttpTransport | HttpxCompanionTransport
+_ManagedTransport: TypeAlias = HttpxAsyncHttpTransport | HttpxCompanionTransport
 _ManagedTransportT = TypeVar("_ManagedTransportT", bound=_ManagedTransport)
 _managed_transports: list[_ManagedTransport] = []
 
@@ -95,6 +97,7 @@ def _http_transport(
     tls_profile: str | None = None,
     tls_profile_ref: str | None = None,
     allowed_private_hosts: tuple[str, ...] = (),
+    retry: RetryPolicy | None = None,
 ) -> HttpxAsyncHttpTransport:
     return _manage_transport(
         HttpxAsyncHttpTransport(
@@ -102,6 +105,7 @@ def _http_transport(
             tls_profile=tls_profile,
             tls_profile_ref=tls_profile_ref,
             allowed_private_hosts=allowed_private_hosts,
+            retry=retry,
         )
     )
 
@@ -125,13 +129,15 @@ def _companion_transport(
 def _graph_file_service() -> GraphFileService:
     settings = get_settings()
     provider = MicrosoftAudienceTokenProvider([GRAPH_AUDIENCE])
+    file_settings = GraphFileSettings(graph_base_url=settings.graph_base_url)
     return GraphFileService(
-        GraphFileSettings(graph_base_url=settings.graph_base_url),
+        file_settings,
         provider,
         _http_transport(
             service="microsoft_graph",
             tls_profile=settings.graph_tls_profile,
             tls_profile_ref=settings.graph_tls_profile_ref,
+            retry=upload_retry_policy(file_settings.max_retries),
         ),
     )
 

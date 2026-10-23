@@ -8,7 +8,6 @@ Print upload origin and sends bounded sequential byte ranges.
 
 from __future__ import annotations
 
-import asyncio
 import base64
 import binascii
 import json
@@ -96,6 +95,10 @@ class PrintDocumentSubmission(BaseModel):
         return content
 
 
+#: Retries the print upload transport applies to a failed range.
+PRINT_UPLOAD_MAX_RETRIES = 3
+
+
 class UniversalPrintUploadError(RuntimeError):
     """Safe upload failure that never contains the preauthenticated URL."""
 
@@ -113,7 +116,6 @@ class UniversalPrintUploader:
         *,
         timeout_seconds: float = 60,
         chunk_bytes: int = PRINT_UPLOAD_CHUNK_BYTES,
-        max_retries: int = 3,
     ) -> None:
         if not 0 < chunk_bytes < 10 * 1024 * 1024:
             raise ValueError("Universal Print chunks must be smaller than 10 MiB")
@@ -121,12 +123,9 @@ class UniversalPrintUploader:
             raise ValueError("Universal Print chunks must be multiples of 320 KiB")
         if not 0 < timeout_seconds <= 600:
             raise ValueError("timeout_seconds must be between 0 and 600")
-        if not 0 <= max_retries <= 8:
-            raise ValueError("max_retries must be between 0 and 8")
         self._transport = transport
         self.timeout_seconds = timeout_seconds
         self.chunk_bytes = chunk_bytes
-        self.max_retries = max_retries
 
     async def upload(self, upload_url: str, content: bytes) -> dict[str, Any]:
         """Upload sequential ranges and return final printDocument metadata."""
@@ -192,31 +191,19 @@ class UniversalPrintUploader:
             "Content-Length": str(len(fragment)),
             "Content-Range": f"bytes {start}-{end}/{total}",
         }
-        for attempt in range(self.max_retries + 1):
-            try:
-                response = await self._transport.request(
-                    "PUT",
-                    upload_url,
-                    headers=headers,
-                    body=fragment,
-                    timeout=self.timeout_seconds,
-                )
-            except (OSError, TimeoutError) as exc:
-                if attempt >= self.max_retries:
-                    raise UniversalPrintUploadError(
-                        "Universal Print upload transport failed."
-                    ) from exc
-                await asyncio.sleep(min(2**attempt, 8))
-                continue
-            if response.status_code in {201, 202}:
-                return response
-            if (
-                response.status_code not in {429, 500, 502, 503, 504}
-                or attempt >= self.max_retries
-            ):
-                return response
-            await asyncio.sleep(_retry_delay(response, attempt))
-        raise UniversalPrintUploadError("Universal Print retry limit was exceeded.")
+        # The transport's SDK retry policy owns backoff and Retry-After handling.
+        try:
+            return await self._transport.request(
+                "PUT",
+                upload_url,
+                headers=headers,
+                body=fragment,
+                timeout=self.timeout_seconds,
+            )
+        except (OSError, TimeoutError) as exc:
+            raise UniversalPrintUploadError(
+                "Universal Print upload transport failed."
+            ) from exc
 
 
 def validate_print_upload_url(value: Any) -> str:
@@ -269,24 +256,8 @@ def _range_start(value: Any) -> int:
     return int(value.partition("-")[0])
 
 
-def _retry_delay(response: HttpResponse, attempt: int) -> float:
-    raw = next(
-        (
-            value
-            for key, value in response.headers.items()
-            if key.casefold() == "retry-after"
-        ),
-        None,
-    )
-    try:
-        return (
-            min(max(float(raw), 0.0), 30.0) if raw is not None else min(2**attempt, 8)
-        )
-    except ValueError:
-        return min(2**attempt, 8)
-
-
 __all__ = [
+    "PRINT_UPLOAD_MAX_RETRIES",
     "MAX_PRINT_DOCUMENT_BYTES",
     "PRINT_UPLOAD_CHUNK_BYTES",
     "PRINT_UPLOAD_HOST",
