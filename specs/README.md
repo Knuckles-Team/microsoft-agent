@@ -14,3 +14,5 @@ Read the existing specs first. Extend the spec that owns the behavior. Create a 
 
 - [`transport-tls/`](transport-tls/spec.md) — `CONN-MICROSOFT-AGENT-TRANSPORT-TLS`: outbound transport TLS comes from the SDK `resolve_tls_profile`.
 - [`upload-retry/`](upload-retry/spec.md) — `CONN-MICROSOFT-AGENT-UPLOAD-RETRY`: upload fragments retry through the SDK client policy.
+
+- [`CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT`](connector-content/spec.md) — The connector serves its packaged content.
