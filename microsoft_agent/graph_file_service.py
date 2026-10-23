@@ -7,7 +7,6 @@ that are multiples of 320 KiB, as required by Graph.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import re
 from collections.abc import Mapping
@@ -261,32 +260,23 @@ class GraphFileService:
             "Content-Range": f"bytes {start}-{end}/{total}",
         }
         # The preauthenticated upload URL must not receive the Graph bearer token.
-        for attempt in range(self.settings.max_retries + 1):
-            try:
-                response = await self._transport.request(
-                    "PUT",
-                    upload_url,
-                    headers=headers,
-                    body=fragment,
-                    timeout=self.settings.timeout_seconds,
-                )
-            except (OSError, TimeoutError) as exc:
-                if attempt >= self.settings.max_retries:
-                    raise GraphFileServiceError("Upload transport failed.") from exc
-                await asyncio.sleep(min(2**attempt, 8))
-                continue
-            if response.status_code in {200, 201, 202}:
-                return response
-            if (
-                response.status_code not in {429, 500, 502, 503, 504}
-                or attempt >= self.settings.max_retries
-            ):
-                raise GraphFileServiceError(
-                    "Microsoft Graph rejected an upload fragment.",
-                    status_code=response.status_code,
-                )
-            await asyncio.sleep(_retry_delay(response, attempt))
-        raise GraphFileServiceError("Upload fragment retry limit was exceeded.")
+        # The transport's SDK retry policy owns backoff and Retry-After handling.
+        try:
+            response = await self._transport.request(
+                "PUT",
+                upload_url,
+                headers=headers,
+                body=fragment,
+                timeout=self.settings.timeout_seconds,
+            )
+        except (OSError, TimeoutError) as exc:
+            raise GraphFileServiceError("Upload transport failed.") from exc
+        if response.status_code in {200, 201, 202}:
+            return response
+        raise GraphFileServiceError(
+            "Microsoft Graph rejected an upload fragment.",
+            status_code=response.status_code,
+        )
 
     async def _graph_request(
         self,
@@ -397,20 +387,3 @@ def _range_start(value: Any) -> int:
     if not isinstance(value, str) or not re.fullmatch(r"\d+-\d*", value):
         raise GraphFileServiceError("Graph returned an invalid expected range.")
     return int(value.partition("-")[0])
-
-
-def _retry_delay(response: HttpResponse, attempt: int) -> float:
-    raw = next(
-        (
-            value
-            for key, value in response.headers.items()
-            if key.lower() == "retry-after"
-        ),
-        None,
-    )
-    try:
-        return (
-            min(max(float(raw), 0.0), 30.0) if raw is not None else min(2**attempt, 8)
-        )
-    except ValueError:
-        return min(2**attempt, 8)

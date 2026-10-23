@@ -2032,8 +2032,12 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
         upload_transport: AsyncHttpTransport | None = None,
     ) -> dict[str, Any]:
         """Create, upload, and start one print job without exposing its upload URL."""
-        from microsoft_agent.power_platform import HttpxAsyncHttpTransport
+        from microsoft_agent.power_platform import (
+            HttpxAsyncHttpTransport,
+            upload_retry_policy,
+        )
         from microsoft_agent.universal_print import (
+            PRINT_UPLOAD_MAX_RETRIES,
             PrintDocumentSubmission,
             UniversalPrintUploader,
             validate_print_upload_url,
@@ -2088,6 +2092,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
                     service="microsoft_graph",
                     tls_profile=self.auth_manager.graph_tls_profile,
                     tls_profile_ref=self.auth_manager.graph_tls_profile_ref,
+                    retry=upload_retry_policy(PRINT_UPLOAD_MAX_RETRIES),
                 )
                 transport = owned_transport
             uploader = UniversalPrintUploader(transport)

@@ -30,7 +30,7 @@ from agent_connector_sdk.credentials.runtime_references import (
 )
 from agent_connector_sdk.http.client import create_http_client
 from agent_connector_sdk.http.options import HttpClientOptions
-from agent_connector_sdk.http.retry import RetryPolicy
+from agent_connector_sdk.http.retry import RETRYABLE_STATUSES, RetryPolicy
 from agent_connector_sdk.tls.profile import ResolvedTLSProfile
 from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from pydantic import (
@@ -112,6 +112,22 @@ class AudienceTokenProvider(Protocol):
         """Return a bearer token whose ``aud`` claim matches ``audience``."""
 
 
+#: Statuses an upload fragment retries; the SDK client applies them to PUT.
+UPLOAD_RETRY_STATUSES = RETRYABLE_STATUSES | {500}
+
+
+def upload_retry_policy(max_retries: int) -> RetryPolicy:
+    """SDK retry policy for resumable upload fragments (``max_retries`` retries)."""
+
+    return RetryPolicy(
+        max_attempts=max_retries + 1,
+        backoff_base=1.0,
+        max_backoff=8.0,
+        max_retry_after=30.0,
+        retry_statuses=UPLOAD_RETRY_STATUSES,
+    )
+
+
 class HttpxAsyncHttpTransport:
     """Bounded async facade over the shared verified sync HTTP boundary."""
 
@@ -124,6 +140,7 @@ class HttpxAsyncHttpTransport:
         allowed_private_hosts: tuple[str, ...] = (),
         max_response_bytes: int = 16 * 1024 * 1024,
         client: httpx.Client | None = None,
+        retry: RetryPolicy | None = None,
     ) -> None:
         if not 1_024 <= max_response_bytes <= 64 * 1024 * 1024:
             raise ValueError("HTTP response bound is invalid")
@@ -149,7 +166,7 @@ class HttpxAsyncHttpTransport:
                     # Requests carry absolute URLs; the base is never dialed.
                     base_url="https://pinned.invalid",
                     timeout=httpx.Timeout(30.0),
-                    retry=RetryPolicy(max_attempts=1),
+                    retry=retry or RetryPolicy(max_attempts=1),
                     tls=self._tls,
                     limits=httpx.Limits(
                         max_connections=32,

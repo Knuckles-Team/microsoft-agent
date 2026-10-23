@@ -11,8 +11,14 @@ import httpx
 import pytest
 
 from microsoft_agent.api_client import MicrosoftGraphApi
-from microsoft_agent.power_platform import HttpxAsyncHttpTransport
-from microsoft_agent.universal_print import PrintDocumentSubmission
+from microsoft_agent.power_platform import (
+    HttpxAsyncHttpTransport,
+    upload_retry_policy,
+)
+from microsoft_agent.universal_print import (
+    PRINT_UPLOAD_MAX_RETRIES,
+    PrintDocumentSubmission,
+)
 from microsoft_agent.windows_companion import HttpxCompanionTransport
 
 
@@ -123,6 +129,7 @@ def test_integration_cache_clear_closes_owned_transports(monkeypatch) -> None:
         tls_profile="private-ca",
         tls_profile_ref=None,
         allowed_private_hosts=(),
+        retry=None,
     )
     transport.close.assert_called_once_with()
 
@@ -181,6 +188,7 @@ async def test_print_upload_closes_only_its_default_transport() -> None:
         service="microsoft_graph",
         tls_profile="private-ca",
         tls_profile_ref=None,
+        retry=upload_retry_policy(PRINT_UPLOAD_MAX_RETRIES),
     )
     owned_transport.close.assert_called_once_with()
 

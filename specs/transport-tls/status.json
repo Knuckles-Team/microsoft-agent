@@ -2,13 +2,29 @@
   "schema_version": 2,
   "spec_id": "CONN-MICROSOFT-AGENT-TRANSPORT-TLS",
   "owner_repo": "microsoft-agent",
-  "delivery_state": "SPECIFIED",
+  "delivery_state": "LANDED",
   "requirement_ids": [
     "CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R001",
     "CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R002"
   ],
   "requirements": [
-    {"id": "CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R001", "title": "Profile-built context", "delivery_state": "SPECIFIED"},
-    {"id": "CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R002", "title": "No hand-built contexts", "delivery_state": "SPECIFIED"}
+    {
+      "id": "CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R001",
+      "title": "Profile-built context",
+      "delivery_state": "LANDED",
+      "landed_in": [
+        "678e83b5593f"
+      ],
+      "verified_by": []
+    },
+    {
+      "id": "CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R002",
+      "title": "No hand-built contexts",
+      "delivery_state": "LANDED",
+      "landed_in": [
+        "678e83b5593f"
+      ],
+      "verified_by": []
+    }
   ]
 }

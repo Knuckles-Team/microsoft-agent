@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "spec_id": "CONN-MICROSOFT-AGENT-UPLOAD-RETRY",
+  "owner_repo": "microsoft-agent",
+  "delivery_state": "SPECIFIED",
+  "requirement_ids": [
+    "CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001"
+  ],
+  "requirements": [
+    {
+      "id": "CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001",
+      "title": "SDK upload retries",
+      "delivery_state": "SPECIFIED",
+      "landed_in": [],
+      "verified_by": [
+        "tests/test_sdk_centralization.py:47",
+        "tests/test_sdk_centralization.py:56",
+        "tests/test_sdk_centralization.py:76"
+      ]
+    }
+  ]
+}
