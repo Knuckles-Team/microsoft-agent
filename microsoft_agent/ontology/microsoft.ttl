@@ -6,17 +6,14 @@
 # identifiers. Provider identifiers, names, addresses, content, filenames, URLs,
 # timestamps, and attachment bytes are not properties in this ontology.
 
-:Message a owl:Class ;
-    rdfs:label "Opaque Microsoft message reference" ;
-    rdfs:comment "A content-free keyed reference to an Outlook or Teams message." .
+:Message a owl:Class .
 
-:Event a owl:Class ;
-    rdfs:label "Opaque Microsoft event reference" ;
-    rdfs:comment "A content-free keyed reference to a calendar event or meeting." .
 
-:File a owl:Class ;
-    rdfs:label "Opaque Microsoft file reference" ;
-    rdfs:comment "A content-free keyed reference to a OneDrive or SharePoint item." .
+:Event a owl:Class .
+
+
+:File a owl:Class .
+
 
 :sentBy a owl:ObjectProperty ;
     rdfs:label "sent by" ;
@@ -45,5 +42,4 @@
 
 <http://knuckles.team/kg/microsoft> a owl:Ontology ;
     rdfs:label "Microsoft Graph zero-PII structural ontology" ;
-    rdfs:comment "Keyed opaque message, event, file, and person relationships for governed Microsoft Graph ingestion." ;
-    owl:imports <http://knuckles.team/kg> .
+    rdfs:comment "Keyed opaque message, event, file, and person relationships for governed Microsoft Graph ingestion." .

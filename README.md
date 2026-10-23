@@ -3,7 +3,7 @@
 agent. It uses Agent Connector SDK for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
-Current package version: **2.3.4**
+Current package version: **2.3.5**
 
 ## Capabilities
 
@@ -822,8 +822,6 @@ _Auto-generated from the code-read env surface (`MCP_TOOL_MODE` + package vars) 
 
 The provider contributes:
 
-- `microsoft_agent/connectors/mcp_source_presets.json`
-- `connector_manifest.yml`
 - `microsoft_agent/ontology/microsoft.ttl`
 - SHACL, mapping, fixture, migration, schema-fingerprint, and certification assets
 

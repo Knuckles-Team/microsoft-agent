@@ -4,8 +4,6 @@
   "task": "microsoft_collaboration_specialist",
   "type": "prompt",
   "source": "microsoft-agent",
-  "extends": "agent-connector-sdk:base",
-  "compose": "append",
   "description": "Governed Microsoft Graph operations through the current Microsoft Agent MCP provider.",
   "metadata": {
     "topic": "Microsoft Graph operations",
