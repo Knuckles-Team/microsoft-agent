@@ -12,4 +12,4 @@ Read the existing specs first. Extend the spec that owns the behavior. Create a 
 
 ## Local specifications
 
-This repository has no local spec yet.
+- [`transport-tls/`](transport-tls/spec.md) — `CONN-MICROSOFT-AGENT-TRANSPORT-TLS`: outbound transport TLS comes from the SDK `resolve_tls_profile`.
