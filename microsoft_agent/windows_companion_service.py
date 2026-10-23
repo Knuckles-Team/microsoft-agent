@@ -60,6 +60,7 @@ from microsoft_agent.windows_runtime import (
     WindowsRuntimeLimits,
     WindowsServiceManager,
     WindowsToastNotificationAdapter,
+    build_client_tls_context,
 )
 
 try:  # Core authentication dependency, guarded for library-only installs.
@@ -241,18 +242,18 @@ def validate_local_service_config(config: WindowsCompanionServiceConfig) -> None
         certificate_der = ssl.PEM_cert_to_DER_cert(certificate_pem)
     except ValueError as exc:
         raise ValueError("Client certificate is not valid PEM") from exc
-    actual_thumbprint = hashlib.sha1(certificate_der).hexdigest().upper()  # noqa: S324
+    actual_thumbprint = (
+        hashlib.sha1(certificate_der, usedforsecurity=False).hexdigest().upper()
+    )
     if not hmac.compare_digest(actual_thumbprint, certificate.thumbprint):
         raise ValueError("Client certificate fingerprint does not match configuration")
     password = _private_key_password(certificate)
-    context = ssl.create_default_context(
-        cafile=str(certificate.ca_bundle_path) if certificate.ca_bundle_path else None
-    )
     try:
-        context.load_cert_chain(
-            certificate.client_certificate_path,
-            certificate.client_private_key_path,
-            password=password,
+        build_client_tls_context(
+            ca_bundle_path=certificate.ca_bundle_path,
+            client_certificate_path=certificate.client_certificate_path,
+            client_private_key_path=certificate.client_private_key_path,
+            private_key_password=password,
         )
     except (OSError, ssl.SSLError) as exc:
         raise ValueError(

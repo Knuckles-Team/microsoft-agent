@@ -21,7 +21,6 @@ import json
 import ntpath
 import os
 import sqlite3
-import ssl
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -69,6 +68,7 @@ from microsoft_agent.windows_runtime import (
     RelayActionDelivery,
     RelayPollBatch,
     WindowsRuntimeError,
+    build_client_tls_context,
 )
 
 try:  # FastAPI is supplied by the MCP/agent runtime extras.
@@ -1235,15 +1235,12 @@ class HttpOutboundRelayTransport(OutboundRelayTransport):
         if not 1024 <= maximum_response_bytes <= 268_435_456:
             raise ValueError("maximum_response_bytes is outside the safe range")
         self._maximum_response_bytes = maximum_response_bytes
-        context = ssl.create_default_context(
-            cafile=str(ca_bundle_path) if ca_bundle_path else None
+        context = build_client_tls_context(
+            ca_bundle_path=ca_bundle_path,
+            client_certificate_path=client_certificate_path,
+            client_private_key_path=client_private_key_path,
+            private_key_password=private_key_password,
         )
-        if client_certificate_path and client_private_key_path:
-            context.load_cert_chain(
-                certfile=str(client_certificate_path),
-                keyfile=str(client_private_key_path),
-                password=private_key_password,
-            )
         self._opener = build_opener(_NoRedirect(), HTTPSHandler(context=context))
 
     async def poll(

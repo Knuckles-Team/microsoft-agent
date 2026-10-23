@@ -16,12 +16,14 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import contextlib
 import hashlib
 import json
 import ntpath
 import os
 import platform
 import socket
+import ssl
 import stat
 import sys
 from collections import OrderedDict
@@ -30,6 +32,7 @@ from datetime import UTC, datetime
 from pathlib import Path, PureWindowsPath
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
+from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from microsoft_agent.windows_companion import (
@@ -227,15 +230,11 @@ class PyWin32OfficeAutomation:
             return {"application": application, "exported": True}
         finally:
             if document is not None:
-                try:
+                with contextlib.suppress(Exception):  # defensive COM cleanup
                     document.Close(False)
-                except Exception:  # pragma: no cover - defensive COM cleanup
-                    pass
             if app is not None:
-                try:
+                with contextlib.suppress(Exception):  # defensive COM cleanup
                     app.Quit()
-                except Exception:  # pragma: no cover - defensive COM cleanup
-                    pass
             self._pythoncom.CoUninitialize()
 
 
@@ -1303,7 +1302,35 @@ def _installed_windows_software() -> list[dict[str, str]]:
     return sorted(found.values(), key=lambda item: item["name"].casefold())[:500]
 
 
+def build_client_tls_context(
+    *,
+    ca_bundle_path: str | os.PathLike[str] | None = None,
+    client_certificate_path: str | os.PathLike[str] | None = None,
+    client_private_key_path: str | os.PathLike[str] | None = None,
+    private_key_password: str | None = None,
+) -> ssl.SSLContext:
+    """Return the verified client context for the control-plane connection.
+
+    Trust comes from the SDK TLS profile (``resolve_tls_profile``): a per-instance
+    CA bundle is passed through the profile, otherwise the deployment's
+    ``MICROSOFT_*`` trust profile applies. The client certificate is loaded onto
+    that context here because the key password is a runtime value that a profile
+    document may not carry.
+    """
+
+    profile = {"ca_bundle_path": str(ca_bundle_path)} if ca_bundle_path else None
+    context = resolve_tls_profile("microsoft", profile=profile).ssl_context
+    if client_certificate_path and client_private_key_path:
+        context.load_cert_chain(
+            certfile=str(client_certificate_path),
+            keyfile=str(client_private_key_path),
+            password=private_key_password,
+        )
+    return context
+
+
 __all__ = [
+    "build_client_tls_context",
     "ClipboardAdapter",
     "DesktopFlowExecutor",
     "NotificationAdapter",
