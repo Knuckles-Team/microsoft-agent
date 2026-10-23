@@ -3,7 +3,7 @@
 agent. It uses Agent Connector SDK for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
-Current package version: **2.3.3**
+Current package version: **2.3.4**
 
 ## Capabilities
 
