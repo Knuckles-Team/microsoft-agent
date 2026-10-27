@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "microsoft-agent"
-dynamic = ["version"]
+version = "2.3.6"
 description = "Governed Microsoft Graph agent and MCP server"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -106,9 +106,6 @@ members = ["."]
 
 [tool.setuptools]
 include-package-data = false
-
-[tool.setuptools.dynamic]
-version = {attr = "microsoft_agent._version.__version__"}
 
 [tool.setuptools.package-data]
 microsoft_agent = ["connectors/**", "ontology/**", "prompts/**", "skills/**"]
