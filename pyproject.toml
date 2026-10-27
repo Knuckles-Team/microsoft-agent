@@ -87,6 +87,7 @@ microsoft-agent = "microsoft_agent.prompts"
 
 [dependency-groups]
 dev = [
+  "bump2version>=1.0.1,<2",
   "mypy>=2.4.0,<3",
   "pytest>=9.1.1,<10",
   "pytest-asyncio>=1.4.0,<2",
