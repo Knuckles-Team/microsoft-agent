@@ -1,4 +1,4 @@
-agent-connector-sdk[mcp]>=0.4.1,<1.0.0
+scion-sdk[mcp]>=0.5.6,<1.0.0
 msal>=1.31.0
 keyring>=25.1.0
 msgraph-sdk>=1.54.0
