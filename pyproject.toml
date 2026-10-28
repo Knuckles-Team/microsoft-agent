@@ -141,5 +141,8 @@ follow_imports = "skip"
 [tool.vulture]
 ignore_names = ["request", "config"]
 
+[tool.pipelines.codespell]
+ignore_words = ["aNULL"]
+
 [tool.pipelines_hooks.ste]
 exempt = ["specs/*", "specs/**/*"]
