@@ -89,7 +89,10 @@ def test_packaged_skill_and_version_contract_are_coherent():
     lock = (ROOT / "uv.lock").read_text()
     assert 'name = "microsoft-agent"' in lock
     package_data = (ROOT / "pyproject.toml").read_text()
-    assert 'microsoft_agent = ["connectors/**", "ontology/**", "prompts/**", "skills/**"]' in package_data
+    assert (
+        'microsoft_agent = ["connectors/**", "ontology/**", "prompts/**", "skills/**"]'
+        in package_data
+    )
     assert (
         ROOT / "microsoft_agent/skills/microsoft-agent-development/SKILL.md"
     ).is_file()
