@@ -84,8 +84,9 @@ def test_development_skill_names_actual_runtime_and_focused_tests():
 
 def test_packaged_skill_and_version_contract_are_coherent():
     version_text = (ROOT / "microsoft_agent/_version.py").read_text()
-    version = re.search(r'__version__ = "([^"]+)"', version_text)
-    assert version is not None
+    # The version is read from distribution metadata; no module spells a literal.
+    assert 'connector_version("microsoft_agent")' in version_text
+    assert re.search(r'__version__\s*=\s*["\d]', version_text) is None
     lock = (ROOT / "uv.lock").read_text()
     assert 'name = "microsoft-agent"' in lock
     package_data = (ROOT / "pyproject.toml").read_text()
