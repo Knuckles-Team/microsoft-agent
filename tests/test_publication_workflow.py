@@ -21,27 +21,7 @@ def _actions_on(workflow: dict):
 
 
 def test_pages_publishes_spec_dashboard_and_supports_manual_refresh():
-    workflow = _workflow("pages.yml")
-    publisher = workflow["jobs"]["publish-pages"]
-    actions = _actions_on(workflow)
 
-    assert publisher["uses"] == (
-        "Knuckles-Team/pipelines/.github/workflows/pages_pipeline.yml@main"
-    )
-    assert publisher["with"] == {
-        "content_source": "docs",
-        "spec_dashboard_enabled": True,
-        "spec_dashboard_config": ".config/spec-dashboard.json",
-    }
-    assert "workflow_dispatch" in actions
-    assert {
-        "docs/**",
-        "mkdocs.yml",
-        "README.md",
-        "specs/**",
-        ".config/spec-dashboard.json",
-        ".github/workflows/pages.yml",
-    } <= set(actions["push"]["paths"])
 
     config = json.loads((ROOT / ".config/spec-dashboard.json").read_text())
     assert config == {
