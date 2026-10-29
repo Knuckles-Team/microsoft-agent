@@ -25,10 +25,12 @@ warnings.filterwarnings("ignore", message=".*urllib3.*or charset_normalizer.*")
 
 import logging
 import sys
+from pathlib import Path
 from typing import Any
 
 from agent_connector_sdk.config import load_config
 from agent_connector_sdk.mcp.concurrency import invoke_client_method
+from agent_connector_sdk.mcp.content import ConnectorContent
 from agent_connector_sdk.mcp.server import create_mcp_server
 from agent_connector_sdk.mcp.tool_surface import register_tool_surface
 from starlette.requests import Request
@@ -268,6 +270,11 @@ def get_mcp_instance() -> tuple[Any, ...]:
         name="microsoft-agent MCP",
         version=__version__,
         instructions="microsoft-agent MCP Server — Condensed Action-Routed Tools.",
+        content=ConnectorContent.for_package(
+            "microsoft_agent",
+            Path(__file__).resolve().parent,
+            __version__,
+        ),
     )
 
     @mcp.custom_route("/health", methods=["GET"])
@@ -281,6 +288,7 @@ def get_mcp_instance() -> tuple[Any, ...]:
         service="microsoft-agent",
         tools_module=sys.modules[__name__],
     )
+    register_kg_tools(mcp)
 
     settings = get_settings()
     if settings.tool_group_enabled("documents"):
