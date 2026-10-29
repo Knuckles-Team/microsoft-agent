@@ -35,9 +35,7 @@ def test_provider_transport_uses_pinned_tls_and_closes_once(monkeypatch) -> None
     resolver = MagicMock(return_value=profile)
     client = MagicMock()
     factory = MagicMock(return_value=client)
-    monkeypatch.setattr(
-        "microsoft_agent.power_platform.resolve_tls_profile", resolver
-    )
+    monkeypatch.setattr("microsoft_agent.power_platform.resolve_tls_profile", resolver)
     monkeypatch.setattr("microsoft_agent.power_platform.create_http_client", factory)
 
     transport = HttpxAsyncHttpTransport(

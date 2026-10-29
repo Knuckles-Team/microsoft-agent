@@ -1,3 +1,5 @@
-"""Single package version authority."""
+"""Installed distribution version used by every Microsoft Agent entry point."""
 
-__version__ = "2.3.6"
+from agent_connector_sdk.connector_identity import connector_version
+
+__version__ = connector_version("microsoft_agent")
