@@ -1,6 +1,6 @@
 # CONN-MICROSOFT-AGENT-TRANSPORT-TLS — Outbound transport TLS
 
-Owner: microsoft-agent. Cross-repo IDs: SDK-CONNECTOR-CONTROL-R017, SDK-CENTRALIZED-CAPABILITIES-R008.
+Owner: microsoft-agent. Cross-repo IDs: SCION-CONNECTOR-CONTROL-R017, SCION-CENTRALIZED-CAPABILITIES-R008.
 Public provenance: the SDK centralization audit (HTTP client, retry, TLS).
 
 ## Purpose and user stories
