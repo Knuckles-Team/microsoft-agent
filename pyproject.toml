@@ -73,15 +73,6 @@ microsoft-config = "microsoft_agent.config_cli:main"
 microsoft-windows-companion = "microsoft_agent.windows_companion_service:main"
 microsoft-windows-control-plane = "microsoft_agent.windows_control_plane_service:main"
 
-[project.entry-points."agent_connector_sdk.source_connector_providers"]
-microsoft-agent = "microsoft_agent.connectors"
-
-[project.entry-points."agent_connector_sdk.skill_providers"]
-microsoft-agent = "microsoft_agent.skills"
-
-[project.entry-points."agent_connector_sdk.ontology_providers"]
-microsoft-agent = "microsoft_agent.ontology"
-
 [project.entry-points."agent_connector_sdk.prompt_providers"]
 microsoft-agent = "microsoft_agent.prompts"
 
@@ -99,7 +90,7 @@ dev = [
 
 # The one declared connector identity: the fleet name (SDK-CONNECTOR-CONTROL-R071).
 [project.entry-points."agent_connector_sdk.connector"]
-microsoft-mcp = "microsoft_agent"
+microsoft-mcp = "microsoft_agent:connector"
 
 [tool.uv.workspace]
 members = ["."]
