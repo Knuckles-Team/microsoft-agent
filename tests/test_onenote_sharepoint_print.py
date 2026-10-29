@@ -10,6 +10,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastmcp import FastMCP
+from kiota_abstractions.headers_collection import HeadersCollection
 from kiota_abstractions.method import Method
 from pydantic import ValidationError
 
@@ -82,7 +83,9 @@ async def test_onenote_create_sends_raw_html_request(mock_auth_manager) -> None:
     pages = MagicMock()
     pages.url_template = "{+baseurl}/me/onenote/pages"
     pages.path_parameters = {"baseurl": "https://graph.microsoft.com/v1.0"}
-    pages.to_post_request_configuration.return_value = MagicMock(options=[])
+    pages.to_post_request_configuration.return_value = MagicMock(
+        options=[], headers=HeadersCollection(), query_parameters=None
+    )
     pages.request_adapter.send_async = AsyncMock(return_value=native)
     client = MagicMock()
     client.me.onenote.pages = pages
