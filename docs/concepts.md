@@ -2,19 +2,19 @@
 
 > **Prefix**: `CONCEPT:MSFT-*`
 > **Version**: 0.15.0
-> **Bridge**: [`CONCEPT:AU-ECO.messaging.native-backend-abstraction`](https://github.com/Knuckles-Team/agent-connector-sdk/blob/main/docs/concepts.md) (Unified Toolkit Ingestion)
+> **Bridge**: [`CONCEPT:AU-ECO.messaging.native-backend-abstraction`](https://github.com/Knuckles-Team/scion-sdk/blob/main/docs/concepts.md) (Unified Toolkit Ingestion)
 Microsoft Agent contributes Microsoft Graph provider semantics to the ecosystem; it
-does not replace Agent Connector SDK or Epistemic Graph authorities.
+does not replace Scion SDK or Epistemic Graph authorities.
 
 | Concept | Provider responsibility | Ecosystem authority |
 |---|---|---|
-| Microsoft identity | acquire a tenant- and audience-bound Graph token through one validated mode | Agent Connector SDK checks MCP caller and delegation identity |
-| Graph actions | execute bounded asynchronous operations through one modular client | Agent Connector SDK owns tool discovery, session, approval, and trace context |
+| Microsoft identity | acquire a tenant- and audience-bound Graph token through one validated mode | Scion SDK checks MCP caller and delegation identity |
+| Graph actions | execute bounded asynchronous operations through one modular client | Scion SDK owns tool discovery, session, approval, and trace context |
 | Action policy | classify the routed action and fail closed for writes/destructive actions | permission governance provides caller policy and approval |
 | Optional integrations | expose native document, Power Platform, Intune, Office, and Windows connection points | deployment AgentConfig provides allowlists, endpoints, trust, and secrets |
 | Knowledge ingestion | map approved provider records into quarantined change envelopes | Epistemic Graph owns persistence, ACL, provenance, lineage, and deletion semantics |
 | Microsoft skill | provide one consolidated operational workflow and provider catalog | Arbora owns skill discovery and direct/delegated execution |
-| Observability | attach privacy-safe provider outcome metadata | Agent Connector SDK and Langfuse own trace transport and retention policy |
+| Observability | attach privacy-safe provider outcome metadata | Scion SDK and Langfuse own trace transport and retention policy |
 
 ## Provider domains
 
@@ -67,17 +67,17 @@ registered tool schemas.
 
 | Concept ID | Name | Origin |
 |------------|------|--------|
-| `CONCEPT:AU-ECO.messaging.native-backend-abstraction` | Unified Toolkit Ingestion | agent-connector-sdk |
-| `CONCEPT:AU-ORCH.adapter.hot-cache-invalidation` | Confidence-Gated Router | agent-connector-sdk |
-| `CONCEPT:AU-OS.config.secrets-authentication` | Prompt Injection Defense | agent-connector-sdk |
-| `CONCEPT:AU-OS.state.cognitive-scheduler-preemption` | Cognitive Scheduler | agent-connector-sdk |
-| `CONCEPT:AU-OS.governance.reactive-multi-axis-budget` | Guardrail Engine | agent-connector-sdk |
-| `CONCEPT:AU-OS.governance.wasm-micro-agent-sandbox` | Audit Logging | agent-connector-sdk |
-| `CONCEPT:AU-KG.query.object-graph-mapper` | Knowledge Graph Core | agent-connector-sdk |
+| `CONCEPT:AU-ECO.messaging.native-backend-abstraction` | Unified Toolkit Ingestion | scion-sdk |
+| `CONCEPT:AU-ORCH.adapter.hot-cache-invalidation` | Confidence-Gated Router | scion-sdk |
+| `CONCEPT:AU-OS.config.secrets-authentication` | Prompt Injection Defense | scion-sdk |
+| `CONCEPT:AU-OS.state.cognitive-scheduler-preemption` | Cognitive Scheduler | scion-sdk |
+| `CONCEPT:AU-OS.governance.reactive-multi-axis-budget` | Guardrail Engine | scion-sdk |
+| `CONCEPT:AU-OS.governance.wasm-micro-agent-sandbox` | Audit Logging | scion-sdk |
+| `CONCEPT:AU-KG.query.object-graph-mapper` | Knowledge Graph Core | scion-sdk |
 
-## Synergy with agent-connector-sdk
+## Synergy with scion-sdk
 
-This project integrates with `agent-connector-sdk` via `CONCEPT:AU-ECO.messaging.native-backend-abstraction` (Unified Toolkit Ingestion). The `microsoft_agent` MCP server registers its tools with the agent-connector-sdk FastMCP middleware, enabling automatic discovery, telemetry, and Knowledge Graph ingestion of all MSFT-* concepts.
+This project integrates with `scion-sdk` via `CONCEPT:AU-ECO.messaging.native-backend-abstraction` (Unified Toolkit Ingestion). The `microsoft_agent` MCP server registers its tools with the scion-sdk FastMCP middleware, enabling automatic discovery, telemetry, and Knowledge Graph ingestion of all MSFT-* concepts.
 ## Invariants
 
 - One Graph client and one Microsoft authentication manager exist.

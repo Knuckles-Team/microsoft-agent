@@ -1,6 +1,6 @@
 # Architecture overview
 
-Microsoft Agent is a governed Microsoft Graph provider for the Agent Connector SDK and
+Microsoft Agent is a governed Microsoft Graph provider for the Scion SDK and
 Epistemic Graph ecosystem. It contributes one MCP server, one modular Graph client,
 one authentication authority, optional integration adapters, a consolidated skill,
 and a provider-owned connector capability bundle.
@@ -9,12 +9,12 @@ and a provider-owned connector capability bundle.
 
 | Boundary | Authority |
 |---|---|
-| MCP server and session | Agent Connector SDK server factory and checked caller session |
+| MCP server and session | Scion SDK server factory and checked caller session |
 | Microsoft Graph client | `MicrosoftGraphApi` composed from `microsoft_agent/api/` |
 | Microsoft authentication | `microsoft_agent/auth.py` and validated `MicrosoftSettings` |
 | Action authorization | `MicrosoftToolPolicy` applied to the routed action |
 | Knowledge ingestion | governed connector manifest, ontology, mapping, and quarantine |
-| Observability | deployment-configured metadata-only Agent Connector SDK telemetry |
+| Observability | deployment-configured metadata-only Scion SDK telemetry |
 
 There is no second API wrapper, raw-token fallback, plaintext token cache, bundled
 database, bundled MCP profile, or alternate agent execution plane.
@@ -23,7 +23,7 @@ database, bundled MCP profile, or alternate agent execution plane.
 
 1. The deployment supplies Microsoft identity, MCP caller identity, TLS trust, and
    an explicit optional-capability profile.
-2. The MCP server creates a checked Agent Connector SDK session and exposes the
+2. The MCP server creates a checked Scion SDK session and exposes the
    configured action families through the selected tool mode.
 3. The tool policy classifies the routed action. Reads are allowed by default;
    writes and destructive actions require separate explicit approvals.

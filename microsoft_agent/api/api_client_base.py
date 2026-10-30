@@ -2,17 +2,17 @@ from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
 import httpx
-from agent_connector_sdk.exceptions import AuthError
-from agent_connector_sdk.http.client import create_async_http_client
-from agent_connector_sdk.http.options import HttpClientOptions
-from agent_connector_sdk.http.retry import RetryPolicy
-from agent_connector_sdk.tls.profile import ResolvedTLSProfile
-from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider,
 )
 from msgraph import GraphServiceClient
 from msgraph.graph_request_adapter import GraphRequestAdapter
+from scion_sdk.exceptions import AuthError
+from scion_sdk.http.client import create_async_http_client
+from scion_sdk.http.options import HttpClientOptions
+from scion_sdk.http.retry import RetryPolicy
+from scion_sdk.tls.profile import ResolvedTLSProfile
+from scion_sdk.tls.resolve import resolve_tls_profile
 
 from microsoft_agent.auth import AuthManager
 from microsoft_agent.credential_adapter import AuthManagerCredential

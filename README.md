@@ -1,6 +1,6 @@
 # Microsoft Agent
 
-agent. It uses Agent Connector SDK for MCP, identity propagation, intent delegation,
+agent. It uses Scion SDK for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
 Current package version: **2.3.6**
@@ -39,7 +39,7 @@ python -m pip install "microsoft-agent[control-plane]"
 python -m pip install "microsoft-agent[all]"
 ```
 
-Agent Connector SDK depends on `epistemic-graph[full]`; the full and numeric engine
+Scion SDK depends on `epistemic-graph[full]`; the full and numeric engine
 
 ## Authentication
 
@@ -144,7 +144,7 @@ tokens remain in memory and are not written to plaintext files.
 | `PORT` | `8000` |  |
 | `AUTH_TYPE` | `oidc` |  |
 
-#### Inherited agent-connector-sdk variables (apply to every connector)
+#### Inherited scion-sdk variables (apply to every connector)
 
 | Variable | Example | Description |
 |----------|---------|-------------|
@@ -169,7 +169,7 @@ tokens remain in memory and are not written to plaintext files.
 | `PROVIDER` | — | Operator-configured LLM provider for the agent |
 | `MODEL_ID` | — | Operator-configured model id for the agent |
 
-_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared agent-connector-sdk set — do not edit._
+_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared scion-sdk set — do not edit._
 <!-- ENV-VARS-TABLE:END -->
 
 ## Run the MCP server
@@ -566,7 +566,7 @@ default; unknown actions are treated as writes. Writes require
 <!-- MCP-CONFIG-EXAMPLES:START -->
 
 > **Install the connector-focused `[mcp]` extra.** Examples use `microsoft-agent[mcp]` to add
-> FastMCP / FastAPI through `agent-connector-sdk`; the required Agent Connector SDK core
+> FastMCP / FastAPI through `scion-sdk`; the required Scion SDK core
 > still carries `epistemic-graph[full]`. The `[agent-runtime]` extra additionally
 > enables model orchestration.
 
@@ -881,15 +881,15 @@ uv run mkdocs build --strict
 
 See `AGENTS.md` for current-only, privacy, security, and change-discipline rules.
 
-<!-- BEGIN agent-connector-sdk-deployment (generated; do not edit between markers) -->
+<!-- BEGIN scion-sdk-deployment (generated; do not edit between markers) -->
 
-## Deploy with `agent-connector-sdk-deployment`
+## Deploy with `scion-sdk-deployment`
 
-Provision this package with the consolidated **`agent-connector-sdk-deployment`**
+Provision this package with the consolidated **`scion-sdk-deployment`**
 workflow. It selects an installed-package, editable-source, or immutable-container
 path; records only runtime secret and TLS-profile references in `AgentConfig`; and
 runs doctor, registration, policy, observability, and rollback gates. Ask your agent
-to **"deploy `microsoft-agent` with agent-connector-sdk-deployment"**.
+to **"deploy `microsoft-agent` with scion-sdk-deployment"**.
 
 | Install mode | Command |
 |------|---------|
@@ -900,7 +900,7 @@ The repository embeds no deployment profile, credential value, certificate path,
 environment-specific endpoint. Supply those at runtime through `AgentConfig` and the
 configured secret provider.
 
-<!-- END agent-connector-sdk-deployment -->
+<!-- END scion-sdk-deployment -->
 
 <!-- GOVERNED-CAPABILITY:START -->
 ## Governed capability contract

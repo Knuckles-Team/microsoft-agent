@@ -52,7 +52,7 @@ def test_development_skill_names_actual_runtime_and_focused_tests():
     ):
         assert (ROOT / path).exists(), path
     for runtime_name in (
-        "agent-connector-sdk",
+        "scion-sdk",
         "MICROSOFT_",
         "Microsoft Graph",
         "ChangeEnvelope",

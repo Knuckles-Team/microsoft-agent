@@ -1,6 +1,6 @@
 # Microsoft Agent
 
-for the Agent Connector SDK and Epistemic Graph ecosystem.
+for the Scion SDK and Epistemic Graph ecosystem.
 
 It supplies:
 

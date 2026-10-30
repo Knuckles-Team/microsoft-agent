@@ -5,7 +5,7 @@ The Python client is available for trusted in-process extensions.
 
 ## MCP surface
 
-`MCP_TOOL_MODE=intent` exposes the compact Agent Connector SDK intent and control
+`MCP_TOOL_MODE=intent` exposes the compact Scion SDK intent and control
 surface. It discovers the installed Microsoft action schemas at runtime and routes
 requests while preserving caller identity, approval, policy, and trace context.
 Use MCP discovery as the authority for exact schemas; do not copy generated action

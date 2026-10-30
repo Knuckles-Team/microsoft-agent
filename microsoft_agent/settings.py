@@ -15,10 +15,6 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
-from agent_connector_sdk.config import setting
-from agent_connector_sdk.credentials.runtime_references import (
-    resolve_runtime_secret_reference,
-)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -26,6 +22,10 @@ from pydantic import (
     SecretStr,
     field_validator,
     model_validator,
+)
+from scion_sdk.config import setting
+from scion_sdk.credentials.runtime_references import (
+    resolve_runtime_secret_reference,
 )
 
 GRAPH_DEFAULT_SCOPE = "https://graph.microsoft.com/.default"

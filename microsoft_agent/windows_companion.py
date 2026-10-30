@@ -27,14 +27,6 @@ from urllib.parse import quote
 from uuid import UUID, uuid4
 
 import httpx
-from agent_connector_sdk.credentials.runtime_references import (
-    validate_runtime_secret_reference,
-)
-from agent_connector_sdk.http.client import create_http_client
-from agent_connector_sdk.http.options import HttpClientOptions
-from agent_connector_sdk.http.retry import RetryPolicy
-from agent_connector_sdk.tls.profile import ResolvedTLSProfile
-from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -43,6 +35,14 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from scion_sdk.credentials.runtime_references import (
+    validate_runtime_secret_reference,
+)
+from scion_sdk.http.client import create_http_client
+from scion_sdk.http.options import HttpClientOptions
+from scion_sdk.http.retry import RetryPolicy
+from scion_sdk.tls.profile import ResolvedTLSProfile
+from scion_sdk.tls.resolve import resolve_tls_profile
 
 from microsoft_agent.integration_auth import normalize_audience
 

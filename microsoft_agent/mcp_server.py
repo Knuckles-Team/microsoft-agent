@@ -28,11 +28,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from agent_connector_sdk.config import load_config
-from agent_connector_sdk.mcp.concurrency import invoke_client_method
-from agent_connector_sdk.mcp.content import ConnectorContent
-from agent_connector_sdk.mcp.server import create_mcp_server
-from agent_connector_sdk.mcp.tool_surface import register_tool_surface
+from scion_sdk.config import load_config
+from scion_sdk.mcp.concurrency import invoke_client_method
+from scion_sdk.mcp.content import ConnectorContent
+from scion_sdk.mcp.server import create_mcp_server
+from scion_sdk.mcp.tool_surface import register_tool_surface
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 

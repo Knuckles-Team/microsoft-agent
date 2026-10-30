@@ -39,7 +39,7 @@ microsoft-mcp \
   --port 8000
 ```
 
-Configure `AUTH_TYPE` and the corresponding Agent Connector SDK caller-authentication
+Configure `AUTH_TYPE` and the corresponding Scion SDK caller-authentication
 settings before exposing the listener. Microsoft Graph authentication and MCP
 caller authentication are independent boundaries; both must pass.
 
@@ -99,7 +99,7 @@ use `REQUESTS_CA_BUNDLE`; OpenSSL-compatible clients can use `SSL_CERT_FILE`; `u
 package resolution can use native platform trust with `UV_NATIVE_TLS=true`.
 
 Do not set an insecure verification mode or package a workstation-specific bundle
-path. The operator's Agent Connector SDK doctor must confirm the selected trust profile
+path. The operator's Scion SDK doctor must confirm the selected trust profile
 before release validation.
 
 ## Optional integrations

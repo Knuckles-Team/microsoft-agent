@@ -8,11 +8,11 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from agent_connector_sdk.tls.errors import TransportSecurityError
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.x509.oid import NameOID
+from scion_sdk.tls.errors import TransportSecurityError
 
 from microsoft_agent import windows_runtime
 from microsoft_agent.windows_runtime import build_client_tls_context

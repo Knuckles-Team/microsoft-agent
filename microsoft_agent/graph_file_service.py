@@ -15,8 +15,8 @@ from pathlib import PurePosixPath
 from typing import Any
 from urllib.parse import quote, urlparse
 
-from agent_connector_sdk.http.egress import validate_base_url
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
+from scion_sdk.http.egress import validate_base_url
 
 from microsoft_agent.document_service import GeneratedArtifact
 from microsoft_agent.power_platform import (

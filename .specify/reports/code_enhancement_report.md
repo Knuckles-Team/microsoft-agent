@@ -42,7 +42,7 @@ xychart-beta
 `██████████████░░░░░░` 74/100
 
 > [!NOTE]
-> Detected ecosystem marker: agent-connector-sdk → Agent-Utilities Ecosystem
+> Detected ecosystem marker: scion-sdk → Agent-Utilities Ecosystem
 
 | Criterion | Points | Evidence | Reasoning |
 |-----------|--------|----------|-----------|
@@ -315,7 +315,7 @@ xychart-beta
 | 14 | 🔴 High | Environment Variables | Only 9% of env vars documented in README.md | High | Medium |
 | 15 | 🔴 High | Environment Variables | Undocumented env vars: ADMINTOOL, AGREEMENTSTOOL, ALLOWED_CLIENT_REDIRECT_URIS,  | High | Medium |
 | 16 | 🔴 High | Environment Variables | 7 Python env vars not in .env.example: AUDIENCE, DELEGATED_SCOPES, MICROSOFT_END | High | Medium |
-| 17 | 🟡 Medium | Project Analysis | Detected ecosystem marker: agent-connector-sdk → Agent-Utilities Ecosystem | Medium | Low |
+| 17 | 🟡 Medium | Project Analysis | Detected ecosystem marker: scion-sdk → Agent-Utilities Ecosystem | Medium | Low |
 | 18 | 🟡 Medium | Project Analysis | Protocol support: MCP | Medium | Low |
 | 19 | 🟡 Medium | Test Coverage | Test suite lacks intent diversity (only one type) | Medium | Low |
 | 20 | 🟡 Medium | Test Coverage | 23 potential doc-test drift items | Medium | Low |

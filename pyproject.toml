@@ -14,7 +14,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
 ]
-dependencies = [ "scion-sdk[mcp]>=0.5.9,<0.6.0", "azure-core>=1.41.0", "httpx>=0.28.1", "keyring>=25.7.0", "msal>=1.39.0", "msgraph-sdk>=1.64.0", "pydantic>=2.14.1",]
+dependencies = [ "scion-sdk[mcp]>=0.6.0,<0.7.0", "azure-core>=1.41.0", "httpx>=0.28.1", "keyring>=25.7.0", "msal>=1.39.0", "msgraph-sdk>=1.64.0", "pydantic>=2.14.1",]
 license = "MIT"
 
 [[project.authors]]
@@ -22,7 +22,7 @@ name = "Repository Maintainers"
 email = "maintainers@knuckles.team"
 
 [project.optional-dependencies]
-mcp = [ "scion-sdk[mcp]>=0.5.9,<0.6.0",]
+mcp = [ "scion-sdk[mcp]>=0.6.0,<0.7.0",]
 documents = ["python-docx>=1.2.0", "python-pptx>=1.0.2"]
 cloud = ["azure-identity>=1.26.0", "httpx>=0.28.1"]
 windows = [
@@ -73,7 +73,7 @@ microsoft-config = "microsoft_agent.config_cli:main"
 microsoft-windows-companion = "microsoft_agent.windows_companion_service:main"
 microsoft-windows-control-plane = "microsoft_agent.windows_control_plane_service:main"
 
-[project.entry-points."agent_connector_sdk.prompt_providers"]
+[project.entry-points."scion_sdk.prompt_providers"]
 microsoft-agent = "microsoft_agent.prompts"
 
 [dependency-groups]
@@ -89,7 +89,7 @@ dev = [
 ]
 
 # The one declared connector identity: the fleet name (SCION-CONNECTOR-CONTROL-R071).
-[project.entry-points."agent_connector_sdk.connector"]
+[project.entry-points."scion_sdk.connector"]
 microsoft-mcp = "microsoft_agent:connector"
 
 [tool.uv.workspace]

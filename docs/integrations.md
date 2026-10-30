@@ -47,7 +47,7 @@ MICROSOFT_DATAVERSE_ENVIRONMENT_URL=https://contoso.crm.dynamics.com
 MICROSOFT_POWER_PLATFORM_ALLOW_LIFECYCLE_CHANGES=false
 ```
 
-The object may also select one deployment-owned Agent Connector SDK TLS profile with
+The object may also select one deployment-owned Scion SDK TLS profile with
 `tls_profile` or `tls_profile_ref`. The fields are mutually exclusive and TLS
 verification cannot be disabled.
 

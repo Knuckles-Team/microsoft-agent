@@ -32,8 +32,8 @@ from datetime import UTC, datetime
 from pathlib import Path, PureWindowsPath
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
-from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from scion_sdk.tls.resolve import resolve_tls_profile
 
 from microsoft_agent.windows_companion import (
     ActionPolicy,

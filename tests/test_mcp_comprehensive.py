@@ -116,7 +116,7 @@ def test_mcp_server_entrypoints():
         # without an auth provider; this test covers argument routing only.
         with (
             patch("fastmcp.FastMCP.run") as mock_run,
-            patch("agent_connector_sdk.mcp.server.apply_served_security_profile"),
+            patch("scion_sdk.mcp.server.apply_served_security_profile"),
         ):
             mcp_server()
             mock_run.assert_called_once_with(
