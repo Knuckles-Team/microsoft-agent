@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "microsoft-agent"
-version = "2.3.6"
+version = "2.3.7"
 description = "Governed Microsoft Graph agent and MCP server"
 readme = "README.md"
 requires-python = ">=3.12"
