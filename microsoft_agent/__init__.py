@@ -3,8 +3,8 @@
 CONCEPT:AU-ECO.mcp.fastmcp-middleware
 """
 
-from agent_connector_sdk.connector import Connector
-from agent_connector_sdk.connector_hooks import RegistrationContext
+from scion_sdk.connector import Connector
+from scion_sdk.connector_hooks import RegistrationContext
 
 from microsoft_agent._version import __version__
 

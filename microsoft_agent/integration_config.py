@@ -8,8 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from agent_connector_sdk.config import setting
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from scion_sdk.config import setting
 
 from microsoft_agent.intune_service import IntuneServiceSettings
 from microsoft_agent.power_platform import PowerPlatformSettings

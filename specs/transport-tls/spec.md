@@ -19,7 +19,7 @@ The repository had no local spec. `specs/README.md` and `specs/_template` were r
 
 ## Scope and interfaces
 
-Owned: `microsoft_agent/windows_runtime.py` (`build_client_tls_context`), its two callers `windows_companion_service.py` and `windows_control_plane.py`. The profile format and verification invariants belong to agent-connector-sdk. Non-goal: HTTP client replacement.
+Owned: `microsoft_agent/windows_runtime.py` (`build_client_tls_context`), its two callers `windows_companion_service.py` and `windows_control_plane.py`. The profile format and verification invariants belong to scion-sdk. Non-goal: HTTP client replacement.
 
 ## Traceability
 

@@ -10,7 +10,7 @@ license: MIT
 tags: [microsoft, graph, development, connector, test, gates]
 tier: repository
 metadata:
-  author: Genius
+  author: Knuckles-Team
   version: '0.1.0'
 ---
 
@@ -19,7 +19,7 @@ metadata:
 This repository owns the Microsoft Graph client, authentication boundary,
 action-routed MCP tools, provider mappings, ontology, and packaged connector
 content. Shared connector contracts and transports belong to
-`agent-connector-sdk`; admission, serving, and durable graph state belong to
+`scion-sdk`; admission, serving, and durable graph state belong to
 their owning repositories. Read `AGENTS.md` before changing code. Keep tenant
 identifiers, credentials, private endpoints, provider records, and raw
 personal data out of source, logs, fixtures, and packaged skill content.

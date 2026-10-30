@@ -2,8 +2,8 @@ import time
 from unittest.mock import MagicMock, patch
 
 import pytest
-from agent_connector_sdk.exceptions import AuthError, UnauthorizedError
 from azure.core.credentials import AccessToken
+from scion_sdk.exceptions import AuthError, UnauthorizedError
 
 import microsoft_agent.auth as auth_mod
 from microsoft_agent.auth import AuthManager, get_client

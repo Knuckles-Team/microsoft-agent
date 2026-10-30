@@ -1,4 +1,4 @@
-"""Regression tests for generated Agent Connector SDK imports."""
+"""Regression tests for generated Scion SDK imports."""
 
 from __future__ import annotations
 
@@ -14,15 +14,15 @@ generate_code = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(generate_code)
 
 
-def test_generated_mcp_uses_canonical_agent_connector_sdk_import() -> None:
+def test_generated_mcp_uses_canonical_scion_sdk_import() -> None:
     generated = generate_code.generate_mcp_code([])
 
-    assert "from agent_connector_sdk import to_boolean" in generated
-    assert "agent_connector_sdk.agent_connector_sdk" not in generated
+    assert "from scion_sdk import to_boolean" in generated
+    assert "scion_sdk.scion_sdk" not in generated
 
 
-def test_generated_agent_uses_canonical_agent_connector_sdk_import() -> None:
+def test_generated_agent_uses_canonical_scion_sdk_import() -> None:
     generated = generate_code.generate_agent_code([])
 
-    assert "from agent_connector_sdk import create_model" in generated
-    assert "agent_connector_sdk.agent_connector_sdk" not in generated
+    assert "from scion_sdk import create_model" in generated
+    assert "scion_sdk.scion_sdk" not in generated

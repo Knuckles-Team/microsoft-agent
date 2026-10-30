@@ -7,9 +7,9 @@ from typing import Any, TypeAlias, TypeVar
 from urllib.parse import urlparse
 from uuid import UUID
 
-from agent_connector_sdk.http.retry import RetryPolicy
 from fastmcp import FastMCP
 from pydantic import Field
+from scion_sdk.http.retry import RetryPolicy
 
 from microsoft_agent.document_service import (
     ArtifactDelivery,

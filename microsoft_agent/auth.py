@@ -14,8 +14,8 @@ from typing import Any
 
 import keyring
 import msal
-from agent_connector_sdk.exceptions import AuthError, UnauthorizedError
 from keyring.errors import KeyringError
+from scion_sdk.exceptions import AuthError, UnauthorizedError
 
 from microsoft_agent.settings import (
     AuthenticationMode,
@@ -77,10 +77,10 @@ def _default_scope_audiences(scopes: Sequence[str]) -> frozenset[str]:
 
 
 def _get_incoming_user_token() -> str | None:
-    """Read the request token captured by agent-connector-sdk middleware."""
+    """Read the request token captured by scion-sdk middleware."""
 
     try:
-        from agent_connector_sdk.auth.delegation import current_user_token
+        from scion_sdk.auth.delegation import current_user_token
 
         return current_user_token()
     except (ImportError, AttributeError):

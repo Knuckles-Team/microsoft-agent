@@ -27,9 +27,6 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import UUID
 
-from agent_connector_sdk.credentials.runtime_references import (
-    resolve_runtime_secret_reference,
-)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -37,6 +34,9 @@ from pydantic import (
     HttpUrl,
     field_validator,
     model_validator,
+)
+from scion_sdk.credentials.runtime_references import (
+    resolve_runtime_secret_reference,
 )
 
 from microsoft_agent.integration_auth import normalize_audience

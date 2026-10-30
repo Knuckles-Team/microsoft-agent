@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import httpx
 import pytest
-from agent_connector_sdk.http.client import create_http_client
-from agent_connector_sdk.http.options import HttpClientOptions
-from agent_connector_sdk.http.retry import RetryPolicy
+from scion_sdk.http.client import create_http_client
+from scion_sdk.http.options import HttpClientOptions
+from scion_sdk.http.retry import RetryPolicy
 
 from microsoft_agent.graph_file_service import (
     GraphFileService,
@@ -33,7 +33,7 @@ class _NoToken:
 def _transport(
     handler: httpx.MockTransport, retries: int, monkeypatch: pytest.MonkeyPatch
 ) -> HttpxAsyncHttpTransport:
-    monkeypatch.setattr("agent_connector_sdk.http.transport.time.sleep", lambda _: None)
+    monkeypatch.setattr("scion_sdk.http.transport.time.sleep", lambda _: None)
     client = create_http_client(
         HttpClientOptions(
             base_url="https://pinned.invalid",

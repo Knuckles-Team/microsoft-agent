@@ -12,7 +12,7 @@ description: >-
 license: MIT
 tags: [microsoft, teams, chat, channel, mcp]
 metadata:
-  author: Genius
+  author: Knuckles-Team
   version: '0.1.0'
 ---
 # Microsoft Teams Messaging

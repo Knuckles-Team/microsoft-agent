@@ -3,11 +3,11 @@
 Auto-generated from mcp_server.py during ecosystem standardization.
 """
 
-from agent_connector_sdk.mcp.action_dispatch import resolve_action
-from agent_connector_sdk.mcp.concurrency import invoke_client_method
 from fastmcp import Context, FastMCP
 from fastmcp.dependencies import Depends
 from pydantic import Field
+from scion_sdk.mcp.action_dispatch import resolve_action
+from scion_sdk.mcp.concurrency import invoke_client_method
 
 from microsoft_agent.auth import get_client_dependency
 

@@ -8,7 +8,7 @@ endpoints and invoke them by name.  This module never uses the unsupported
 an invocation request.
 
 The client is independent of any particular OAuth library. Production uses the
-shared Agent Connector SDK TLS and DNS-pinned HTTP boundary; tests may inject the
+shared Scion SDK TLS and DNS-pinned HTTP boundary; tests may inject the
 minimal transport protocol directly.
 """
 
@@ -25,14 +25,6 @@ from urllib.parse import urlparse
 from uuid import UUID, uuid4
 
 import httpx
-from agent_connector_sdk.credentials.runtime_references import (
-    validate_runtime_secret_reference,
-)
-from agent_connector_sdk.http.client import create_http_client
-from agent_connector_sdk.http.options import HttpClientOptions
-from agent_connector_sdk.http.retry import RETRYABLE_STATUSES, RetryPolicy
-from agent_connector_sdk.tls.profile import ResolvedTLSProfile
-from agent_connector_sdk.tls.resolve import resolve_tls_profile
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -41,6 +33,14 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from scion_sdk.credentials.runtime_references import (
+    validate_runtime_secret_reference,
+)
+from scion_sdk.http.client import create_http_client
+from scion_sdk.http.options import HttpClientOptions
+from scion_sdk.http.retry import RETRYABLE_STATUSES, RetryPolicy
+from scion_sdk.tls.profile import ResolvedTLSProfile
+from scion_sdk.tls.resolve import resolve_tls_profile
 
 PUBLIC_FLOW_SERVICE_AUDIENCE = "https://service.flow.microsoft.com/"
 _UNSUPPORTED_FLOW_API_HOST = "api.flow.microsoft.com"
