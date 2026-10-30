@@ -201,3 +201,13 @@ def test_policy_separates_writes_and_destructive_actions():
         )
     )
     assert destructive_policy.require("delete_mail_message").allowed is True
+
+
+def test_served_tool_prefix_does_not_hide_a_read_verb():
+    """Served names carry ``microsoft_``; a read verb after it stays a read."""
+    from microsoft_agent.tool_policy import ToolRisk, classify_tool_risk
+
+    assert classify_tool_risk("microsoft_list_service_health") is ToolRisk.READ
+    assert classify_tool_risk("list_service_health") is ToolRisk.READ
+    assert classify_tool_risk("microsoft_delete_user") is ToolRisk.DESTRUCTIVE
+    assert classify_tool_risk("microsoft_unknownverb_thing") is ToolRisk.WRITE
