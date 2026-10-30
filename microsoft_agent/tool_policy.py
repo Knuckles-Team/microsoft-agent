@@ -82,6 +82,9 @@ def classify_tool_risk(tool_name: str) -> ToolRisk:
     """Classify a tool conservatively from its stable public name."""
 
     name = tool_name.lower().strip()
+    # Served tools carry the connector prefix (``microsoft_list_service_health``);
+    # the verb that decides the risk follows it.
+    name = name.removeprefix("microsoft_")
     if name in ALWAYS_ALLOWED:
         return ToolRisk.READ
     if any(fnmatch.fnmatch(name, pattern) for pattern in DESTRUCTIVE_PATTERNS):
