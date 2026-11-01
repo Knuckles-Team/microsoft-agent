@@ -25,6 +25,36 @@ The Entra token verifier in `windows_control_plane.py` keeps its own JWT validat
 The search `git grep -n "retry" -- specs` found no owner for upload retries.
 The `transport-tls` spec owns TLS only. This spec owns the retry behavior.
 
+## User Scenarios & Testing
+
+### User Story 1 - SDK upload retries (Priority: P1)
+
+The fleet operator and the engine rely on this behaviour of `microsoft-agent`: The connector must retry upload fragments through the SDK retry policy set in `microsoft_agent/power_platform.py`. It is proven independently of the other stories.
+
+**Acceptance Scenarios**:
+
+1. **Given** the `microsoft-agent` connector built from the default branch, **When** `tests/test_sdk_centralization.py::test_print_range_retries_through_the_sdk_client` runs, **Then** `tests/test_sdk_centralization.py::test_print_range_retries_through_the_sdk_client` must observe three attempts through the SDK client.
+
+### Edge Cases
+
+- The vendor service is unreachable or rejects the credential: the connector returns the SDK typed error and never a partial result.
+- An argument outside the documented inputs is refused with the SDK typed refusal and causes no effect on the vendor service.
+
 ## Requirements
 
-See [requirements.md](requirements.md), [plan.md](plan.md), and [test-spec.md](test-spec.md).
+- **FR-001**: SDK upload retries. Rows: `CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001`.
+
+## Success Criteria
+
+- **SC-001**: `tests/test_sdk_centralization.py::test_print_range_retries_through_the_sdk_client` must observe three attempts through the SDK client. Rows: `CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001`.
+
+## Assumptions
+
+- The `microsoft-agent` package keeps the entry point and module layout named in the rows.
+- The shared SDK supplies the transport, authentication, retry and certification helpers the rows reuse.
+
+## Traceability
+
+| Label | Rows | Design section | Test ID | Evidence |
+|---|---|---|---|---|
+| FR-001 | `CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001` | plan.md Production caller chain | T-001 | tests/test_sdk_centralization.py::test_print_range_retries_through_the_sdk_client |
