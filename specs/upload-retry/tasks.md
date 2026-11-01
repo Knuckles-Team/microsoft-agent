@@ -1,5 +1,7 @@
 # CONN-MICROSOFT-AGENT-UPLOAD-RETRY — Implementation tasks
 
-Governing specification: [spec.md](spec.md).
+Governing spec: [spec.md](spec.md). Design: [plan.md](plan.md). Rows: [requirements.md](requirements.md).
 
-- [x] `CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001` — Retry upload fragments through the SDK policy. `tests/test_sdk_centralization.py::test_print_range_retries_through_the_sdk_client` must observe three attempts through the SDK client.
+Each task line reads `- [ ] T001 [P] [US1] <ID>-R012.4 description`. Tasks run producer first; a checked task has landed.
+
+- [ ] T001 [US1] CONN-MICROSOFT-AGENT-UPLOAD-RETRY-R001 SDK upload retries.

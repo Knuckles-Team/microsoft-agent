@@ -2,5 +2,7 @@
 
 Governing spec: [spec.md](spec.md). Design: [plan.md](plan.md). Rows: [requirements.md](requirements.md).
 
-- [x] Add `build_client_tls_context` and route both callers through it.
-- [x] Prove behavior and the absence of hand-built contexts in `tests/test_transport_tls.py`.
+Each task line reads `- [ ] T001 [P] [US1] <ID>-R012.4 description`. Tasks run producer first; a checked task has landed.
+
+- [x] T001 [US1] CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R001 Profile-built context.
+- [x] T002 [US2] CONN-MICROSOFT-AGENT-TRANSPORT-TLS-R002 No hand-built contexts.
