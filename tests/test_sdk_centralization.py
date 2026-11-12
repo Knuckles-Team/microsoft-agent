@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import httpx
 import pytest
-from scion_sdk.http.client import create_http_client
+from scion_sdk.http.client import build_http_client
 from scion_sdk.http.options import HttpClientOptions
 from scion_sdk.http.retry import RetryPolicy
 
@@ -34,7 +34,7 @@ def _transport(
     handler: httpx.MockTransport, retries: int, monkeypatch: pytest.MonkeyPatch
 ) -> HttpxAsyncHttpTransport:
     monkeypatch.setattr("scion_sdk.http.transport.time.sleep", lambda _: None)
-    client = create_http_client(
+    client = build_http_client(
         HttpClientOptions(
             base_url="https://pinned.invalid",
             retry=upload_retry_policy(retries),

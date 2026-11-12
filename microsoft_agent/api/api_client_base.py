@@ -8,7 +8,7 @@ from kiota_authentication_azure.azure_identity_authentication_provider import (
 from msgraph import GraphServiceClient
 from msgraph.graph_request_adapter import GraphRequestAdapter
 from scion_sdk.exceptions import AuthError
-from scion_sdk.http.client import create_async_http_client
+from scion_sdk.http.client import build_http_client
 from scion_sdk.http.options import HttpClientOptions
 from scion_sdk.http.retry import RetryPolicy
 from scion_sdk.tls.profile import ResolvedTLSProfile
@@ -44,7 +44,7 @@ class MicrosoftGraphApiBase(ABC):
                 scopes=auth_manager.scopes,
                 allowed_hosts=[endpoint_host],
             )
-            self._http_client = create_async_http_client(
+            self._http_client = build_http_client(
                 HttpClientOptions(
                     base_url=auth_manager.graph_base_url,
                     timeout=httpx.Timeout(30.0),
@@ -55,7 +55,8 @@ class MicrosoftGraphApiBase(ABC):
                         max_keepalive_connections=16,
                     ),
                     pin_egress=True,
-                )
+                ),
+                async_=True,
             )
         except Exception:
             self.tls_profile.cleanup()

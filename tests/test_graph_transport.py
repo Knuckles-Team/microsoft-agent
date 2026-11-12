@@ -47,7 +47,7 @@ def test_graph_transport_uses_shared_tls_profile_without_redirects(monkeypatch) 
         "microsoft_agent.api.api_client_base.resolve_tls_profile", resolver
     )
     monkeypatch.setattr(
-        "microsoft_agent.api.api_client_base.create_async_http_client", httpx_client
+        "microsoft_agent.api.api_client_base.build_http_client", httpx_client
     )
     monkeypatch.setattr(
         "microsoft_agent.api.api_client_base.AzureIdentityAuthenticationProvider",
@@ -90,7 +90,7 @@ async def test_graph_transport_closes_client_and_tls_material(monkeypatch) -> No
         MagicMock(return_value=profile),
     )
     monkeypatch.setattr(
-        "microsoft_agent.api.api_client_base.create_async_http_client",
+        "microsoft_agent.api.api_client_base.build_http_client",
         MagicMock(return_value=client),
     )
     monkeypatch.setattr(
@@ -124,7 +124,7 @@ def test_graph_transport_cleans_tls_when_client_creation_fails(monkeypatch) -> N
         MagicMock(return_value=profile),
     )
     monkeypatch.setattr(
-        "microsoft_agent.api.api_client_base.create_async_http_client",
+        "microsoft_agent.api.api_client_base.build_http_client",
         MagicMock(side_effect=RuntimeError("creation failed")),
     )
     monkeypatch.setattr(
