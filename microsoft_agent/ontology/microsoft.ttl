@@ -1,4 +1,5 @@
 @prefix : <http://knuckles.team/kg#> .
+@prefix core: <https://knuckles-team.github.io/ontology/core#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
@@ -6,13 +7,16 @@
 # identifiers. Provider identifiers, names, addresses, content, filenames, URLs,
 # timestamps, and attachment bytes are not properties in this ontology.
 
-:Message a owl:Class .
+:Message a owl:Class ;
+    rdfs:subClassOf core:DomainEntity .
 
 
-:Event a owl:Class .
+:Event a owl:Class ;
+    rdfs:subClassOf core:DomainEntity .
 
 
-:File a owl:Class .
+:File a owl:Class ;
+    rdfs:subClassOf core:Artifact .
 
 
 :sentBy a owl:ObjectProperty ;
