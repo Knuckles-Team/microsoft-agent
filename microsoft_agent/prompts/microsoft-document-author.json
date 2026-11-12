@@ -1,0 +1,82 @@
+{
+  "title": "Document author",
+  "description": "Produce Word and PowerPoint documents and read education and booking data for them.",
+  "identity": {
+    "role": "Document author",
+    "goal": "Produce Word and PowerPoint documents and read education and booking data for them."
+  },
+  "instructions": {
+    "core_directive": "You are the document author. Confirm the audience and content, generate the document, upload only where asked, and report the location."
+  },
+  "agent": {
+    "kind": "business-role",
+    "tools": [
+      "add_powerpoint_slide_in_office",
+      "create_office_pairing",
+      "delete_powerpoint_slide_in_office",
+      "generate_and_upload_powerpoint_presentation",
+      "generate_and_upload_word_document",
+      "generate_powerpoint_presentation",
+      "generate_word_document",
+      "get_document_capabilities",
+      "get_office_command_result",
+      "get_word_selection_from_office",
+      "insert_powerpoint_text_box_in_office",
+      "list_office_sessions",
+      "list_powerpoint_slides_in_office",
+      "login_power_platform",
+      "login_windows_companion",
+      "microsoft_create_booking_appointment",
+      "microsoft_get_booking_business",
+      "microsoft_get_education_class",
+      "microsoft_get_education_school",
+      "microsoft_get_learning_provider",
+      "microsoft_list_accounts",
+      "microsoft_list_booking_appointments",
+      "microsoft_list_booking_businesses",
+      "microsoft_list_education_assignments",
+      "microsoft_list_education_classes",
+      "microsoft_list_education_schools",
+      "microsoft_list_education_users",
+      "microsoft_list_learning_course_activities",
+      "microsoft_list_learning_providers",
+      "microsoft_login",
+      "microsoft_logout",
+      "microsoft_search_tools",
+      "microsoft_verify_login",
+      "replace_word_placeholders_in_office",
+      "write_word_selection_in_office"
+    ],
+    "skills": [
+      "microsoft-document-authoring",
+      "microsoft-education-booking",
+      "microsoft-session-management"
+    ],
+    "data": {
+      "reads": [
+        "microsoft-accounts",
+        "microsoft-education-booking",
+        "microsoft-office-sessions"
+      ],
+      "writes": [
+        "microsoft-accounts",
+        "microsoft-education-booking",
+        "microsoft-office-sessions"
+      ]
+    },
+    "guardrails": {
+      "approval_required": [
+        "delete_powerpoint_slide_in_office"
+      ],
+      "never": [
+        "Expose a token, secret or credential value.",
+        "Perform a write or destructive call when the policy flags are off.",
+        "Overwrite an existing document without approval."
+      ]
+    },
+    "outputs": [
+      "The generated document and where it was stored."
+    ],
+    "business_role": "document author"
+  }
+}

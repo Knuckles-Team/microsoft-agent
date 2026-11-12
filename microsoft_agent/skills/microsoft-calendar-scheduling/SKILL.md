@@ -2,80 +2,71 @@
 name: microsoft-calendar-scheduling
 skill_type: skill
 description: >-
-  Outlook calendar and Teams online-meeting scheduling on Microsoft Graph via the
-  microsoft-agent MCP server — list a calendar view, read/create/update/delete
-  events, and find meeting times with the domain-typed `microsoft_calendar` tool.
-  Use when the agent must check availability, book or reschedule a meeting, or
-  enumerate a user's events in a date window. Do NOT use for mailbox messages
-  (use microsoft-mail-operations) or Teams chat posts
+  Outlook calendars, events, online meetings, meeting-time search, rooms and
+  places on Microsoft Graph. Use when the agent must read a schedule, create or
+  change an event, find a common meeting time, or manage an online meeting. Do
+  NOT use for mail (use microsoft-mail-operations) or Teams channel messages
   (use microsoft-teams-messaging).
 license: MIT
-tags: [microsoft, outlook, calendar, meetings, mcp]
+tags: [microsoft, calendar, outlook, graph, mcp]
 metadata:
   author: Knuckles-Team
-  version: '0.1.0'
+  version: '0.2.0'
 ---
-# Microsoft Calendar & Scheduling
+# Microsoft calendar scheduling
 
-Domain-typed access to Outlook calendars and events through Microsoft Graph
-(`/me/events`, `/me/calendarView`, `/me/findMeetingTimes`). Prefer the
-`microsoft_calendar` tool over raw Graph calls — it carries the event and
-meeting-time action set and returns Graph-shaped records.
+Typed calendar operations including the calendar view, specific-calendar events, online meetings and `find_meeting_times`.
 
 ## When to use
-- Enumerate events in a window (`get_calendar_view` with start/end).
-- Read / create / update / delete a calendar event.
-- Suggest slots that work for a set of attendees (`find_meeting_times`).
-- List the user's calendars or events on a specific calendar.
+- Read the calendar view for a time window.
+- Create, update or cancel an event.
+- Find meeting times for several attendees.
+- Create or delete an online meeting; list rooms and places.
 
 ## When NOT to use
-- Mailbox triage / sending mail → `microsoft-mail-operations`.
-- Teams chat or channel messages → `microsoft-teams-messaging`.
-- Files / documents → the `microsoft_files` tool.
+- Mail: use microsoft-mail-operations.
+- Contacts: use microsoft-contacts.
 
-## Prerequisites & environment
-Connect via the `mcp-client` skill against the **`microsoft-agent`** MCP server.
-Run `microsoft_auth` (`login`) first. Requires the `Calendars.ReadWrite` (and,
-for meeting links, `OnlineMeetings.ReadWrite`) Graph scopes.
+## Safety
+- Writes need MICROSOFT_ALLOW_WRITES and destructive tools also need MICROSOFT_ALLOW_DESTRUCTIVE; the server refuses them otherwise.
+- Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `OIDC_CLIENT_ID` | optional | Azure AD app (client) id; a default is baked in |
-| `TESTING` | optional | Set truthy to skip the global auth manager |
+## Tools (23)
 
-## Tools & actions
-Prefer the **condensed** `microsoft_calendar` tool; `action` + a `params_json`
-**JSON string** (query options inside a `params` object).
+R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.
 
-| Condensed tool | Key actions |
-|----------------|-------------|
-| `microsoft_calendar` | `list_calendar_events`, `get_calendar_view`, `get_calendar_event`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event`, `list_calendars`, `find_meeting_times` |
+| Tool | Kind | Inputs |
+|---|---|---|
+| `microsoft_create_calendar_event` | W | data, params |
+| `microsoft_create_online_meeting` | W | data, params |
+| `microsoft_create_specific_calendar_event` | W | calendar_id, data, params |
+| `microsoft_delete_calendar_event` | D | confirm, event_id, params |
+| `microsoft_delete_online_meeting` | D | confirm, meeting_id, params |
+| `microsoft_delete_specific_calendar_event` | D | calendar_id, confirm, event_id, params |
+| `microsoft_find_meeting_times` | R | data, params |
+| `microsoft_get_calendar_event` | R | event_id, params, timezone |
+| `microsoft_get_calendar_view` | R | params, timezone |
+| `microsoft_get_online_meeting` | R | meeting_id, params |
+| `microsoft_get_place` | R | params, place_id |
+| `microsoft_get_specific_calendar_event` | R | calendar_id, event_id, params, timezone |
+| `microsoft_list_calendar_events` | R | params, timezone |
+| `microsoft_list_calendars` | R | params |
+| `microsoft_list_online_meetings` | R | params |
+| `microsoft_list_room_lists` | R | params |
+| `microsoft_list_rooms` | R | params |
+| `microsoft_list_specific_calendar_events` | R | calendar_id, params, timezone |
+| `microsoft_list_virtual_events` | R | params |
+| `microsoft_update_calendar_event` | W | data, event_id, params |
+| `microsoft_update_online_meeting` | W | data, meeting_id, params |
+| `microsoft_update_place` | W | data, params, place_id |
+| `microsoft_update_specific_calendar_event` | W | calendar_id, data, event_id, params |
 
-## Recipes (`params_json`)
-List a calendar view for a date window (expanded recurrences):
-```json
-{"params":{"startDateTime":"2026-07-01T00:00:00Z","endDateTime":"2026-07-08T00:00:00Z","$orderby":"start/dateTime","$top":50}}
-```
-Get one event:
-```json
-{"event_id":"AAMkAG...","params":{"$select":"subject,start,end,organizer,attendees"}}
-```
-Create an event (body carries the event payload):
-```json
-{"body":{"subject":"Design sync","start":{"dateTime":"2026-07-05T15:00:00","timeZone":"UTC"},"end":{"dateTime":"2026-07-05T15:30:00","timeZone":"UTC"},"attendees":[{"emailAddress":{"address":"ana@contoso.com"},"type":"required"}]}}
-```
+## Tasks
 
-## Gotchas
-- `params_json` is a **string** of JSON — serialize it.
-- `get_calendar_view` requires **both** `startDateTime` and `endDateTime` and is
-  the only way to get expanded recurring instances; plain `list_calendar_events`
-  returns the series masters.
-- Times are objects: `{"dateTime": ..., "timeZone": ...}` — pass a `timeZone` or
-  Graph assumes UTC.
-- Responses are raw Graph JSON — the collection is under `value`.
+Each task is a tool-use contract the platform serves; steps run in this order.
 
-## Related
-- **Native KG ingestion:** the `microsoft_ingest_records` tool (`kind:"events"`)
-  maps events → `:Event` (+ organizer/attendee `:Person`) nodes.
-- **Source preset:** `microsoft-calendar` in `connectors/mcp_source_presets.json`
-  syncs events into the KG as `event` documents.
+- `calendar-event`: `microsoft_get_calendar_event` -> `microsoft_list_calendar_events` -> `microsoft_create_calendar_event` -> `microsoft_update_calendar_event` -> `microsoft_delete_calendar_event`
+- `calendar-online-meeting`: `microsoft_get_online_meeting` -> `microsoft_list_online_meetings` -> `microsoft_create_online_meeting` -> `microsoft_update_online_meeting` -> `microsoft_delete_online_meeting`
+- `calendar-place`: `microsoft_get_place` -> `microsoft_update_place`
+- `calendar-specific-calendar`: `microsoft_get_specific_calendar_event` -> `microsoft_list_specific_calendar_events` -> `microsoft_create_specific_calendar_event` -> `microsoft_update_specific_calendar_event` -> `microsoft_delete_specific_calendar_event`
+- `calendar-read-records`: `microsoft_find_meeting_times` -> `microsoft_get_calendar_view` -> `microsoft_list_calendars` -> `microsoft_list_room_lists` -> `microsoft_list_rooms` -> `microsoft_list_virtual_events`

@@ -17,7 +17,7 @@ metadata:
 # microsoft-agent development
 
 This repository owns the Microsoft Graph client, authentication boundary,
-action-routed MCP tools, provider mappings, ontology, and packaged connector
+typed MCP tools (one per Graph operation), provider mappings, ontology, and packaged connector
 content. Shared connector contracts and transports belong to
 `scion-sdk`; admission, serving, and durable graph state belong to
 their owning repositories. Read `AGENTS.md` before changing code. Keep tenant
@@ -32,11 +32,11 @@ owning spec row in the commit trailer.
 - Find the owning row first with `git grep -n "<term>" -- specs` and extend the
   existing spec before adding requirement text.
 - Reuse the one SDK `Connector`, the existing Graph client, auth/settings
-  boundary, and action-routed tool modules. Do not create a second MCP,
+  boundary, and the SDK-registered operation tools. Do not create a second MCP,
   authentication, graph-ingest, or safety plane.
 - Preserve fail-closed read/write/destructive policy, tenant and provenance
-  checks, TLS verification, and the existing condensed and verbose tool
-  surfaces. Provider calls remain mocked in local tests.
+  checks, TLS verification, and the one typed tool surface. Never add a tool
+  that routes an `action` argument to several operations. Provider calls remain mocked in local tests.
 - Bind every delivered requirement to a focused test. Generated
   `specs/*/status.json` files come from the shared hooks; never hand-edit them.
 - Keep `skills/**`, `ontology/**`, `connectors/**`, prompts, manifests, and

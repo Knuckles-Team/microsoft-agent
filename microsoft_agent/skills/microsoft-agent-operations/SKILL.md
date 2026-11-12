@@ -12,7 +12,7 @@ Use the provider's governed MCP tools through Arbora delegation.
 ## Workflow
 
 1. Establish the verified GraphSession and tenant before discovery or retrieval.
-2. Discover the current condensed tool surface; never assume a stale tool name or schema.
+2. Discover the current typed tool surface (one tool per Graph operation, named `microsoft_<operation>`); never assume a stale tool name or schema.
 3. Prefer read-only inspection first. For changes, present impact and use the provider's
    dry-run or preview mode when available.
 4. Execute mutations as fenced WorkItems so retries remain idempotent and auditable.
@@ -32,8 +32,14 @@ Use the provider's governed MCP tools through Arbora delegation.
   projection; let Arbora validate the signed source manifest and commit it
   through the native ChangeEnvelope authority.
 
-The installed MCP schema is authoritative. Route the discovered action through its
-current family and preserve the caller's session and approval context.
+The installed MCP schema is authoritative. Call the typed tool for the operation and
+preserve the caller's session and approval context. Per-domain skills list every tool:
+`microsoft-session-management`, `microsoft-mail-operations`, `microsoft-calendar-scheduling`,
+`microsoft-contacts`, `microsoft-teams-messaging`, `microsoft-files-sharepoint`,
+`microsoft-office-apps`, `microsoft-identity-directory`, `microsoft-security-operations`,
+`microsoft-service-reports`, `microsoft-graph-integration`, `microsoft-endpoint-management`,
+`microsoft-power-platform`, `microsoft-document-authoring`, `microsoft-universal-print`
+and `microsoft-education-booking`.
 
 ## Safety contract
 
