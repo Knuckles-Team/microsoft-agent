@@ -191,16 +191,11 @@ def test_policy_separates_writes_and_destructive_actions():
     write_settings = MicrosoftSettings(allow_write_tools=True)
     write_policy = MicrosoftToolPolicy(write_settings)
     assert write_policy.require("send_mail").allowed is True
-    with pytest.raises(ToolError, match="MICROSOFT_ALLOW_DESTRUCTIVE"):
-        write_policy.require("delete_mail_message")
-
-    destructive_policy = MicrosoftToolPolicy(
-        MicrosoftSettings(
-            allow_write_tools=True,
-            allow_destructive_tools=True,
-        )
-    )
-    assert destructive_policy.require("delete_mail_message").allowed is True
+    assert write_policy.require("delete_mail_message").allowed is True
+    read_only = MicrosoftToolPolicy(MicrosoftSettings())
+    with pytest.raises(ToolError, match="MICROSOFT_ALLOW_WRITES"):
+        read_only.require("delete_mail_message")
+    assert not hasattr(MicrosoftSettings(), "allow_destructive_tools")
 
 
 def test_served_tool_prefix_does_not_hide_a_read_verb():

@@ -1,4 +1,4 @@
-@prefix : <https://knuckles-team.github.io/ontology/connector/microsoft#> .
+@prefix : <http://knuckles.team/kg#> .
 @prefix core: <https://knuckles-team.github.io/ontology/core#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -8,42 +8,42 @@
 # timestamps, and attachment bytes are not properties in this ontology.
 
 :Message a owl:Class ;
-    rdfs:subClassOf core:Message .
+    rdfs:subClassOf core:DomainEntity .
 
 
 :Event a owl:Class ;
-    rdfs:subClassOf core:Event .
+    rdfs:subClassOf core:DomainEntity .
 
 
 :File a owl:Class ;
-    rdfs:subClassOf core:File .
+    rdfs:subClassOf core:Artifact .
 
 
 :sentBy a owl:ObjectProperty ;
     rdfs:label "sent by" ;
     rdfs:domain :Message ;
-    rdfs:range core:Person .
+    rdfs:range :Person .
 
 :sentTo a owl:ObjectProperty ;
     rdfs:label "sent to" ;
     rdfs:domain :Message ;
-    rdfs:range core:Person .
+    rdfs:range :Person .
 
 :organizedBy a owl:ObjectProperty ;
     rdfs:label "organized by" ;
     rdfs:domain :Event ;
-    rdfs:range core:Person .
+    rdfs:range :Person .
 
 :hasAttendee a owl:ObjectProperty ;
     rdfs:label "has attendee" ;
     rdfs:domain :Event ;
-    rdfs:range core:Person .
+    rdfs:range :Person .
 
 :ownedByPerson a owl:ObjectProperty ;
     rdfs:label "owned by person" ;
     rdfs:domain :File ;
-    rdfs:range core:Person .
+    rdfs:range :Person .
 
-<https://knuckles-team.github.io/ontology/connector/microsoft> a owl:Ontology ;
+<http://knuckles.team/kg/microsoft> a owl:Ontology ;
     rdfs:label "Microsoft Graph zero-PII structural ontology" ;
     rdfs:comment "Keyed opaque message, event, file, and person relationships for governed Microsoft Graph ingestion." .

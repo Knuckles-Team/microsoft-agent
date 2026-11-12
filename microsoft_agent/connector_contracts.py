@@ -70,7 +70,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -133,7 +133,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -226,7 +226,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -289,7 +289,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -330,7 +330,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -542,7 +542,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -753,7 +753,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -994,7 +994,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1057,7 +1057,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1087,7 +1087,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1150,7 +1150,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1247,7 +1247,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1377,7 +1377,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1440,7 +1440,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1481,7 +1481,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1680,7 +1680,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1731,7 +1731,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1794,7 +1794,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1846,7 +1846,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -1938,7 +1938,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -2294,7 +2294,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -2431,7 +2431,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),
@@ -3543,7 +3543,7 @@ CONTRACTS = (
                 refusals=(
                     Refusal(
                         code="FORBIDDEN",
-                        when="destructive calls are disabled (MICROSOFT_ALLOW_DESTRUCTIVE is off) or approval is missing",
+                        when="the destructive call is not confirmed (no gateway approval and no confirm argument)",
                     ),
                     Refusal(code="NOT_FOUND", when="the target record does not exist"),
                 ),

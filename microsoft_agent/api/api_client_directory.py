@@ -1,6 +1,7 @@
 from typing import Any
 
 from msgraph.generated.users.users_request_builder import UsersRequestBuilder
+from scion_sdk.mcp.destructive import destructive_operation
 
 from microsoft_agent.api._graph_models import (
     graph_model_from_dict,
@@ -639,6 +640,7 @@ class MicrosoftGraphApiDirectory(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def dismiss_risky_user(
         self, user_id: str, params: dict | None = None
     ) -> dict[str, Any]:

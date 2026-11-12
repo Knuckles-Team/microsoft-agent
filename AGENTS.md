@@ -68,8 +68,10 @@ asynchronous tool execution. Core libraries: `scion-sdk`, `fastmcp`,
   tokens in memory and must not enable plaintext persistence.
 - Each tool is authorized by its own name; unknown verbs are treated as writes and
   fail closed. No tool routes an `action` argument.
-- Writes require `MICROSOFT_ALLOW_WRITES`; destructive actions also require
-  `MICROSOFT_ALLOW_DESTRUCTIVE`.
+- Writes require `MICROSOFT_ALLOW_WRITES`; destructive actions also need a live
+  confirmation (the gateway's approval or the `confirm` argument); there is no
+  connector destructive setting (the operator's one setting is
+  `SCION_ALLOW_DESTRUCTIVE`).
 - Connector materialization remains quarantined until tenant, ACL, provenance,
   schema, and privacy policy are checked.
 - Tests must mock all provider and network interactions.

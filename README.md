@@ -79,7 +79,6 @@ tokens remain in memory and are not written to plaintext files.
 | `MICROSOFT_GRAPH_SCOPES` | — |  |
 | `MICROSOFT_ENABLED_TOOL_GROUPS` | `misc,auth,meta,mail,files,calendar,notes,tasks,contacts,user,chat,teams,sites,search,groups,communications,documents,power_platform,windows,intune` | Tools are registered, but side effects remain disabled until explicitly enabled. |
 | `MICROSOFT_ALLOW_WRITES` | `false` |  |
-| `MICROSOFT_ALLOW_DESTRUCTIVE` | `false` |  |
 | `MICROSOFT_INGESTION_PSEUDONYMIZATION_KEY_REF` | — | Required only for graph projection/ingestion. Resolve from AgentConfig or a secret store; use at least 32 bytes and never reuse an identity credential. |
 | `MICROSOFT_INTEGRATIONS_CONFIG_PATH` | — | Complex Power Platform, Intune, and Windows companion allowlists. |
 | `MICROSOFT_DOCUMENT_ARTIFACT_ROOT` | — |  |
@@ -264,13 +263,13 @@ and MCP caller identity are separate boundaries and both must be configured.
 | `microsoft_tasks` | `TASKSTOOL` | Manage microsoft tasks operations. |
 | `microsoft_teams` | `TEAMSTOOL` | Manage microsoft teams operations. |
 | `microsoft_user` | `USERTOOL` | Manage microsoft user operations. |
-| `reboot_intune_device` | `INTUNETOOL` | Immediately reboot an allowlisted Intune device after destructive action acknowledgement and time-bound confirmation. |
+| `reboot_intune_device` | `INTUNETOOL` | Immediately reboot an allowlisted Intune device after time-bound confirmation. |
 | `remote_lock_intune_device` | `INTUNETOOL` | Remotely lock an allowlisted Intune device after time-bound confirmation bound to that device and action. |
 | `replace_word_placeholders_in_office` | `DOCUMENTSTOOL` | Replace a literal placeholder throughout a paired, open Word document. |
 | `run_power_automate_desktop_flow` | `POWER_PLATFORMTOOL` | Run one allowlisted Power Automate desktop flow using its fixed Dataverse connection or connection reference. |
 | `run_power_automate_flow` | `POWER_PLATFORMTOOL` | Invoke one named, allowlisted, OAuth-protected Power Automate HTTP trigger. The caller cannot supply a trigger URL. |
 | `scan_intune_device_with_defender` | `INTUNETOOL` | Request a quick or full Microsoft Defender scan on an allowlisted Intune device with time-bound confirmation. |
-| `shut_down_intune_device` | `INTUNETOOL` | Immediately shut down an allowlisted Intune device after destructive action acknowledgement and time-bound confirmation. |
+| `shut_down_intune_device` | `INTUNETOOL` | Immediately shut down an allowlisted Intune device after time-bound confirmation. |
 | `submit_windows_action` | `WINDOWS_COMPANIONTOOL` | Submit one typed allowlisted laptop action through the authenticated outbound relay. Arbitrary shell, process, and URL execution are absent. |
 | `sync_intune_device` | `INTUNETOOL` | Request an Intune sync for an allowlisted device. Time-bound confirmation evidence bound to the action and device is required. |
 | `write_word_selection_in_office` | `DOCUMENTSTOOL` | Write bounded text at the selection in a paired, open Word task pane. |
@@ -558,8 +557,8 @@ _79 action-routed tool(s) · 268 verbose 1:1 tool(s). Each is enabled unless its
 
 Every routed action passes the fail-closed tool policy. Reads are permitted by
 default; unknown actions are treated as writes. Writes require
-`MICROSOFT_ALLOW_WRITES=true`, and destructive actions also require
-`MICROSOFT_ALLOW_DESTRUCTIVE=true`.
+`MICROSOFT_ALLOW_WRITES=true`, and destructive actions also need a live
+confirmation (the gateway's approval or the `confirm` argument).
 
 ## MCP client configuration
 
@@ -607,7 +606,6 @@ default; unknown actions are treated as writes. Writes require
         "KGTOOL": "true",
         "MAILTOOL": "true",
         "METATOOL": "true",
-        "MICROSOFT_ALLOW_DESTRUCTIVE": "false",
         "MICROSOFT_ALLOW_DEVICE_CODE": "false",
         "MICROSOFT_ALLOW_WRITES": "false",
         "MICROSOFT_AUTHORITY_HOST": "https://login.microsoftonline.com",
@@ -692,7 +690,6 @@ own runtime secret boundary.
         "KGTOOL": "true",
         "MAILTOOL": "true",
         "METATOOL": "true",
-        "MICROSOFT_ALLOW_DESTRUCTIVE": "false",
         "MICROSOFT_ALLOW_DEVICE_CODE": "false",
         "MICROSOFT_ALLOW_WRITES": "false",
         "MICROSOFT_AUTHORITY_HOST": "https://login.microsoftonline.com",
@@ -776,7 +773,6 @@ docker run -i --rm \
   -e KGTOOL=true \
   -e MAILTOOL=true \
   -e METATOOL=true \
-  -e MICROSOFT_ALLOW_DESTRUCTIVE=false \
   -e MICROSOFT_ALLOW_DEVICE_CODE=false \
   -e MICROSOFT_ALLOW_WRITES=false \
   -e MICROSOFT_AUTHORITY_HOST=https://login.microsoftonline.com \

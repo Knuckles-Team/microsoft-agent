@@ -31,7 +31,6 @@
         "KGTOOL": "true",
         "MAILTOOL": "true",
         "METATOOL": "true",
-        "MICROSOFT_ALLOW_DESTRUCTIVE": "false",
         "MICROSOFT_ALLOW_DEVICE_CODE": "false",
         "MICROSOFT_ALLOW_WRITES": "false",
         "MICROSOFT_AUTHORITY_HOST": "https://login.microsoftonline.com",

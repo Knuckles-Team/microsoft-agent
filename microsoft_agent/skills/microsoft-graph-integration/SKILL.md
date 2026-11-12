@@ -27,7 +27,7 @@ Integration operations. The ingestion projection returns keyed opaque nodes only
 - Reading item content: use the domain skills.
 
 ## Safety
-- Writes need MICROSOFT_ALLOW_WRITES and destructive tools also need MICROSOFT_ALLOW_DESTRUCTIVE; the server refuses them otherwise.
+- Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
 ## Tools (11)
