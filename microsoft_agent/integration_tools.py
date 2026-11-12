@@ -709,7 +709,7 @@ def register_windows_companion_tools(mcp: FastMCP) -> None:
     )
     async def submit_windows_action(
         device_alias: str,
-        action: CompanionAction,
+        companion_action: CompanionAction,
         confirmation: ConfirmationEvidence | None = None,
         idempotency_key: str | None = None,
     ) -> dict[str, Any]:
@@ -718,7 +718,7 @@ def register_windows_companion_tools(mcp: FastMCP) -> None:
         integration_settings = get_integration_settings().windows_companion
         if integration_settings is None:
             raise ValueError("Windows companion is not configured.")
-        kind = CompanionActionKind(action.kind)
+        kind = CompanionActionKind(companion_action.kind)
         action_policy = integration_settings.action_policies.get(kind)
         if action_policy is None:
             raise ValueError("Windows action has no configured policy.")
@@ -726,7 +726,10 @@ def register_windows_companion_tools(mcp: FastMCP) -> None:
             raise ValueError(
                 "This Windows action requires MICROSOFT_ALLOW_DESTRUCTIVE=true."
             )
-        values: dict[str, Any] = {"action": action, "confirmation": confirmation}
+        values: dict[str, Any] = {
+            "action": companion_action,
+            "confirmation": confirmation,
+        }
         if idempotency_key is not None:
             values["idempotency_key"] = idempotency_key
         request = CompanionActionRequest(**values)

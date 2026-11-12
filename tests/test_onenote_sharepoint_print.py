@@ -9,7 +9,6 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from fastmcp import FastMCP
 from kiota_abstractions.headers_collection import HeadersCollection
 from kiota_abstractions.method import Method
 from pydantic import ValidationError
@@ -334,20 +333,15 @@ def test_print_submission_validates_filename_and_base64() -> None:
         request.content_bytes()
 
 
-@pytest.mark.asyncio
-async def test_print_tools_register_typed_submit_operation() -> None:
-    from microsoft_agent.mcp_server import register_print_tools
+@pytest.mark.spec("CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001")
+def test_print_tools_register_typed_submit_operation() -> None:
+    from _served import served_tools as _served_tools
 
-    mcp = FastMCP("print-test")
-    register_print_tools(mcp)
+    tools = {tool.name: tool for tool in _served_tools()}
 
-    names = {tool.name for tool in await mcp.list_tools()}
-    assert names == {"microsoft_print"}
-    tool = await mcp.get_tool("microsoft_print")
-    actions = await tool.fn(
-        action="list_actions",
-        params_json="{}",
-        client=MagicMock(),
-        ctx=None,
+    assert "microsoft_submit_print_document" in tools
+    assert "microsoft_print" not in tools
+    assert (
+        "action"
+        not in tools["microsoft_submit_print_document"].inputSchema["properties"]
     )
-    assert "submit_print_document" in actions["actions"]

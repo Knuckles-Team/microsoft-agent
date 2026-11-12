@@ -46,114 +46,6 @@ from microsoft_agent.integration_tools import (
     register_power_platform_tools,
     register_windows_companion_tools,
 )
-from microsoft_agent.mcp import (
-    register_admin_tools as register_admin_tools,
-)
-from microsoft_agent.mcp import (
-    register_agreements_tools as register_agreements_tools,
-)
-from microsoft_agent.mcp import (
-    register_applications_tools as register_applications_tools,
-)
-from microsoft_agent.mcp import (
-    register_audit_tools as register_audit_tools,
-)
-from microsoft_agent.mcp import (
-    register_auth_tools as register_auth_tools,
-)
-from microsoft_agent.mcp import (
-    register_calendar_tools as register_calendar_tools,
-)
-from microsoft_agent.mcp import (
-    register_chat_tools as register_chat_tools,
-)
-from microsoft_agent.mcp import (
-    register_communications_tools as register_communications_tools,
-)
-from microsoft_agent.mcp import (
-    register_connections_tools as register_connections_tools,
-)
-from microsoft_agent.mcp import (
-    register_contacts_tools as register_contacts_tools,
-)
-from microsoft_agent.mcp import (
-    register_devices_tools as register_devices_tools,
-)
-from microsoft_agent.mcp import (
-    register_directory_tools as register_directory_tools,
-)
-from microsoft_agent.mcp import (
-    register_domains_tools as register_domains_tools,
-)
-from microsoft_agent.mcp import (
-    register_education_tools as register_education_tools,
-)
-from microsoft_agent.mcp import (
-    register_employee_experience_tools as register_employee_experience_tools,
-)
-from microsoft_agent.mcp import (
-    register_files_tools as register_files_tools,
-)
-from microsoft_agent.mcp import (
-    register_groups_tools as register_groups_tools,
-)
-from microsoft_agent.mcp import (
-    register_identity_tools as register_identity_tools,
-)
-from microsoft_agent.mcp import (
-    register_mail_tools as register_mail_tools,
-)
-from microsoft_agent.mcp import (
-    register_meta_tools as register_meta_tools,
-)
-from microsoft_agent.mcp import (
-    register_notes_tools as register_notes_tools,
-)
-from microsoft_agent.mcp import (
-    register_organization_tools as register_organization_tools,
-)
-from microsoft_agent.mcp import (
-    register_places_tools as register_places_tools,
-)
-from microsoft_agent.mcp import (
-    register_policies_tools as register_policies_tools,
-)
-from microsoft_agent.mcp import (
-    register_print_tools as register_print_tools,
-)
-from microsoft_agent.mcp import (
-    register_privacy_tools as register_privacy_tools,
-)
-from microsoft_agent.mcp import (
-    register_reports_tools as register_reports_tools,
-)
-from microsoft_agent.mcp import (
-    register_search_tools as register_search_tools,
-)
-from microsoft_agent.mcp import (
-    register_security_tools as register_security_tools,
-)
-from microsoft_agent.mcp import (
-    register_sites_tools as register_sites_tools,
-)
-from microsoft_agent.mcp import (
-    register_solutions_tools as register_solutions_tools,
-)
-from microsoft_agent.mcp import (
-    register_storage_tools as register_storage_tools,
-)
-from microsoft_agent.mcp import (
-    register_subscriptions_tools as register_subscriptions_tools,
-)
-from microsoft_agent.mcp import (
-    register_tasks_tools as register_tasks_tools,
-)
-from microsoft_agent.mcp import (
-    register_teams_tools as register_teams_tools,
-)
-from microsoft_agent.mcp import (
-    register_user_tools as register_user_tools,
-)
 from microsoft_agent.office_bridge import register_office_bridge
 from microsoft_agent.settings import get_settings
 from microsoft_agent.tool_policy import MicrosoftToolPolicy, ToolPolicyMiddleware
@@ -263,13 +155,34 @@ def register_kg_tools(mcp: FastMCP):
     return None
 
 
+def register_extra_surface(mcp: FastMCP) -> None:
+    """Register the tools beyond the Graph operations, and the side-effect policy.
+
+    Shared by the stand-alone server and the declared connector so both serve
+    the same tools under the same fail-closed authorization.
+    """
+    register_kg_tools(mcp)
+
+    settings = get_settings()
+    if settings.tool_group_enabled("documents"):
+        register_document_tools(mcp)
+        register_office_bridge(mcp)
+    if settings.tool_group_enabled("power_platform"):
+        register_power_platform_tools(mcp)
+    if settings.tool_group_enabled("windows"):
+        register_windows_companion_tools(mcp)
+    if settings.tool_group_enabled("intune"):
+        register_intune_tools(mcp)
+    mcp.add_middleware(ToolPolicyMiddleware(MicrosoftToolPolicy(settings)))
+
+
 def get_mcp_instance() -> tuple[Any, ...]:
     """Initialize and return the MCP instance."""
     load_config()
     args, mcp, middlewares = create_mcp_server(
         name="microsoft-agent MCP",
         version=__version__,
-        instructions="microsoft-agent MCP Server — Condensed Action-Routed Tools.",
+        instructions="microsoft-agent MCP Server — one typed tool per Microsoft Graph operation.",
         content=ConnectorContent.for_package(
             "microsoft_agent",
             Path(__file__).resolve().parent,
@@ -286,24 +199,11 @@ def get_mcp_instance() -> tuple[Any, ...]:
         client_cls=MicrosoftGraphApi,
         get_client=get_client_dependency,
         service="microsoft-agent",
-        tools_module=sys.modules[__name__],
     )
-    register_kg_tools(mcp)
-
-    settings = get_settings()
-    if settings.tool_group_enabled("documents"):
-        register_document_tools(mcp)
-        register_office_bridge(mcp)
-    if settings.tool_group_enabled("power_platform"):
-        register_power_platform_tools(mcp)
-    if settings.tool_group_enabled("windows"):
-        register_windows_companion_tools(mcp)
-    if settings.tool_group_enabled("intune"):
-        register_intune_tools(mcp)
+    register_extra_surface(mcp)
 
     for mw in middlewares:
         mcp.add_middleware(mw)
-    mcp.add_middleware(ToolPolicyMiddleware(MicrosoftToolPolicy(settings)))
     return mcp, args, middlewares
 
 
