@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import fnmatch
-from collections.abc import Mapping
 from enum import StrEnum
 from typing import Any
 
@@ -172,20 +171,6 @@ def _tool_name(message: Any) -> str | None:
     return str(name) if name else None
 
 
-def _tool_action(message: Any) -> str | None:
-    """Return the routed action from a FastMCP call without trusting its name."""
-
-    params = getattr(message, "params", None)
-    arguments = getattr(params, "arguments", None) if params is not None else None
-    if not isinstance(arguments, Mapping):
-        return None
-    action = arguments.get("action")
-    if not isinstance(action, str):
-        return None
-    normalized = action.strip()
-    return normalized if normalized else None
-
-
 class ToolPolicyMiddleware(Middleware):
     """Enforce side-effect policy before any MCP tool implementation runs."""
 
@@ -196,10 +181,7 @@ class ToolPolicyMiddleware(Middleware):
         name = _tool_name(context.message)
         if not name:
             raise ToolError("Unable to authorize unnamed Microsoft tool call.")
-        action = _tool_action(context.message)
-        # Condensed tools route many Graph operations through one stable MCP
-        # name. Authorize the validated action verb, not merely the envelope,
-        # so read operations remain usable while writes fail closed.
-        policy_name = action if name.startswith("microsoft_") and action else name
-        self.policy.require(policy_name)
+        # Every served tool is one typed Graph operation, so the tool name alone
+        # decides the side-effect tier; no call argument can change it.
+        self.policy.require(name)
         return await call_next(context)

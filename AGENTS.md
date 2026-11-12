@@ -14,8 +14,9 @@ Tool-neutral rules for any AI agent or human working in this repository. This bl
 
 ## Architecture
 
-- `microsoft_agent/mcp_server.py` exposes the current condensed Microsoft Graph
-  action tools through the Scion SDK MCP server factory.
+- `microsoft_agent/mcp_server.py` registers the extra tool groups and the policy;
+  the SDK registers one typed `microsoft_<operation>` tool per Graph client method
+  (declared in `microsoft_agent/__init__.py`).
 - `microsoft_agent/api_client.py` composes the domain clients in
   `microsoft_agent/api/`; it is the only Graph API client authority.
 - `microsoft_agent/auth.py` and `microsoft_agent/settings.py` implement validated
@@ -65,8 +66,8 @@ asynchronous tool execution. Core libraries: `scion-sdk`, `fastmcp`,
   baked-in client identifier.
 - Tokens are stored only through secure OS-backed storage. A keyring failure leaves
   tokens in memory and must not enable plaintext persistence.
-- Condensed action tools authorize the routed action, not merely the envelope tool
-  name. Unknown actions are treated as writes and fail closed.
+- Each tool is authorized by its own name; unknown verbs are treated as writes and
+  fail closed. No tool routes an `action` argument.
 - Writes require `MICROSOFT_ALLOW_WRITES`; destructive actions also require
   `MICROSOFT_ALLOW_DESTRUCTIVE`.
 - Connector materialization remains quarantined until tenant, ACL, provenance,

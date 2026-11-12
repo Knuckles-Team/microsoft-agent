@@ -2,91 +2,69 @@
 name: microsoft-mail-operations
 skill_type: skill
 description: >-
-  Outlook / Exchange mail operations on Microsoft Graph via the microsoft-agent
-  MCP server — list and read messages, send mail and drafts, manage folders, and
-  handle attachments with the domain-typed `microsoft_mail` tool. Use when the
-  agent must triage a mailbox, read a message by id, send or draft an email, or
-  pull attachment bytes into the knowledge graph. Do NOT use for calendar events
-  (use microsoft-calendar-scheduling), Teams chat/channel posts
-  (use microsoft-teams-messaging), or OneDrive/SharePoint files.
+  Outlook and Exchange mail through Microsoft Graph: list and read messages,
+  folders and attachments, send mail and drafts, move or delete messages, read
+  shared mailboxes and mailbox reports. Use when the agent must triage a
+  mailbox, send or draft an email, or fetch an attachment. Do NOT use for
+  calendar events (use microsoft-calendar-scheduling) or Teams messages (use
+  microsoft-teams-messaging).
 license: MIT
 tags: [microsoft, outlook, mail, graph, mcp]
 metadata:
   author: Knuckles-Team
-  version: '0.1.0'
+  version: '0.2.0'
 ---
-# Microsoft Mail Operations
+# Microsoft mail operations
 
-Domain-typed access to Outlook mail through Microsoft Graph (`/me/messages`,
-`/me/mailFolders`). Prefer the `microsoft_mail` tool over raw Graph calls — it
-carries the message/folder/attachment action set and returns Graph-shaped records.
+Typed mail operations over `/me/messages`, `/me/mailFolders` and shared mailboxes. Needs the Mail.ReadWrite and Mail.Send scopes.
 
 ## When to use
-- Triage a mailbox: list messages, filter by folder, search subject/body.
-- Read a single message by `id` (headers, body, attachments).
-- Send a mail, create a draft, move/update/delete a message.
-- List or fetch attachments (and store their bytes in the KG).
+- Triage a mailbox: list folders, list messages, read one message.
+- Draft, send, move or delete a message.
+- Read or add an attachment.
+- Read a shared mailbox or the mailbox usage and email activity reports.
 
 ## When NOT to use
-- Calendar events / meetings → `microsoft-calendar-scheduling`.
-- Teams 1:1 chat or channel posts → `microsoft-teams-messaging`.
-- OneDrive / SharePoint drive items → the `microsoft_files` tool.
-- Directory users/groups → the `microsoft_user` / `microsoft_groups` tools.
+- Calendar events: use microsoft-calendar-scheduling.
+- Teams chat and channel posts: use microsoft-teams-messaging.
 
-## Prerequisites & environment
-Connect via the `mcp-client` skill against the **`microsoft-agent`** MCP server.
-Auth is interactive MSAL (device/auth-code) — run the `microsoft_auth` tool
-(`login`) first. Requires the `Mail.ReadWrite` (and `Mail.Send`) Graph scopes.
+## Safety
+- Writes need MICROSOFT_ALLOW_WRITES and destructive tools also need MICROSOFT_ALLOW_DESTRUCTIVE; the server refuses them otherwise.
+- Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `OIDC_CLIENT_ID` | optional | Azure AD app (client) id; a default is baked in |
-| `TESTING` | optional | Set truthy to skip the global auth manager |
+## Tools (19)
 
-`MCP_TOOL_MODE` (`condensed`|`verbose`|`both`) selects the condensed surface
-(used below) vs. the 1:1 verbose tools.
+R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.
 
-## Tools & actions
-Prefer the **condensed** `microsoft_mail` tool; it takes `action` + a `params_json`
-**JSON string** whose keys are passed straight to the client method (usually inside
-a `params` object of OData query options).
+| Tool | Kind | Inputs |
+|---|---|---|
+| `microsoft_add_mail_attachment` | W | data, message_id, params |
+| `microsoft_create_draft_email` | W | data, params |
+| `microsoft_delete_mail_attachment` | D | attachment_id, confirm, message_id, params |
+| `microsoft_delete_mail_message` | D | confirm, message_id, params |
+| `microsoft_get_email_activity_report` | R | params, period |
+| `microsoft_get_mail_attachment` | R | attachment_id, message_id, params |
+| `microsoft_get_mail_message` | R | message_id, params |
+| `microsoft_get_mailbox_usage_report` | R | params, period |
+| `microsoft_get_shared_mailbox_message` | R | message_id, params, user_id |
+| `microsoft_list_mail_attachments` | R | message_id, params |
+| `microsoft_list_mail_folder_messages` | R | mailFolder_id, params |
+| `microsoft_list_mail_folders` | R | params |
+| `microsoft_list_mail_messages` | R | params |
+| `microsoft_list_shared_mailbox_folder_messages` | R | mailFolder_id, params, user_id |
+| `microsoft_list_shared_mailbox_messages` | R | params, user_id |
+| `microsoft_move_mail_message` | W | data, message_id, params |
+| `microsoft_send_mail` | W | data, params |
+| `microsoft_send_shared_mailbox_mail` | W | data, params, user_id |
+| `microsoft_update_mail_message` | W | data, message_id, params |
 
-| Condensed tool | Key actions |
-|----------------|-------------|
-| `microsoft_mail` | `list_mail_messages`, `list_mail_folders`, `list_mail_folder_messages`, `get_mail_message`, `send_mail`, `create_draft_email`, `move_mail_message`, `update_mail_message`, `delete_mail_message`, `list_mail_attachments`, `get_mail_attachment` |
+## Tasks
 
-## Recipes (`params_json`)
-List the 25 most recent messages (few fields):
-```json
-{"params":{"$top":25,"$select":"id,subject,from,receivedDateTime,hasAttachments","$orderby":"receivedDateTime desc"}}
-```
-Search the mailbox by subject:
-```json
-{"params":{"$search":"\"quarterly report\"","$top":10}}
-```
-Get one message by id:
-```json
-{"message_id":"AAMkAG...","params":{"$select":"subject,body,from,toRecipients"}}
-```
-List a message's attachments:
-```json
-{"message_id":"AAMkAG..."}
-```
+Each task is a tool-use contract the platform serves; steps run in this order.
 
-## Gotchas
-- `params_json` is a **string** of JSON, not an object — serialize it.
-- OData query options go **inside** a `params` object (`$select`, `$filter`,
-  `$search`, `$top`, `$orderby`); `$search` requires quoting and adds a
-  `ConsistencyLevel: eventual` requirement server-side.
-- Responses are raw Graph JSON: the collection is under the `value` array, not
-  `data`.
-- `$select` a small field set — full message bodies are large and slow.
-- Attachment bytes arrive base64 in `contentBytes` on `fileAttachment` records.
-
-## Related
-- **Native KG ingestion:** the `microsoft_ingest_records` tool (`kind:"messages"`)
-  maps messages → `:Message` (+ `:Person` sender/recipients + `:Document` body)
-  nodes; `microsoft_agent.kg_media.ingest_attachment` stores attachment bytes as a
-  `:Blob` / `:MediaAsset`. Ingestion only — not part of the triage surface.
-- **Source preset:** `microsoft-mail` in `connectors/mcp_source_presets.json` syncs
-  mail into the KG as `email` documents.
+- `mail-attachment`: `microsoft_get_mail_attachment` -> `microsoft_list_mail_attachments` -> `microsoft_add_mail_attachment` -> `microsoft_delete_mail_attachment`
+- `mail-folder`: `microsoft_list_mail_folder_messages` -> `microsoft_list_mail_folders`
+- `mail-message`: `microsoft_get_mail_message` -> `microsoft_list_mail_messages` -> `microsoft_move_mail_message` -> `microsoft_update_mail_message` -> `microsoft_delete_mail_message`
+- `mail-shared-mailbox`: `microsoft_get_shared_mailbox_message` -> `microsoft_list_shared_mailbox_folder_messages` -> `microsoft_list_shared_mailbox_messages` -> `microsoft_send_shared_mailbox_mail`
+- `mail-read-records`: `microsoft_get_email_activity_report` -> `microsoft_get_mailbox_usage_report`
+- `mail-change-records`: `microsoft_create_draft_email` -> `microsoft_send_mail`

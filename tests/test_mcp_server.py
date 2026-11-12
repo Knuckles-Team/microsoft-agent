@@ -1,69 +1,40 @@
-"""Current-only tests for the condensed Microsoft MCP surface."""
+"""Tests for the typed Microsoft MCP surface: one tool per Graph operation."""
 
 from __future__ import annotations
 
 import importlib
 
 import pytest
+from _served import served_tools as _served_tools
 from fastmcp import FastMCP
 
 from microsoft_agent import mcp_server
 
-_ACTION_FAMILIES = (
-    ("auth", "microsoft_auth"),
-    ("meta", "microsoft_meta"),
-    ("mail", "microsoft_mail"),
-    ("files", "microsoft_files"),
-    ("calendar", "microsoft_calendar"),
-    ("notes", "microsoft_notes"),
-    ("tasks", "microsoft_tasks"),
-    ("contacts", "microsoft_contacts"),
-    ("user", "microsoft_user"),
-    ("chat", "microsoft_chat"),
-    ("teams", "microsoft_teams"),
-    ("sites", "microsoft_sites"),
-    ("search", "microsoft_search"),
-    ("groups", "microsoft_groups"),
-    ("admin", "microsoft_admin"),
-    ("organization", "microsoft_organization"),
-    ("domains", "microsoft_domains"),
-    ("subscriptions", "microsoft_subscriptions"),
-    ("communications", "microsoft_communications"),
-    ("identity", "microsoft_identity"),
-    ("security", "microsoft_security"),
-    ("audit", "microsoft_audit"),
-    ("reports", "microsoft_reports"),
-    ("applications", "microsoft_applications"),
-    ("directory", "microsoft_directory"),
-    ("policies", "microsoft_policies"),
-    ("devices", "microsoft_devices"),
-    ("education", "microsoft_education"),
-    ("agreements", "microsoft_agreements"),
-    ("places", "microsoft_places"),
-    ("print", "microsoft_print"),
-    ("privacy", "microsoft_privacy"),
-    ("solutions", "microsoft_solutions"),
-    ("storage", "microsoft_storage"),
-    ("employee_experience", "microsoft_employee_experience"),
-    ("connections", "microsoft_connections"),
-)
+
+@pytest.mark.spec("CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001")
+def test_served_tools_are_typed_operations_without_action_routing() -> None:
+    tools = _served_tools()
+    names = {tool.name for tool in tools}
+
+    assert len(names) > 300
+    assert {
+        "microsoft_list_mail_messages",
+        "microsoft_send_mail",
+        "microsoft_submit_print_document",
+        "microsoft_list_users",
+        "microsoft_format_excel_range",
+    } <= names
+    for tool in tools:
+        properties = (tool.inputSchema or {}).get("properties", {})
+        assert "action" not in properties, tool.name
+        assert tool.description, tool.name
 
 
-@pytest.mark.parametrize(("family", "tool_name"), _ACTION_FAMILIES)
-@pytest.mark.asyncio
-async def test_each_current_action_family_registers_one_described_tool(
-    family: str,
-    tool_name: str,
-) -> None:
-    server = FastMCP("test-microsoft-agent")
-    register = getattr(mcp_server, f"register_{family}_tools")
+@pytest.mark.spec("CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001")
+def test_old_condensed_family_tools_are_gone() -> None:
+    names = {tool.name for tool in _served_tools()}
 
-    register(server)
-
-    tools = await server.list_tools()
-    assert [tool.name for tool in tools] == [tool_name]
-    assert tools[0].description
-    assert family in tools[0].tags
+    assert not names & {"microsoft_mail", "microsoft_files", "microsoft_auth"}
 
 
 @pytest.mark.asyncio

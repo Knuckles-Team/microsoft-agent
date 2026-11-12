@@ -38,7 +38,7 @@ from pydantic import (
 from scion_sdk.credentials.runtime_references import (
     validate_runtime_secret_reference,
 )
-from scion_sdk.http.client import create_http_client
+from scion_sdk.http.client import build_http_client
 from scion_sdk.http.options import HttpClientOptions
 from scion_sdk.http.retry import RetryPolicy
 from scion_sdk.tls.profile import ResolvedTLSProfile
@@ -120,7 +120,7 @@ class HttpxCompanionTransport:
             self._tls = None
             raise ValueError("Pinned provider transport does not support a proxy")
         try:
-            self._client = create_http_client(
+            self._client = build_http_client(
                 HttpClientOptions(
                     # Requests carry absolute URLs; the base is never dialed.
                     base_url="https://pinned.invalid",

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.10] - 2026-11-12
+
+### Changed
+- Serve one typed `microsoft_<operation>` tool per Graph operation; the 36 action-routed tool modules (`action` plus `params_json`) are removed.
+- Authorize every call by tool name only; the `action` argument no longer selects the policy tier.
+- `submit_windows_action` parameter `action` is now `companion_action`.
+- Declare tool-use contracts, links, data locations, business roles, role prompts and per-domain skills.
+- Require `scion-sdk>=0.10.1,<1.0.0` and use `build_http_client`.
+
 ## [2.3.9] - 2026-10-30
 
 ### Changed

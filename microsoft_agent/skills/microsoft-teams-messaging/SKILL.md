@@ -2,81 +2,73 @@
 name: microsoft-teams-messaging
 skill_type: skill
 description: >-
-  Microsoft Teams chat and channel messaging on Microsoft Graph via the
-  microsoft-agent MCP server — list and read 1:1/group chat messages and channel
-  posts, send messages, and reply in threads using the `microsoft_chat` and
-  `microsoft_teams` tools. Use when the agent must read a Teams conversation,
-  post a message to a chat or channel, or reply to a thread. Do NOT use for
-  Outlook mail (use microsoft-mail-operations) or calendar events
-  (use microsoft-calendar-scheduling).
+  Microsoft Teams teams, channels, chats, messages, replies, presence and call
+  records on Microsoft Graph. Use when the agent must read or post in a chat or
+  channel, reply to a message, list joined teams, or check presence. Do NOT use
+  for mail (use microsoft-mail-operations) or files (use microsoft-files-
+  sharepoint).
 license: MIT
-tags: [microsoft, teams, chat, channel, mcp]
+tags: [microsoft, teams, chat, graph, mcp]
 metadata:
   author: Knuckles-Team
-  version: '0.1.0'
+  version: '0.2.0'
 ---
-# Microsoft Teams Messaging
+# Microsoft Teams collaboration
 
-Domain-typed access to Teams conversations through Microsoft Graph (`/chats`,
-`/teams/{id}/channels/{id}/messages`). Chat/channel message verbs live on the
-`microsoft_mail` action router (Graph co-locates them), while team and chat
-container reads use the `microsoft_teams` / `microsoft_chat` tools.
+Typed Teams operations. Posting a message is a visible side effect: confirm the target chat or channel first.
 
 ## When to use
-- Read messages in a 1:1 or group chat, or a channel's posts.
-- Send a chat message or a channel message.
-- List replies to a message, or reply to a thread.
-- Resolve a team, its channels, or a chat container.
+- List joined teams, channels, chats and members.
+- Read channel and chat messages and replies.
+- Send a message or reply.
+- Check presence; read call records.
 
 ## When NOT to use
-- Outlook mailbox messages → `microsoft-mail-operations`.
-- Calendar events / meetings → `microsoft-calendar-scheduling`.
-- Directory group membership management → the `microsoft_groups` tool.
+- Files shared in Teams: use microsoft-files-sharepoint.
+- Mail: use microsoft-mail-operations.
 
-## Prerequisites & environment
-Connect via the `mcp-client` skill against the **`microsoft-agent`** MCP server.
-Run `microsoft_auth` (`login`) first. Requires `Chat.Read`/`ChatMessage.Read.All`
-and `ChannelMessage.Read.All` (plus send scopes) Graph permissions.
+## Safety
+- Writes need MICROSOFT_ALLOW_WRITES and destructive tools also need MICROSOFT_ALLOW_DESTRUCTIVE; the server refuses them otherwise.
+- Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `OIDC_CLIENT_ID` | optional | Azure AD app (client) id; a default is baked in |
-| `TESTING` | optional | Set truthy to skip the global auth manager |
+## Tools (23)
 
-## Tools & actions
-`action` + a `params_json` **JSON string**.
+R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.
 
-| Condensed tool | Key actions |
-|----------------|-------------|
-| `microsoft_mail` | `list_chat_messages`, `get_chat_message`, `send_chat_message`, `list_channel_messages`, `get_channel_message`, `send_channel_message`, `list_chat_message_replies`, `reply_to_chat_message` |
-| `microsoft_teams` | `get_team`, `get_team_channel` |
-| `microsoft_chat` | `get_chat` |
+| Tool | Kind | Inputs |
+|---|---|---|
+| `microsoft_get_call_record` | R | call_id, params |
+| `microsoft_get_channel_message` | R | channel_id, chatMessage_id, params, team_id |
+| `microsoft_get_chat` | R | chat_id, params |
+| `microsoft_get_chat_message` | R | chatMessage_id, chat_id, params |
+| `microsoft_get_my_presence` | R | params |
+| `microsoft_get_presence` | R | params, user_id |
+| `microsoft_get_team` | R | params, team_id |
+| `microsoft_get_team_channel` | R | channel_id, params, team_id |
+| `microsoft_get_teams_user_activity` | R | params, period |
+| `microsoft_list_call_records` | R | params |
+| `microsoft_list_channel_message_replies` | R | channel_id, chatMessage_id, params, team_id |
+| `microsoft_list_channel_messages` | R | channel_id, params, team_id |
+| `microsoft_list_chat_message_replies` | R | chatMessage_id, chat_id, params |
+| `microsoft_list_chat_messages` | R | chat_id, params |
+| `microsoft_list_chats` | R | params |
+| `microsoft_list_joined_teams` | R | params |
+| `microsoft_list_presences` | R | params |
+| `microsoft_list_team_channels` | R | params, team_id |
+| `microsoft_list_team_members` | R | params, team_id |
+| `microsoft_reply_to_channel_message` | W | channel_id, chatMessage_id, data, params, team_id |
+| `microsoft_reply_to_chat_message` | W | chatMessage_id, chat_id, data, params |
+| `microsoft_send_channel_message` | W | channel_id, data, params, team_id |
+| `microsoft_send_chat_message` | W | chat_id, data, params |
 
-## Recipes (`params_json`)
-List messages in a chat:
-```json
-{"chat_id":"19:abc...@thread.v2","params":{"$top":20,"$orderby":"createdDateTime desc"}}
-```
-List a channel's messages:
-```json
-{"team_id":"<team-guid>","channel_id":"19:def...@thread.tacv2","params":{"$top":20}}
-```
-Send a channel message:
-```json
-{"team_id":"<team-guid>","channel_id":"19:def...@thread.tacv2","body":{"body":{"content":"Deploy is green ✅"}}}
-```
+## Tasks
 
-## Gotchas
-- `params_json` is a **string** of JSON — serialize it.
-- Chat/channel message verbs live under the **`microsoft_mail`** action set (Graph
-  models them as messages), not under `microsoft_teams`.
-- `chat_id` / `team_id` / `channel_id` are Graph thread ids (`19:...@thread.*`),
-  not display names — resolve them first via `list_chats` / `list_joined_teams`.
-- Responses are raw Graph JSON — the collection is under `value`.
+Each task is a tool-use contract the platform serves; steps run in this order.
 
-## Related
-- **Native KG ingestion:** the `microsoft_ingest_records` tool (`kind:"messages"`)
-  maps chat/channel messages → `:Message` (+ `:Person` sender) nodes, the same
-  mapper used for mail.
-- **Composed by:** the `microsoft-mail-operations` skill shares the underlying
-  `microsoft_mail` tool for the message verbs.
+- `teams-call-record`: `microsoft_get_call_record` -> `microsoft_list_call_records`
+- `teams-channel-message`: `microsoft_get_channel_message` -> `microsoft_list_channel_message_replies` -> `microsoft_list_channel_messages` -> `microsoft_send_channel_message` -> `microsoft_reply_to_channel_message`
+- `teams-chat`: `microsoft_get_chat` -> `microsoft_list_chats`
+- `teams-chat-message`: `microsoft_get_chat_message` -> `microsoft_list_chat_message_replies` -> `microsoft_list_chat_messages` -> `microsoft_send_chat_message` -> `microsoft_reply_to_chat_message`
+- `teams-presence`: `microsoft_get_my_presence` -> `microsoft_get_presence` -> `microsoft_list_presences`
+- `teams-team-channel`: `microsoft_get_team_channel` -> `microsoft_list_team_channels`
+- `teams-read-records`: `microsoft_get_team` -> `microsoft_get_teams_user_activity` -> `microsoft_list_joined_teams` -> `microsoft_list_team_members`

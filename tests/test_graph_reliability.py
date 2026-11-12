@@ -3,7 +3,6 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from fastmcp import FastMCP
 
 from microsoft_agent.api_client import MicrosoftGraphApi
 
@@ -260,67 +259,18 @@ async def test_list_excel_worksheets_uses_valid_request_configuration() -> None:
     assert request_config.query_parameters.select == ["id", "name"]
 
 
-@pytest.mark.asyncio
-async def test_files_action_tool_awaits_current_client_methods() -> None:
-    from microsoft_agent.mcp_server import register_files_tools
+@pytest.mark.spec("CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001")
+def test_excel_operations_are_served_as_typed_tools_with_required_inputs() -> None:
+    from _served import served_tools as _served_tools
 
-    graph_api = MagicMock()
-    graph_api.list_users = AsyncMock(return_value={"value": []})
-    graph_api.list_excel_worksheets = AsyncMock(return_value={"value": []})
-    graph_api.format_excel_range = AsyncMock(return_value={"status": "success"})
-    graph_api.sort_excel_range = AsyncMock(return_value={"status": "success"})
-    mcp = FastMCP("graph-reliability-test")
-    register_files_tools(mcp)
-    files = await mcp.get_tool("microsoft_files")
+    tools = {tool.name: tool for tool in _served_tools()}
 
-    await files.fn(
-        action="list_users",
-        params_json='{"params":{"$top":"1"}}',
-        client=graph_api,
-        ctx=None,
-    )
-    await files.fn(
-        action="list_excel_worksheets",
-        params_json='{"drive_id":"drive-1","item_id":"item-1","params":null}',
-        client=graph_api,
-        ctx=None,
-    )
-    await files.fn(
-        action="format_excel_range",
-        params_json=(
-            '{"drive_id":"drive-1","item_id":"item-1",'
-            '"worksheet_id":"sheet-1","address":"A1:B2",'
-            '"data":{"wrapText":true},"params":null}'
-        ),
-        client=graph_api,
-        ctx=None,
-    )
-    await files.fn(
-        action="sort_excel_range",
-        params_json=(
-            '{"drive_id":"drive-1","item_id":"item-1",'
-            '"worksheet_id":"sheet-1","address":"A1:B2",'
-            '"data":{"fields":[{"key":0}]},"params":null}'
-        ),
-        client=graph_api,
-        ctx=None,
-    )
-
-    graph_api.list_users.assert_awaited_once_with(params={"$top": "1"})
-    graph_api.list_excel_worksheets.assert_awaited_once_with(
-        drive_id="drive-1", item_id="item-1"
-    )
-    graph_api.format_excel_range.assert_awaited_once_with(
-        drive_id="drive-1",
-        worksheet_id="sheet-1",
-        item_id="item-1",
-        address="A1:B2",
-        data={"wrapText": True},
-    )
-    graph_api.sort_excel_range.assert_awaited_once_with(
-        drive_id="drive-1",
-        item_id="item-1",
-        worksheet_id="sheet-1",
-        address="A1:B2",
-        data={"fields": [{"key": 0}]},
-    )
+    for name in (
+        "microsoft_list_users",
+        "microsoft_list_excel_worksheets",
+        "microsoft_format_excel_range",
+        "microsoft_sort_excel_range",
+    ):
+        assert name in tools
+    schema = tools["microsoft_format_excel_range"].inputSchema
+    assert {"drive_id", "item_id", "worksheet_id", "address"} <= set(schema["required"])

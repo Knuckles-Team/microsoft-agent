@@ -211,3 +211,31 @@ def test_served_tool_prefix_does_not_hide_a_read_verb():
     assert classify_tool_risk("list_service_health") is ToolRisk.READ
     assert classify_tool_risk("microsoft_delete_user") is ToolRisk.DESTRUCTIVE
     assert classify_tool_risk("microsoft_unknownverb_thing") is ToolRisk.WRITE
+
+
+@pytest.mark.asyncio
+@pytest.mark.spec("CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001")
+async def test_middleware_authorizes_by_tool_name_and_ignores_call_arguments():
+    from types import SimpleNamespace
+
+    from microsoft_agent.tool_policy import ToolPolicyMiddleware
+
+    middleware = ToolPolicyMiddleware(MicrosoftToolPolicy(MicrosoftSettings()))
+
+    async def call_next(_context):
+        return "ran"
+
+    def context(name, arguments):
+        message = SimpleNamespace(name=name, arguments=arguments)
+        return SimpleNamespace(message=message)
+
+    # A read-looking `action` argument must not downgrade a write tool.
+    with pytest.raises(ToolError, match="MICROSOFT_ALLOW_WRITES"):
+        await middleware.on_call_tool(
+            context("microsoft_send_mail", {"action": "list_mail_messages"}),
+            call_next,
+        )
+    assert (
+        await middleware.on_call_tool(context("microsoft_list_users", {}), call_next)
+        == "ran"
+    )
