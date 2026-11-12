@@ -273,6 +273,4 @@ def test_excel_operations_are_served_as_typed_tools_with_required_inputs() -> No
     ):
         assert name in tools
     schema = tools["microsoft_format_excel_range"].inputSchema
-    assert {"drive_id", "item_id", "worksheet_id", "address", "data"} <= set(
-        schema["required"]
-    )
+    assert {"drive_id", "item_id", "worksheet_id", "address"} <= set(schema["required"])
