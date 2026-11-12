@@ -27,8 +27,8 @@ URLs, or an open-ended action name.
 
 1. Start the MCP server over HTTPS and set
    `MICROSOFT_OFFICE_ADDIN_ORIGINS` to the task pane's exact HTTPS origin.
-2. Enable `documents` and `MICROSOFT_ALLOW_WRITES`. Enable
-   `MICROSOFT_ALLOW_DESTRUCTIVE` only if the agent may delete slides.
+2. Enable `documents` and `MICROSOFT_ALLOW_WRITES`. Deleting a slide also needs
+   a live confirmation (the gateway's approval or the `confirm` argument).
 3. Ask the agent to call `create_office_pairing` with `Word` or `PowerPoint`
    and a recognizable window label.
 4. Paste the returned one-time secret into **Agent pairing** in that intended

@@ -103,12 +103,12 @@ server is currently allowed to invoke:
 
 ```text
 MICROSOFT_ALLOW_WRITES=false
-MICROSOFT_ALLOW_DESTRUCTIVE=false
 ```
 
-Reads work with both flags disabled. Sends, creates, edits, uploads, flow runs,
+Reads work with writes disabled. Sends, creates, edits, uploads, flow runs,
 and remote actions require writes. Deletes, wipes, retirements, immediate
-reboots, shutdowns, and other destructive tools require both flags. Intune and
+reboots, shutdowns, and other destructive tools require writes and also a live
+confirmation (the gateway's approval or the `confirm` argument). Intune and
 Windows companion actions also enforce per-device/action allowlists and
 time-bound confirmation evidence inside their service layer.
 

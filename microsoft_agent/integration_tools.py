@@ -7,9 +7,10 @@ from typing import Any, TypeAlias, TypeVar
 from urllib.parse import urlparse
 from uuid import UUID
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from pydantic import Field
 from scion_sdk.http.retry import RetryPolicy
+from scion_sdk.mcp.destructive import guard_destructive
 
 from microsoft_agent.document_service import (
     ArtifactDelivery,
@@ -630,9 +631,19 @@ def register_power_platform_tools(mcp: FastMCP) -> None:
     )
     async def cancel_power_automate_desktop_flow_run(
         flow_session_id: UUID,
+        confirm: bool = False,
+        ctx: Context | None = None,
     ) -> dict[str, Any]:
         """Cancel a desktop-flow session under both global and integration policy."""
 
+        refused = await guard_destructive(
+            ctx,
+            "cancel_power_automate_desktop_flow_run",
+            {"flow_session_id": str(flow_session_id)},
+            confirm=confirm is True,
+        )
+        if refused is not None:
+            return refused
         result = await _power_platform_client().cancel_desktop_flow_run(flow_session_id)
         return result.model_dump(mode="json")
 
@@ -705,13 +716,15 @@ def register_windows_companion_tools(mcp: FastMCP) -> None:
             "outbound relay. Arbitrary shell, process, and URL execution are absent."
         ),
         tags={"windows", "devices"},
-        annotations={"readOnlyHint": False, "destructiveHint": False},
+        annotations={"readOnlyHint": False, "destructiveHint": True},
     )
     async def submit_windows_action(
         device_alias: str,
         companion_action: CompanionAction,
         confirmation: ConfirmationEvidence | None = None,
         idempotency_key: str | None = None,
+        confirm: bool = False,
+        ctx: Context | None = None,
     ) -> dict[str, Any]:
         """Validate device/action policy and enqueue an expiring action request."""
 
@@ -722,10 +735,15 @@ def register_windows_companion_tools(mcp: FastMCP) -> None:
         action_policy = integration_settings.action_policies.get(kind)
         if action_policy is None:
             raise ValueError("Windows action has no configured policy.")
-        if action_policy.destructive and not get_settings().allow_destructive_tools:
-            raise ValueError(
-                "This Windows action requires MICROSOFT_ALLOW_DESTRUCTIVE=true."
+        if action_policy.destructive:
+            refused = await guard_destructive(
+                ctx,
+                f"windows action {kind.value}",
+                {"device_alias": device_alias, "action": kind.value},
+                confirm=confirm is True,
             )
+            if refused is not None:
+                return refused
         values: dict[str, Any] = {
             "action": companion_action,
             "confirmation": confirmation,
@@ -849,17 +867,28 @@ def register_intune_tools(mcp: FastMCP) -> None:
     @mcp.tool(
         name="reboot_intune_device",
         description=(
-            "Immediately reboot an allowlisted Intune device after destructive "
-            "action acknowledgement and time-bound confirmation."
+            "Immediately reboot an allowlisted Intune device after "
+            "time-bound confirmation."
         ),
         tags={"intune", "devices"},
         annotations={"readOnlyHint": False, "destructiveHint": True},
     )
     async def reboot_intune_device(
-        device_id: UUID, confirmation: IntuneConfirmationEvidence
+        device_id: UUID,
+        confirmation: IntuneConfirmationEvidence,
+        confirm: bool = False,
+        ctx: Context | None = None,
     ) -> dict[str, Any]:
-        """Submit a confirmed and explicitly acknowledged rebootNow action."""
+        """Submit a confirmed rebootNow action."""
 
+        refused = await guard_destructive(
+            ctx,
+            "reboot_intune_device",
+            {"device_id": str(device_id)},
+            confirm=confirm is True,
+        )
+        if refused is not None:
+            return refused
         result = await _intune_service().reboot_now(
             device_id, confirmation=confirmation
         )
@@ -887,17 +916,28 @@ def register_intune_tools(mcp: FastMCP) -> None:
     @mcp.tool(
         name="shut_down_intune_device",
         description=(
-            "Immediately shut down an allowlisted Intune device after destructive "
-            "action acknowledgement and time-bound confirmation."
+            "Immediately shut down an allowlisted Intune device after "
+            "time-bound confirmation."
         ),
         tags={"intune", "devices"},
         annotations={"readOnlyHint": False, "destructiveHint": True},
     )
     async def shut_down_intune_device(
-        device_id: UUID, confirmation: IntuneConfirmationEvidence
+        device_id: UUID,
+        confirmation: IntuneConfirmationEvidence,
+        confirm: bool = False,
+        ctx: Context | None = None,
     ) -> dict[str, Any]:
-        """Submit a confirmed and explicitly acknowledged shutDown action."""
+        """Submit a confirmed shutDown action."""
 
+        refused = await guard_destructive(
+            ctx,
+            "shut_down_intune_device",
+            {"device_id": str(device_id)},
+            confirm=confirm is True,
+        )
+        if refused is not None:
+            return refused
         result = await _intune_service().shut_down(device_id, confirmation=confirmation)
         return result.model_dump(mode="json")
 

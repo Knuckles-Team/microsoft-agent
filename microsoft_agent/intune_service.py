@@ -153,7 +153,6 @@ class ConfirmationEvidence(BaseModel):
     expires_at: AwareDatetime
     idempotency_key: UUID
     correlation_id: UUID
-    destructive_action_acknowledged: bool = False
 
     @model_validator(mode="after")
     def validate_time_order(self) -> ConfirmationEvidence:
@@ -678,11 +677,6 @@ class IntuneService:
                 seconds=self.settings.max_confirmation_lifetime_seconds
             ):
                 message = "Confirmation evidence lifetime exceeds policy"
-            elif (
-                capability.destructive
-                and not confirmation.destructive_action_acknowledged
-            ):
-                message = "The destructive action was not explicitly acknowledged"
         if message:
             raise ConfirmationError(
                 IntuneError(

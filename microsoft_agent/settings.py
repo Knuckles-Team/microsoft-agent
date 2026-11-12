@@ -209,7 +209,6 @@ class MicrosoftSettings(BaseModel):
     require_secure_cache: bool = True
     enabled_tool_groups: tuple[str, ...] = DEFAULT_TOOL_GROUPS
     allow_write_tools: bool = False
-    allow_destructive_tools: bool = False
     graph_base_url: str = "https://graph.microsoft.com/v1.0"
     graph_tls_profile: str | None = None
     graph_tls_profile_ref: str | None = None
@@ -464,9 +463,6 @@ class MicrosoftSettings(BaseModel):
             ),
             enabled_tool_groups=groups or DEFAULT_TOOL_GROUPS,
             allow_write_tools=_configured_bool(env, "MICROSOFT_ALLOW_WRITES", False),
-            allow_destructive_tools=_configured_bool(
-                env, "MICROSOFT_ALLOW_DESTRUCTIVE", False
-            ),
             graph_base_url=_configured_value(
                 env, "MICROSOFT_GRAPH_BASE_URL", "https://graph.microsoft.com/v1.0"
             ),

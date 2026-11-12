@@ -1,5 +1,7 @@
 from typing import Any
 
+from scion_sdk.mcp.destructive import destructive_operation
+
 from microsoft_agent.api._graph_models import (
     comma_separated_values,
     graph_model_from_dict,
@@ -581,6 +583,7 @@ class MicrosoftGraphApiDrive(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def update_admin_sharepoint(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:

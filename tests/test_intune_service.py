@@ -96,7 +96,6 @@ def confirmation(
     correlation_id: UUID = UUID("55555555-5555-4555-8555-555555555555"),
     confirmed_at: datetime = NOW - timedelta(minutes=1),
     expires_at: datetime = NOW + timedelta(minutes=4),
-    destructive_acknowledged: bool = False,
 ) -> ConfirmationEvidence:
     return ConfirmationEvidence(
         confirmation_id=UUID("66666666-6666-4666-8666-666666666666"),
@@ -109,7 +108,6 @@ def confirmation(
         expires_at=expires_at,
         idempotency_key=idempotency_key,
         correlation_id=correlation_id,
-        destructive_action_acknowledged=destructive_acknowledged,
     )
 
 
@@ -268,7 +266,7 @@ async def test_documented_actions_use_fixed_paths_and_audit_headers(
 ) -> None:
     http = FakeHttpClient(FakeResponse(204, headers={"request-id": "graph-id"}))
     client = service(http)
-    evidence = confirmation(action, destructive_acknowledged=destructive)
+    evidence = confirmation(action)
     method = getattr(client, method_name)
 
     if action == DeviceAction.WINDOWS_DEFENDER_SCAN:
@@ -333,18 +331,6 @@ async def test_actions_require_allowlists_and_bound_fresh_confirmation() -> None
 
 
 @pytest.mark.asyncio
-async def test_destructive_actions_require_separate_acknowledgement() -> None:
-    client = service(FakeHttpClient())
-
-    with pytest.raises(ConfirmationError) as exc_info:
-        await client.reboot_now(
-            DEVICE_ID, confirmation=confirmation(DeviceAction.REBOOT_NOW)
-        )
-
-    assert "not explicitly acknowledged" in exc_info.value.error.message
-
-
-@pytest.mark.asyncio
 async def test_idempotency_replays_same_action_and_rejects_key_reuse() -> None:
     http = FakeHttpClient(FakeResponse(204))
     client = service(http)
@@ -378,10 +364,7 @@ async def test_rotate_bitlocker_keys_is_stably_unsupported_and_never_calls_beta(
     with pytest.raises(UnsupportedCapabilityError) as exc_info:
         await client.rotate_bitlocker_keys(
             DEVICE_ID,
-            confirmation=confirmation(
-                DeviceAction.ROTATE_BITLOCKER_KEYS,
-                destructive_acknowledged=True,
-            ),
+            confirmation=confirmation(DeviceAction.ROTATE_BITLOCKER_KEYS),
         )
 
     assert exc_info.value.error.code == IntuneErrorCode.CAPABILITY_UNSUPPORTED

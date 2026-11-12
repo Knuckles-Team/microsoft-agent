@@ -23,8 +23,8 @@ The installed provider families cover:
 
 Every routed action crosses the fail-closed Microsoft tool policy. Read actions are
 available by default. Unknown actions are classified as writes. Non-destructive
-writes require `MICROSOFT_ALLOW_WRITES=true`; destructive actions also
-require `MICROSOFT_ALLOW_DESTRUCTIVE=true`.
+writes require `MICROSOFT_ALLOW_WRITES=true`; destructive actions also need a live
+confirmation (the gateway's approval or the `confirm` argument).
 
 `list_microsoft_ingestion_projection` returns only keyed opaque node identifiers,
 types, and relationships. Arbora validates the signed source manifest and

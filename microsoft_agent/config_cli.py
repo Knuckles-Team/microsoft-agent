@@ -39,7 +39,6 @@ def configuration_report() -> dict[str, Any]:
         },
         "policy": {
             "writes_enabled": settings.allow_write_tools,
-            "destructive_enabled": settings.allow_destructive_tools,
             "enabled_tool_groups": list(settings.enabled_tool_groups),
         },
         "documents": get_document_capabilities().model_dump(mode="json"),
