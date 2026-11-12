@@ -13,7 +13,7 @@ Current package version: **2.3.6**
 - Entra users, groups, applications, policy, audit, security, and reports
 - Optional Word and PowerPoint generation and an exact-origin Office.js bridge
 - Optional Power Platform, Intune, and outbound Windows companion integrations
-- Governed ingestion into Epistemic Graph with provider-owned ontology, mapping,
+- Governed ingestion into Medulla with provider-owned ontology, mapping,
   schema fingerprint, provenance, and quarantine contracts
 - One consolidated `microsoft-agent-operations` skill
 
@@ -39,7 +39,7 @@ python -m pip install "microsoft-agent[control-plane]"
 python -m pip install "microsoft-agent[all]"
 ```
 
-Scion SDK depends on `epistemic-graph[full]`; the full and numeric engine
+Scion SDK depends on `medulla[full]`; the full and numeric engine
 
 ## Authentication
 
@@ -567,7 +567,7 @@ default; unknown actions are treated as writes. Writes require
 
 > **Install the connector-focused `[mcp]` extra.** Examples use `microsoft-agent[mcp]` to add
 > FastMCP / FastAPI through `scion-sdk`; the required Scion SDK core
-> still carries `epistemic-graph[full]`. The `[agent-runtime]` extra additionally
+> still carries `medulla[full]`. The `[agent-runtime]` extra additionally
 > enables model orchestration.
 
 #### stdio Transport (local IDEs — Cursor, Claude Desktop, VS Code)

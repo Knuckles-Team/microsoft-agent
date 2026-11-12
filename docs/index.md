@@ -1,6 +1,6 @@
 # Microsoft Agent
 
-for the Scion SDK and Epistemic Graph ecosystem.
+for the Scion SDK and Medulla ecosystem.
 
 It supplies:
 
@@ -11,7 +11,7 @@ It supplies:
 - fail-closed read, write, and destructive action policy;
 - optional document, Office bridge, Power Platform, Intune, and Windows companion
   connection points;
-- governed Epistemic Graph ingestion with provider-owned ontology, mappings,
+- governed Medulla ingestion with provider-owned ontology, mappings,
   provenance, schema fingerprints, and quarantine; and
 - one consolidated `microsoft-agent-operations` skill.
 

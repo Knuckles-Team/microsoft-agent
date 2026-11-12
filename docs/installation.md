@@ -27,7 +27,7 @@ Install a broader approved profile when required:
 python -m pip install "microsoft-agent[agent,documents,cloud]"
 ```
 
-Scion SDK resolves Epistemic Graph with the `full` feature set, including the
+Scion SDK resolves Medulla with the `full` feature set, including the
 folded numeric ABI. Do not substitute a minimal or numeric-only engine artifact.
 
 ## Source checkout

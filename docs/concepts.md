@@ -4,7 +4,7 @@
 > **Version**: 0.15.0
 > **Bridge**: [`CONCEPT:AU-ECO.messaging.native-backend-abstraction`](https://github.com/Knuckles-Team/scion-sdk/blob/main/docs/concepts.md) (Unified Toolkit Ingestion)
 Microsoft Agent contributes Microsoft Graph provider semantics to the ecosystem; it
-does not replace Scion SDK or Epistemic Graph authorities.
+does not replace Scion SDK or Medulla authorities.
 
 | Concept | Provider responsibility | Ecosystem authority |
 |---|---|---|
@@ -12,7 +12,7 @@ does not replace Scion SDK or Epistemic Graph authorities.
 | Graph actions | execute bounded asynchronous operations through one modular client | Scion SDK owns tool discovery, session, approval, and trace context |
 | Action policy | classify the routed action and fail closed for writes/destructive actions | permission governance provides caller policy and approval |
 | Optional integrations | expose native document, Power Platform, Intune, Office, and Windows connection points | deployment AgentConfig provides allowlists, endpoints, trust, and secrets |
-| Knowledge ingestion | map approved provider records into quarantined change envelopes | Epistemic Graph owns persistence, ACL, provenance, lineage, and deletion semantics |
+| Knowledge ingestion | map approved provider records into quarantined change envelopes | Medulla owns persistence, ACL, provenance, lineage, and deletion semantics |
 | Microsoft skill | provide one consolidated operational workflow and provider catalog | Arbora owns skill discovery and direct/delegated execution |
 | Observability | attach privacy-safe provider outcome metadata | Scion SDK and Langfuse own trace transport and retention policy |
 
