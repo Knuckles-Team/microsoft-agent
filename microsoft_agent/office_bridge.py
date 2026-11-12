@@ -26,7 +26,7 @@ from enum import StrEnum
 from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from fastmcp import FastMCP
+from fastmcp import Context, FastMCP
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -37,6 +37,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from scion_sdk.mcp.destructive import guard_destructive
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
@@ -1095,9 +1096,19 @@ def register_office_bridge(
         session_id: UUID,
         slide_number: int = Field(ge=1, le=10_000),
         wait_timeout_seconds: float = Field(default=20, ge=0, le=55),
+        confirm: bool = False,
+        ctx: Context | None = None,
     ) -> dict[str, Any]:
         """Enqueue a policy-classified destructive PowerPoint slide deletion."""
 
+        refused = await guard_destructive(
+            ctx,
+            "delete_powerpoint_slide_in_office",
+            {"session_id": str(session_id), "slide_number": slide_number},
+            confirm=confirm is True,
+        )
+        if refused is not None:
+            return refused
         return await _dispatch_and_wait(
             bridge,
             session_id,

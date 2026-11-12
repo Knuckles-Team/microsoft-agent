@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from microsoft_agent.power_platform import AsyncHttpTransport
 
+from scion_sdk.mcp.destructive import destructive_operation
+
 from microsoft_agent.api._graph_models import (
     decode_graph_base64,
     graph_model_from_dict,
@@ -482,6 +484,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def create_application(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
@@ -553,6 +556,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def add_application_password(
         self, app_id: str, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
@@ -657,6 +661,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def create_service_principal(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
@@ -1069,6 +1074,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def wipe_managed_device(
         self, device_id: str, params: dict | None = None
     ) -> dict[str, Any]:
@@ -1094,6 +1100,7 @@ class MicrosoftGraphApiOther(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def retire_managed_device(
         self, device_id: str, params: dict | None = None
     ) -> dict[str, Any]:

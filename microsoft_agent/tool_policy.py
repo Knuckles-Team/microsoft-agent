@@ -109,7 +109,7 @@ class ToolPolicyDecision(BaseModel):
 
 
 class MicrosoftToolPolicy:
-    """Authorize tools using explicit deployment-level side-effect flags."""
+    """Authorize tools by deployment access scope; destructive calls also ask the SDK guard."""
 
     def __init__(self, settings: MicrosoftSettings | None = None):
         self.settings = settings or get_settings()
@@ -132,17 +132,12 @@ class MicrosoftToolPolicy:
                 allowed=False,
                 reason="MICROSOFT_ALLOW_WRITES is disabled",
             )
-        if risk is ToolRisk.DESTRUCTIVE and not (
-            self.settings.allow_write_tools and self.settings.allow_destructive_tools
-        ):
+        if risk is ToolRisk.DESTRUCTIVE and not self.settings.allow_write_tools:
             return ToolPolicyDecision(
                 tool_name=tool_name,
                 risk=risk,
                 allowed=False,
-                reason=(
-                    "destructive operations require both MICROSOFT_ALLOW_WRITES "
-                    "and MICROSOFT_ALLOW_DESTRUCTIVE"
-                ),
+                reason="MICROSOFT_ALLOW_WRITES is disabled",
             )
         return ToolPolicyDecision(
             tool_name=tool_name,

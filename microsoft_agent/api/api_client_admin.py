@@ -1,5 +1,7 @@
 from typing import Any
 
+from scion_sdk.mcp.destructive import destructive_operation
+
 from microsoft_agent.api._graph_models import (
     graph_model_from_dict,
 )
@@ -137,6 +139,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def update_organization(
         self, org_id: str, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
@@ -555,6 +558,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def create_conditional_access_policy(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
@@ -582,6 +586,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def update_conditional_access_policy(
         self, policy_id: str, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:
@@ -919,6 +924,7 @@ class MicrosoftGraphApiAdmin(MicrosoftGraphApiBase):
             print(f"Operation failed: {type(e).__name__}")
             return {"error": "Operation failed"}
 
+    @destructive_operation
     async def create_role_assignment(
         self, data: dict[str, Any], params: dict | None = None
     ) -> dict[str, Any]:

@@ -77,7 +77,8 @@ protected.
 Intune configuration requires at least one managed-device UUID and an explicit
 action allowlist. Every mutation requires evidence bound to the device, action,
 correlation ID, idempotency key, approver, reason, and a short expiration. Reboot
-and shutdown also require destructive acknowledgement.
+and shutdown also need a live confirmation (the gateway's approval or the
+`confirm` argument).
 
 The service uses only Microsoft Graph v1.0. `rotateBitLockerKeys` is visible in
 the capability report as unsupported because Microsoft currently documents it
