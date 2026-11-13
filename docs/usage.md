@@ -17,7 +17,7 @@ The installed provider families cover:
 - mail, calendars, contacts, tasks, files, sites, notes, Teams, and chat;
 - applications, policy, security, audit, reports, devices, storage, print, and
   subscriptions;
-- keyed zero-PII projection and governed Epistemic Graph ingestion; and
+- keyed zero-PII projection and governed Medulla ingestion; and
 - optional documents, Office bridge, Power Platform, Intune, and Windows
   companion capabilities.
 

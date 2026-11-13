@@ -1,7 +1,7 @@
 # Architecture overview
 
 Microsoft Agent is a governed Microsoft Graph provider for the Scion SDK and
-Epistemic Graph ecosystem. It contributes one MCP server, one modular Graph client,
+Medulla ecosystem. It contributes one MCP server, one modular Graph client,
 one authentication authority, optional integration adapters, a consolidated skill,
 and a provider-owned connector capability bundle.
 

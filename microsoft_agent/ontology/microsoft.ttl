@@ -1,4 +1,4 @@
-@prefix : <http://knuckles.team/kg#> .
+@prefix : <https://knuckles-team.github.io/ontology/connector/microsoft#> .
 @prefix core: <https://knuckles-team.github.io/ontology/core#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -22,28 +22,28 @@
 :sentBy a owl:ObjectProperty ;
     rdfs:label "sent by" ;
     rdfs:domain :Message ;
-    rdfs:range :Person .
+    rdfs:range core:Person .
 
 :sentTo a owl:ObjectProperty ;
     rdfs:label "sent to" ;
     rdfs:domain :Message ;
-    rdfs:range :Person .
+    rdfs:range core:Person .
 
 :organizedBy a owl:ObjectProperty ;
     rdfs:label "organized by" ;
     rdfs:domain :Event ;
-    rdfs:range :Person .
+    rdfs:range core:Person .
 
 :hasAttendee a owl:ObjectProperty ;
     rdfs:label "has attendee" ;
     rdfs:domain :Event ;
-    rdfs:range :Person .
+    rdfs:range core:Person .
 
 :ownedByPerson a owl:ObjectProperty ;
     rdfs:label "owned by person" ;
     rdfs:domain :File ;
-    rdfs:range :Person .
+    rdfs:range core:Person .
 
-<http://knuckles.team/kg/microsoft> a owl:Ontology ;
+<https://knuckles-team.github.io/ontology/connector/microsoft> a owl:Ontology ;
     rdfs:label "Microsoft Graph zero-PII structural ontology" ;
     rdfs:comment "Keyed opaque message, event, file, and person relationships for governed Microsoft Graph ingestion." .
