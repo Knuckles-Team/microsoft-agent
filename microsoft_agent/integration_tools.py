@@ -482,15 +482,25 @@ def register_power_platform_tools(mcp: FastMCP) -> None:
         name="deactivate_power_automate_flow",
         description="Deactivate a solution-aware cloud flow through Dataverse.",
         tags={"power_platform", "power_automate"},
-        annotations={"readOnlyHint": False, "destructiveHint": False},
+        annotations={"readOnlyHint": False, "destructiveHint": True},
     )
     async def deactivate_power_automate_flow(
         workflow_id: UUID,
         idempotency_key: str | None = None,
         etag: str = "*",
+        confirm: bool = False,
+        ctx: Context | None = None,
     ) -> dict[str, Any]:
         """Deactivate a flow when lifecycle changes are explicitly enabled."""
 
+        refused = await guard_destructive(
+            ctx,
+            "deactivate_power_automate_flow",
+            {"workflow_id": str(workflow_id)},
+            confirm=confirm is True,
+        )
+        if refused is not None:
+            return refused
         result = await _power_platform_client().set_solution_flow_state(
             workflow_id,
             FlowState.DRAFT,

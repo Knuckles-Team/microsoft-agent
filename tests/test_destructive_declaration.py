@@ -16,6 +16,7 @@ DECLARED_GRAPH = (
 HAND_WRITTEN = (
     "delete_powerpoint_slide_in_office",
     "cancel_power_automate_desktop_flow_run",
+    "deactivate_power_automate_flow",
     "reboot_intune_device",
     "shut_down_intune_device",
     "submit_windows_action",
