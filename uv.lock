@@ -1794,7 +1794,7 @@ wheels = [
 
 [[package]]
 name = "microsoft-agent"
-version = "2.3.10"
+version = "2.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "azure-core" },
