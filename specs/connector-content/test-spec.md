@@ -6,6 +6,7 @@ Governing spec: [spec.md](spec.md).
 |---|---|---|---|
 | T-001 | `CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001` | `tests/test_default_content_surfaces.py::test_default_content_surfaces` | `resources/list` includes `skill://` and `ontology://`; `prompts/list` includes each packaged prompt. |
 | T-002 | `CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R002` | `tests/test_destructive_declaration.py::test_destructive_tools_are_declared_and_take_confirm` | Each destructive tool is served with `destructiveHint` true and a `confirm` argument, none has an allow argument, and a hand-written destructive tool refuses without confirmation and sends no request. |
+| T-003 | `CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R003` | `tests/test_ontology_extends_core.py::test_pack_declares_no_core_term` | The served Turtle declares none of the listed core terms. |
 
 ## Negative and boundary cases
 

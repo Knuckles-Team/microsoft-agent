@@ -7,41 +7,34 @@
 # identifiers. Provider identifiers, names, addresses, content, filenames, URLs,
 # timestamps, and attachment bytes are not properties in this ontology.
 
-:Message a owl:Class ;
-    rdfs:subClassOf core:DomainEntity .
-
-
-:Event a owl:Class ;
-    rdfs:subClassOf core:DomainEntity .
-
-
-:File a owl:Class ;
-    rdfs:subClassOf core:Artifact .
-
+:DriveItem a owl:Class ;
+    rdfs:label "Drive Item" ;
+    rdfs:comment "A Microsoft Graph drive item, an opaque keyed reference to a OneDrive or SharePoint file." ;
+    rdfs:subClassOf core:File .
 
 :sentBy a owl:ObjectProperty ;
     rdfs:label "sent by" ;
-    rdfs:domain :Message ;
+    rdfs:domain core:Message ;
     rdfs:range core:Person .
 
 :sentTo a owl:ObjectProperty ;
     rdfs:label "sent to" ;
-    rdfs:domain :Message ;
+    rdfs:domain core:Message ;
     rdfs:range core:Person .
 
 :organizedBy a owl:ObjectProperty ;
     rdfs:label "organized by" ;
-    rdfs:domain :Event ;
+    rdfs:domain core:Event ;
     rdfs:range core:Person .
 
 :hasAttendee a owl:ObjectProperty ;
     rdfs:label "has attendee" ;
-    rdfs:domain :Event ;
+    rdfs:domain core:Event ;
     rdfs:range core:Person .
 
 :ownedByPerson a owl:ObjectProperty ;
     rdfs:label "owned by person" ;
-    rdfs:domain :File ;
+    rdfs:domain core:File ;
     rdfs:range core:Person .
 
 <https://knuckles-team.github.io/ontology/connector/microsoft> a owl:Ontology ;
