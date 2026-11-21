@@ -6,3 +6,4 @@ Each task line reads `- [ ] T001 [P] [US1] <ID>-R012.4 description`. Tasks run p
 
 - [x] T001 [US1] CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R001 Default content.
 - [ ] T002 [US1] CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R002 Destructive operations use the SDK's one declaration and guard
+- [x] T003 [US2] CONN-MICROSOFT-AGENT-CONNECTOR-CONTENT-R003 The pack extends only the core ontology.
