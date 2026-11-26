@@ -30,6 +30,25 @@ Typed drive and site operations. Download returns file content; upload writes it
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Locate the site or drive with `microsoft_list_sites` or `microsoft_list_drives`.
+   Verify the site name or drive id matches the request.
+2. Browse contents with `microsoft_list_folder_files` or `microsoft_list_site_lists`.
+   Verify the item id you need appears in the result.
+3. Read data with `microsoft_download_onedrive_file_content` or `microsoft_list_sharepoint_site_list_items`.
+   Verify the file name or item count matches expectations.
+4. Change data only when asked with `microsoft_upload_file_content` or `microsoft_delete_onedrive_file`.
+   Verify the item appears or disappears in `microsoft_list_folder_files`.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+
 ## Tools (26)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

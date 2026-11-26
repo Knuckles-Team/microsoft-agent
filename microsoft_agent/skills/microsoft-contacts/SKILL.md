@@ -26,6 +26,25 @@ Personal contacts only; tenant users live in the directory.
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Find the contact with `microsoft_list_outlook_contacts`.
+   Verify the returned display name and email match the request.
+2. Read the full record with `microsoft_get_outlook_contact` using the id from the list.
+   Verify the id resolves to one contact.
+3. Create or change it with `microsoft_create_outlook_contact` or `microsoft_update_outlook_contact`.
+   Verify the response shows the submitted fields.
+4. Delete only when asked with `microsoft_delete_outlook_contact`.
+   Verify `microsoft_get_outlook_contact` no longer returns it.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+
 ## Tools (5)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

@@ -31,6 +31,25 @@ Typed Teams operations. Posting a message is a visible side effect: confirm the 
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Find the team or chat with `microsoft_list_joined_teams` or `microsoft_list_chats`.
+   Verify the id matches the request.
+2. Read context with `microsoft_list_channel_messages` or `microsoft_list_chat_messages`.
+   Verify the latest message is the one to answer.
+3. Post with `microsoft_send_channel_message`, `microsoft_send_chat_message` or the reply tools.
+   Verify the response returns a message id.
+4. Check presence when asked with `microsoft_get_presence`.
+   Verify the availability field is present.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Empty or unexpected result | The id or filter does not match any object | List the parent collection with the list tool in the step above, copy the id from the result, and resubmit |
+
 ## Tools (23)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

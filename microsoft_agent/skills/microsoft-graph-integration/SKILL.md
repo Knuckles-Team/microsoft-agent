@@ -30,6 +30,25 @@ Integration operations. The ingestion projection returns keyed opaque nodes only
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. List what exists with `microsoft_list_subscriptions` or `microsoft_list_external_connections`.
+   Verify there is no duplicate before creating.
+2. Create the resource with `microsoft_create_subscription` or `microsoft_create_external_connection`.
+   Verify the response returns an id and the expected expiry or state.
+3. Search with `microsoft_search_query` or project structure with `list_microsoft_ingestion_projection` using a bounded request.
+   Verify the result count stays within the requested limit.
+4. Renew or remove with `microsoft_update_subscription` or `microsoft_delete_subscription`.
+   Verify `microsoft_get_subscription` shows the new expiry or no longer finds it.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+| Subscription creation fails | The notification URL or resource is invalid | Read the error text, correct the `data` payload fields it names, and submit `microsoft_create_subscription` with the corrected payload |
+
 ## Tools (11)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

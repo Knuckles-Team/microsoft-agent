@@ -19,6 +19,25 @@ Use the provider's governed MCP tools through Arbora delegation.
 5. Ingest source data only through the signed connector preset and ChangeEnvelope path.
 6. Verify the durable result and its trace/evidence before reporting completion.
 
+## Steps
+
+1. Establish the session with `microsoft_verify_login`.
+   Verify it reports the expected tenant.
+2. Discover the tool for the request with `microsoft_search_tools`.
+   Verify the exact tool name and schema before use.
+3. Read the current state with the matching `microsoft_get_*` or `microsoft_list_*` tool before changing anything.
+   Verify the state matches the impact you intend to present.
+4. Execute the change as a fenced WorkItem and record its trace reference (procedures in `references/catalog.md`).
+   Verify the result and trace reference exist before reporting completion.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Tool name not found | The tool name was assumed from memory | Call `microsoft_search_tools` with the operation name and use the name it returns |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+
 ## Operation families
 
 - Identity and directory: authentication, users, groups, applications, policy,

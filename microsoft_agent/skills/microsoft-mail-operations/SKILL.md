@@ -32,6 +32,25 @@ Typed mail operations over `/me/messages`, `/me/mailFolders` and shared mailboxe
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Confirm the mailbox session by calling `microsoft_list_mail_folders`.
+   Verify the response lists the expected folders.
+2. Locate the message with `microsoft_list_mail_messages` or `microsoft_list_mail_folder_messages`.
+   Verify the returned id matches the intended subject and sender.
+3. Read the message with `microsoft_get_mail_message` and any files with `microsoft_list_mail_attachments`.
+   Verify the body or attachment name matches the request before acting.
+4. Apply the change with `microsoft_create_draft_email`, `microsoft_send_mail`, `microsoft_move_mail_message` or `microsoft_delete_mail_message`.
+   Verify the result by reading the message or folder again with `microsoft_get_mail_message`.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+
 ## Tools (19)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

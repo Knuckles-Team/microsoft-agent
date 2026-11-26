@@ -2,12 +2,7 @@
 name: microsoft-identity-directory
 skill_type: skill
 description: >-
-  Entra ID directory: users, groups and membership, applications, service
-  principals, domains, roles and assignments, conditional access, access
-  reviews, entitlement, policies, organization settings and deleted items. Use
-  when the agent must look up or administer identities and access. Do NOT use
-  for security alerts (use microsoft-security-operations) or device management
-  (use microsoft-endpoint-management).
+  Entra ID directory: users, groups and membership, applications, service principals, domains, roles and assignments, conditional access, access reviews, entitlement, policies, organization settings and deleted items. Use when the agent must look up or administer identities and access. Do NOT use for security alerts (use microsoft-security-operations) or devices (use microsoft-endpoint-management).
 license: MIT
 tags: [microsoft, entra, directory, identity, graph]
 metadata:
@@ -15,6 +10,8 @@ metadata:
   version: '0.2.0'
 ---
 # Microsoft identity and directory administration
+
+Scope: Entra ID directory: users, groups and membership, applications, service principals, domains, roles and assignments, conditional access, access reviews, entitlement, policies, organization settings and deleted items. Use when the agent must look up or administer identities and access. Do NOT use for security alerts (use microsoft-security-operations) or device management (use microsoft-endpoint-management).
 
 Typed directory operations. Role assignments, conditional access and application credentials are destructive-tier: require explicit approval.
 
@@ -32,6 +29,25 @@ Typed directory operations. Role assignments, conditional access and application
 ## Safety
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
+
+## Steps
+
+1. Look up the object with `microsoft_list_users`, `microsoft_list_groups` or `microsoft_list_applications`.
+   Verify the object id and display name match the request.
+2. Read its detail with `microsoft_get_group`, `microsoft_get_application` or `microsoft_list_group_members`.
+   Verify membership or settings before any change.
+3. Apply the change with `microsoft_create_group`, `microsoft_add_group_member` or `microsoft_update_application`.
+   Verify the response echoes the submitted values.
+4. Perform destructive actions such as `microsoft_remove_group_member` or `microsoft_create_role_assignment` only with explicit approval.
+   Verify with `microsoft_list_group_members` or `microsoft_list_role_assignments` afterwards.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
 
 ## Tools (73)
 

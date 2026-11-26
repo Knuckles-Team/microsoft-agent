@@ -27,6 +27,25 @@ Specialist workloads of Microsoft Graph.
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. List the container with `microsoft_list_education_classes`, `microsoft_list_booking_businesses` or `microsoft_list_learning_providers`.
+   Verify the target appears in the result.
+2. Read the chosen object with `microsoft_get_education_class`, `microsoft_get_booking_business` or `microsoft_get_learning_provider`.
+   Verify the id and name match.
+3. Inspect related records with `microsoft_list_education_assignments` or `microsoft_list_booking_appointments`.
+   Verify the counts are plausible for the period.
+4. Book only when asked with `microsoft_create_booking_appointment`.
+   Verify the new appointment appears in `microsoft_list_booking_appointments`.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Empty or unexpected result | The id or filter does not match any object | List the parent collection with the list tool in the step above, copy the id from the result, and resubmit |
+
 ## Tools (13)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

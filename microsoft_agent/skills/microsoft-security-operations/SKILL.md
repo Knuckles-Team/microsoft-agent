@@ -30,6 +30,25 @@ Typed security operations. Updating an alert or incident changes its state: reco
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Pull the current signals with `microsoft_list_security_alerts` or `microsoft_list_security_incidents`.
+   Verify the list is filtered to the intended period or severity.
+2. Open one with `microsoft_get_security_alert` or `microsoft_get_security_incident`.
+   Verify its status and affected entities.
+3. Gather evidence with `microsoft_list_sign_in_logs`, `microsoft_list_risky_users` or `microsoft_run_hunting_query`.
+   Verify returned records fall inside the incident window.
+4. Record the triage with `microsoft_update_security_alert` or `microsoft_update_security_incident`.
+   Verify `microsoft_get_security_alert` shows the new status.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Hunting query rejected | The query text is invalid for the hunting endpoint | Correct the `data` payload query and submit `microsoft_run_hunting_query` with the fixed text |
+
 ## Tools (24)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

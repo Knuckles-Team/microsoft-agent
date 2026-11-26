@@ -31,6 +31,25 @@ Typed calendar operations including the calendar view, specific-calendar events,
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Read the existing schedule with `microsoft_get_calendar_view` (start and end window).
+   Verify the window returns the events you expect.
+2. Find a free slot with `microsoft_find_meeting_times`, and rooms with `microsoft_list_rooms` when needed.
+   Verify the suggested slot has no attendee conflict.
+3. Create or change the event with `microsoft_create_calendar_event` or `microsoft_update_calendar_event`.
+   Verify the response carries the new event id and time.
+4. Remove an event only on request with `microsoft_delete_calendar_event`.
+   Verify it no longer appears in `microsoft_get_calendar_view` for the same window.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+
 ## Tools (23)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.
