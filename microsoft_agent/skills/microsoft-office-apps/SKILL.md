@@ -29,6 +29,25 @@ Typed operations over workbook ranges and tables, notebook pages, plan tasks and
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Locate the workbook, notebook, plan or list with `microsoft_list_excel_worksheets`, `microsoft_list_onenote_notebooks`, `microsoft_list_planner_tasks` or `microsoft_list_todo_task_lists`.
+   Verify the right container id is returned.
+2. Read current content with `microsoft_get_excel_range`, `microsoft_get_onenote_page_content` or `microsoft_get_todo_task`.
+   Verify the content matches the request.
+3. Change it with `microsoft_format_excel_range`, `microsoft_create_onenote_page` or `microsoft_update_planner_task` (pass the current etag).
+   Verify the response shows the new values.
+4. Delete a to-do only on request with `microsoft_delete_todo_task`.
+   Verify `microsoft_list_todo_tasks` no longer lists it.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Planner update rejected | The etag is stale | Read the task with `microsoft_get_planner_task`, take its current etag, and submit the update with that etag |
+| Destructive call refused | No live confirmation was given | Obtain the gateway approval or pass `confirm` set to true in the call, as the Safety section requires |
+
 ## Tools (26)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

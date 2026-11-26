@@ -28,6 +28,25 @@ Interactive and service sign-in for the Microsoft Graph connector. Always verify
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. List cached accounts with `microsoft_list_accounts`.
+   Verify whether the intended account is present.
+2. Sign in with `microsoft_login` when no account is signed in.
+   Verify the sign-in prompt or device code completes.
+3. Confirm the session with `microsoft_verify_login`.
+   Verify the response reports a signed-in account and tenant.
+4. Discover tools for the task with `microsoft_search_tools` (query, limit).
+   Verify the tool you need appears by name.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Login does not complete | The device code expired or was not entered | Call `microsoft_login` with `force` set to true and finish the new prompt |
+| Authentication error or expired session | The Graph session is missing or expired | Call `microsoft_login`, call `microsoft_verify_login`, and resubmit the original call (see microsoft-session-management) |
+| Wrong account in use | A different cached account is active | Call `microsoft_logout`, then `microsoft_login`, and confirm with `microsoft_verify_login` |
+
 ## Tools (7)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

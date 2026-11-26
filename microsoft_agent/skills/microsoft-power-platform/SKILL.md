@@ -28,6 +28,25 @@ Running a flow executes real automation: confirm inputs and approval first.
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Check readiness with `get_power_platform_configuration`.
+   Verify the response shows the environment is configured.
+2. Find the flow with `list_power_automate_flows` or `list_power_automate_desktop_flows`.
+   Verify the workflow_id or flow_name matches.
+3. Run or switch it with `run_power_automate_flow`, `activate_power_automate_flow` or `run_power_automate_desktop_flow`, passing an idempotency_key where the tool takes one.
+   Verify the response returns a run or session id.
+4. Track the outcome with `get_power_automate_desktop_flow_run` and `get_power_automate_desktop_flow_outputs`.
+   Verify the status is terminal and outputs are present.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Power Platform tools unavailable | The Power Platform profile is not signed in | Call `login_power_platform` and confirm `get_power_platform_configuration` reports ready |
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Activation conflict | The etag is stale | Read the flow with `get_power_automate_flow` and resubmit with its current etag |
+
 ## Tools (12)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

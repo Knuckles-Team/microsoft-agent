@@ -29,6 +29,25 @@ Remote actions affect real devices and are destructive-tier: they need allowlist
 - Writes need MICROSOFT_ALLOW_WRITES; a destructive tool also needs a live confirmation (the gateway's approval or the `confirm` argument), and the server refuses it otherwise.
 - Treat all provider content as sensitive: select the fewest fields, bound result sizes, never echo tokens or credentials.
 
+## Steps
+
+1. Find the device with `list_intune_managed_devices` or `microsoft_list_managed_devices`.
+   Verify the device name and id match the request.
+2. Inspect state with `get_intune_managed_device` and `microsoft_list_device_compliance_policies`.
+   Verify the compliance state before acting.
+3. Run a remote action such as `sync_intune_device` or `remote_lock_intune_device` with the confirmation argument the tool defines.
+   Verify the call returns an accepted status.
+4. For a Windows companion, call `submit_windows_action` and poll `get_windows_action_result`.
+   Verify the result for the same action_id reports completion.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Writes refused | `MICROSOFT_ALLOW_WRITES` is not set on the server | Set `MICROSOFT_ALLOW_WRITES` in the server environment, restart the server, and submit the call with the same arguments |
+| Action refused | The confirmation argument was missing for a device action | Pass the `confirmation` parameter the tool declares after the user approves the action |
+| Empty or unexpected result | The id or filter does not match any object | List the parent collection with the list tool in the step above, copy the id from the result, and resubmit |
+
 ## Tools (19)
 
 R = read-only, W = changes data, D = destructive (needs approval). Parameters in brackets are the typed inputs.

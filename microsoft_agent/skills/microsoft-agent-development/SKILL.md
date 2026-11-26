@@ -43,6 +43,25 @@ owning spec row in the commit trailer.
   package-data declarations coherent. Put `Spec: <ID>` and the assisting-agent
   trailer on consecutive final commit message lines.
 
+## Steps
+
+1. Find the owning spec row with `git grep -n "<term>" -- specs`.
+   Verify a row exists before writing code.
+2. Set up the environment with `scripts/bootstrap.sh`.
+   Verify it prints the gate command.
+3. Implement the change with a focused test bound to the spec row.
+   Verify the test fails before and passes after with `uv run pytest -q <test file>`.
+4. Run the gates with `uvx pre-commit run --all-files`.
+   Verify every hook passes before committing.
+
+## Failure recovery
+
+| Failure | Cause | Recovery |
+|---|---|---|
+| Hook fails | A formatting, spelling or gate rule was violated | Read the hook output, fix the named file, and re-stage the explicit path before committing |
+| Spec row missing | The change has no owning requirement | Extend the existing spec in `specs/` with the row and cite it in the `Spec:` trailer |
+| Bootstrap fails | The pinned Python or uv is missing | Install uv, then execute `scripts/bootstrap.sh` from the checkout root |
+
 ## Setup and gates
 
 Use the pinned environment and shared gates from the checkout root:
