@@ -1,11 +1,41 @@
 # Microsoft Agent
+## CLI or API | MCP
+
+![PyPI - Version](https://img.shields.io/pypi/v/microsoft-agent)
+![MCP Server](https://badge.mcpx.dev?type=server 'MCP Server')
+![PyPI - Downloads](https://img.shields.io/pypi/dd/microsoft-agent)
+![GitHub Repo stars](https://img.shields.io/github/stars/Knuckles-Team/microsoft-agent)
+![GitHub forks](https://img.shields.io/github/forks/Knuckles-Team/microsoft-agent)
+![GitHub contributors](https://img.shields.io/github/contributors/Knuckles-Team/microsoft-agent)
+![PyPI - License](https://img.shields.io/pypi/l/microsoft-agent)
+![GitHub](https://img.shields.io/github/license/Knuckles-Team/microsoft-agent)
+![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/Knuckles-Team/microsoft-agent)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Knuckles-Team/microsoft-agent)
+![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/Knuckles-Team/microsoft-agent)
+![GitHub issues](https://img.shields.io/github/issues/Knuckles-Team/microsoft-agent)
+![GitHub top language](https://img.shields.io/github/languages/top/Knuckles-Team/microsoft-agent)
+![GitHub language count](https://img.shields.io/github/languages/count/Knuckles-Team/microsoft-agent)
+![GitHub repo size](https://img.shields.io/github/repo-size/Knuckles-Team/microsoft-agent)
+![GitHub repo file count (file type)](https://img.shields.io/github/directory-file-count/Knuckles-Team/microsoft-agent)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/microsoft-agent)
+![PyPI - Implementation](https://img.shields.io/pypi/implementation/microsoft-agent)
+
+> **Documentation** — Installation, deployment, and usage across the API, CLI, MCP,
+> and A2A agent interfaces are maintained in the
+> [official documentation](https://knuckles-team.github.io/microsoft-agent/).
+
+---
+
+## Overview
 
 agent. It uses Scion SDK for MCP, identity propagation, intent delegation,
 configuration, telemetry, and graph integration.
 
 Current package version: **2.3.6**
 
-## Capabilities
+---
+
+## Key Features
 
 - Outlook mail, calendars, contacts, tasks, and attachments
 - Teams chats, channels, meetings, and presence
@@ -23,155 +53,11 @@ The current implementation has one modular Graph client in
 `microsoft_agent/mcp_server.py`. No raw-token fallback, plaintext cache, bundled
 database, bundled endpoint profile, or duplicate API wrapper is shipped.
 
-## Install
+---
 
-```bash
-python -m pip install "microsoft-agent[mcp]"
-```
+## MCP
 
-Useful extras:
-
-```bash
-python -m pip install "microsoft-agent[documents]"    # Word and PowerPoint
-python -m pip install "microsoft-agent[cloud]"        # managed/workload identity
-python -m pip install "microsoft-agent[windows]"      # Windows companion
-python -m pip install "microsoft-agent[control-plane]"
-python -m pip install "microsoft-agent[all]"
-```
-
-Scion SDK depends on `medulla[full]`; the full and numeric engine
-
-## Authentication
-
-Microsoft identity values are provided by deployment configuration. There is no
-baked-in client identifier.
-
-Supported modes:
-
-- `delegated`: broker or browser login; device code is opt-in
-- `application`: certificate or referenced client secret
-- `on_behalf_of`: checked incoming user delegation
-- `external_token`: checked request token for an explicitly allowed audience
-- `managed_identity`: Azure managed identity
-- `workload_identity`: federated workload token file
-
-Token caches use OS-backed secure storage only. If secure storage is unavailable,
-tokens remain in memory and are not written to plaintext files.
-
-<!-- ENV-VARS-TABLE:START -->
-
-#### Package environment variables
-
-| Variable | Example | Description |
-|----------|---------|-------------|
-| `MICROSOFT_TENANT_ID` | — | Microsoft identity (values intentionally blank; supply them after app enrollment) |
-| `MICROSOFT_CLIENT_ID` | — |  |
-| `MICROSOFT_AUTHORITY_HOST` | `https://login.microsoftonline.com` |  |
-| `MICROSOFT_GRAPH_BASE_URL` | `https://graph.microsoft.com/v1.0` |  |
-| `MICROSOFT_GRAPH_TLS_PROFILE` | — |  |
-| `MICROSOFT_GRAPH_TLS_PROFILE_REF` | — |  |
-| `MICROSOFT_AUTH_MODE` | `delegated` | delegated \| application \| on_behalf_of \| external_token \| managed_identity \| workload_identity |
-| `MICROSOFT_LOGIN_METHOD` | `auto` |  |
-| `MICROSOFT_ENABLE_BROKER` | `true` |  |
-| `MICROSOFT_ALLOW_DEVICE_CODE` | `false` |  |
-| `MICROSOFT_REQUIRE_SECURE_CACHE` | `true` |  |
-| `MICROSOFT_PERMISSION_PROFILES` | `productivity,collaboration` | Named least-privilege bundles. Add device_read/device_admin only for Intune. |
-| `MICROSOFT_GRAPH_SCOPES` | — |  |
-| `MICROSOFT_ENABLED_TOOL_GROUPS` | `misc,auth,meta,mail,files,calendar,notes,tasks,contacts,user,chat,teams,sites,search,groups,communications,documents,power_platform,windows,intune` | Tools are registered, but side effects remain disabled until explicitly enabled. |
-| `MICROSOFT_ALLOW_WRITES` | `false` |  |
-| `MICROSOFT_INGESTION_PSEUDONYMIZATION_KEY_REF` | — | Required only for graph projection/ingestion. Resolve from AgentConfig or a secret store; use at least 32 bytes and never reuse an identity credential. |
-| `MICROSOFT_INTEGRATIONS_CONFIG_PATH` | — | Complex Power Platform, Intune, and Windows companion allowlists. |
-| `MICROSOFT_DOCUMENT_ARTIFACT_ROOT` | — |  |
-| `MICROSOFT_DOCUMENT_TEMPLATE_ROOT` | — |  |
-| `MICROSOFT_DATAVERSE_ENVIRONMENT_URL` | — |  |
-| `MICROSOFT_DATAVERSE_AUDIENCE` | — |  |
-| `MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON` | `{}` |  |
-| `MICROSOFT_POWER_PLATFORM_ALLOW_LIFECYCLE_CHANGES` | `false` |  |
-| `MICROSOFT_OFFICE_ADDIN_ORIGINS` | — |  |
-| `MICROSOFT_CLIENT_CERTIFICATE_PATH` | — | Confidential modes: prefer a certificate, managed identity, or workload identity. |
-| `MICROSOFT_CLIENT_CERTIFICATE_THUMBPRINT` | — |  |
-| `MICROSOFT_CLIENT_CERTIFICATE_PASSWORD_REF` | — |  |
-| `MICROSOFT_CLIENT_SECRET_REF` | — |  |
-| `MICROSOFT_MANAGED_IDENTITY_CLIENT_ID` | — |  |
-| `MICROSOFT_WORKLOAD_IDENTITY_TOKEN_FILE` | secret-injected |  |
-| `AZURE_FEDERATED_TOKEN_FILE` | secret-injected |  |
-| `MICROSOFT_COMPANION_TLS_PROFILE` | — | Companion relay TLS uses the same deployment-owned trust-profile contract. |
-| `MICROSOFT_COMPANION_TLS_PROFILE_REF` | — |  |
-| `ADMINTOOL` | `true` | Per-domain tool registration toggles. Set false to suppress a domain. |
-| `AGREEMENTSTOOL` | `true` |  |
-| `APPLICATIONSTOOL` | `true` |  |
-| `AUDITTOOL` | `true` |  |
-| `AUTHTOOL` | `true` |  |
-| `CALENDARTOOL` | `true` |  |
-| `CHATTOOL` | `true` |  |
-| `COMMUNICATIONSTOOL` | `true` |  |
-| `CONNECTIONSTOOL` | `true` |  |
-| `CONTACTSTOOL` | `true` |  |
-| `DEVICESTOOL` | `true` |  |
-| `DIRECTORYTOOL` | `true` |  |
-| `DOCUMENTTOOL` | `true` |  |
-| `DOMAINSTOOL` | `true` |  |
-| `EDUCATIONTOOL` | `true` |  |
-| `EMPLOYEE_EXPERIENCETOOL` | `true` |  |
-| `FILESTOOL` | `true` |  |
-| `GROUPSTOOL` | `true` |  |
-| `IDENTITYTOOL` | `true` |  |
-| `INTUNETOOL` | `true` |  |
-| `KGTOOL` | `true` |  |
-| `MAILTOOL` | `true` |  |
-| `METATOOL` | `true` |  |
-| `NOTESTOOL` | `true` |  |
-| `ORGANIZATIONTOOL` | `true` |  |
-| `PLACESTOOL` | `true` |  |
-| `POLICIESTOOL` | `true` |  |
-| `POWER_PLATFORMTOOL` | `true` |  |
-| `PRINTTOOL` | `true` |  |
-| `PRIVACYTOOL` | `true` |  |
-| `REPORTSTOOL` | `true` |  |
-| `SEARCHTOOL` | `true` |  |
-| `SECURITYTOOL` | `true` |  |
-| `SITESTOOL` | `true` |  |
-| `SOLUTIONSTOOL` | `true` |  |
-| `STORAGETOOL` | `true` |  |
-| `SUBSCRIPTIONSTOOL` | `true` |  |
-| `TASKSTOOL` | `true` |  |
-| `TEAMSTOOL` | `true` |  |
-| `USERTOOL` | `true` |  |
-| `WINDOWS_COMPANIONTOOL` | `true` |  |
-| `TRANSPORT` | `stdio` | Local MCP defaults. Require an authenticated transport before non-loopback use. |
-| `HOST` | `127.0.0.1` |  |
-| `PORT` | `8000` |  |
-| `AUTH_TYPE` | `oidc` |  |
-
-#### Inherited scion-sdk variables (apply to every connector)
-
-| Variable | Example | Description |
-|----------|---------|-------------|
-| `MCP_TOOL_MODE` | `intent` | Tool surface: `intent` \| `condensed` \| `verbose` \| `both` |
-| `MCP_ENABLED_TOOLS` | — | Comma-separated tool allow-list |
-| `MCP_DISABLED_TOOLS` | — | Comma-separated tool deny-list |
-| `MCP_ENABLED_TAGS` | — | Comma-separated tag allow-list |
-| `MCP_DISABLED_TAGS` | — | Comma-separated tag deny-list |
-| `EUNOMIA_TYPE` | `none` | Authorization mode: `none` \| `embedded` \| `remote` |
-| `EUNOMIA_POLICY_FILE` | `mcp_policies.json` | Embedded Eunomia policy file |
-| `EUNOMIA_REMOTE_URL` | — | Remote Eunomia authorization server URL |
-| `ENABLE_OTEL` | `False` | Enable OpenTelemetry export |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector endpoint |
-| `MCP_CLIENT_AUTH` | — | Outbound MCP child auth: `oidc-client-credentials` \| `basic` \| `none` |
-| `OIDC_CLIENT_ID` | — | OIDC client id (service-account auth) |
-| `OIDC_CLIENT_SECRET_REF` | `secret://identity/oidc-client-secret` | Runtime secret reference for the OIDC service account |
-| `MCP_BASIC_AUTH_USERNAME` | — | HTTP Basic username (`MCP_CLIENT_AUTH=basic`) |
-| `MCP_BASIC_AUTH_PASSWORD_REF` | `secret://identity/mcp-basic-password` | Runtime secret reference for HTTP Basic auth (`MCP_CLIENT_AUTH=basic`) |
-| `DEBUG` | `False` | Verbose logging |
-| `PYTHONUNBUFFERED` | `1` | Unbuffered stdout (recommended in containers) |
-| `MCP_URL` | `http://localhost:8000/mcp` | URL of the MCP server the agent connects to |
-| `PROVIDER` | — | Operator-configured LLM provider for the agent |
-| `MODEL_ID` | — | Operator-configured model id for the agent |
-
-_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared scion-sdk set — do not edit._
-<!-- ENV-VARS-TABLE:END -->
-
-## Run the MCP server
+### Run the MCP server
 
 Local stdio:
 
@@ -560,7 +446,7 @@ default; unknown actions are treated as writes. Writes require
 `MICROSOFT_ALLOW_WRITES=true`, and destructive actions also need a live
 confirmation (the gateway's approval or the `confirm` argument).
 
-## MCP client configuration
+### MCP client configuration
 
 <!-- MCP-CONFIG-EXAMPLES:START -->
 
@@ -814,6 +700,8 @@ does not emit an unauthenticated non-loopback listener.
 _Auto-generated from the code-read env surface (`MCP_TOOL_MODE` + package vars) — do not edit._
 <!-- MCP-CONFIG-EXAMPLES:END -->
 
+---
+
 ## Governed ingestion
 
 The provider contributes:
@@ -830,6 +718,8 @@ schema, signature, and privacy requirements are satisfied. Generated signatures
 and fingerprints must be regenerated whenever the tool schema or ontology changes;
 stale attestations are not valid release evidence.
 
+---
+
 ## Optional integrations
 
 Power Platform, Intune, Windows companion, document roots, Office origins, and
@@ -837,6 +727,8 @@ allowlists are described by an external profile referenced with
 `MICROSOFT_INTEGRATIONS_CONFIG_PATH`. The repository contains only the native
 connection points and generic schemas. It does not ship organization-specific
 environments, device lists, URLs, or ontologies.
+
+---
 
 ## Containers
 
@@ -847,6 +739,160 @@ environments, device lists, URLs, or ontologies.
 
 Deployment-owned Compose or Kubernetes configuration provides identity, trust,
 storage, and network policy.
+
+---
+
+## Installation
+
+```bash
+python -m pip install "microsoft-agent[mcp]"
+```
+
+Useful extras:
+
+```bash
+python -m pip install "microsoft-agent[documents]"    # Word and PowerPoint
+python -m pip install "microsoft-agent[cloud]"        # managed/workload identity
+python -m pip install "microsoft-agent[windows]"      # Windows companion
+python -m pip install "microsoft-agent[control-plane]"
+python -m pip install "microsoft-agent[all]"
+```
+
+Scion SDK depends on `medulla[full]`; the full and numeric engine
+
+---
+
+## Authentication
+
+Microsoft identity values are provided by deployment configuration. There is no
+baked-in client identifier.
+
+Supported modes:
+
+- `delegated`: broker or browser login; device code is opt-in
+- `application`: certificate or referenced client secret
+- `on_behalf_of`: checked incoming user delegation
+- `external_token`: checked request token for an explicitly allowed audience
+- `managed_identity`: Azure managed identity
+- `workload_identity`: federated workload token file
+
+Token caches use OS-backed secure storage only. If secure storage is unavailable,
+tokens remain in memory and are not written to plaintext files.
+
+<!-- ENV-VARS-TABLE:START -->
+
+#### Package environment variables
+
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `MICROSOFT_TENANT_ID` | — | Microsoft identity (values intentionally blank; supply them after app enrollment) |
+| `MICROSOFT_CLIENT_ID` | — |  |
+| `MICROSOFT_AUTHORITY_HOST` | `https://login.microsoftonline.com` |  |
+| `MICROSOFT_GRAPH_BASE_URL` | `https://graph.microsoft.com/v1.0` |  |
+| `MICROSOFT_GRAPH_TLS_PROFILE` | — |  |
+| `MICROSOFT_GRAPH_TLS_PROFILE_REF` | — |  |
+| `MICROSOFT_AUTH_MODE` | `delegated` | delegated \| application \| on_behalf_of \| external_token \| managed_identity \| workload_identity |
+| `MICROSOFT_LOGIN_METHOD` | `auto` |  |
+| `MICROSOFT_ENABLE_BROKER` | `true` |  |
+| `MICROSOFT_ALLOW_DEVICE_CODE` | `false` |  |
+| `MICROSOFT_REQUIRE_SECURE_CACHE` | `true` |  |
+| `MICROSOFT_PERMISSION_PROFILES` | `productivity,collaboration` | Named least-privilege bundles. Add device_read/device_admin only for Intune. |
+| `MICROSOFT_GRAPH_SCOPES` | — |  |
+| `MICROSOFT_ENABLED_TOOL_GROUPS` | `misc,auth,meta,mail,files,calendar,notes,tasks,contacts,user,chat,teams,sites,search,groups,communications,documents,power_platform,windows,intune` | Tools are registered, but side effects remain disabled until explicitly enabled. |
+| `MICROSOFT_ALLOW_WRITES` | `false` |  |
+| `MICROSOFT_INGESTION_PSEUDONYMIZATION_KEY_REF` | — | Required only for graph projection/ingestion. Resolve from AgentConfig or a secret store; use at least 32 bytes and never reuse an identity credential. |
+| `MICROSOFT_INTEGRATIONS_CONFIG_PATH` | — | Complex Power Platform, Intune, and Windows companion allowlists. |
+| `MICROSOFT_DOCUMENT_ARTIFACT_ROOT` | — |  |
+| `MICROSOFT_DOCUMENT_TEMPLATE_ROOT` | — |  |
+| `MICROSOFT_DATAVERSE_ENVIRONMENT_URL` | — |  |
+| `MICROSOFT_DATAVERSE_AUDIENCE` | — |  |
+| `MICROSOFT_POWER_AUTOMATE_NAMED_FLOWS_JSON` | `{}` |  |
+| `MICROSOFT_POWER_PLATFORM_ALLOW_LIFECYCLE_CHANGES` | `false` |  |
+| `MICROSOFT_OFFICE_ADDIN_ORIGINS` | — |  |
+| `MICROSOFT_CLIENT_CERTIFICATE_PATH` | — | Confidential modes: prefer a certificate, managed identity, or workload identity. |
+| `MICROSOFT_CLIENT_CERTIFICATE_THUMBPRINT` | — |  |
+| `MICROSOFT_CLIENT_CERTIFICATE_PASSWORD_REF` | — |  |
+| `MICROSOFT_CLIENT_SECRET_REF` | — |  |
+| `MICROSOFT_MANAGED_IDENTITY_CLIENT_ID` | — |  |
+| `MICROSOFT_WORKLOAD_IDENTITY_TOKEN_FILE` | secret-injected |  |
+| `AZURE_FEDERATED_TOKEN_FILE` | secret-injected |  |
+| `MICROSOFT_COMPANION_TLS_PROFILE` | — | Companion relay TLS uses the same deployment-owned trust-profile contract. |
+| `MICROSOFT_COMPANION_TLS_PROFILE_REF` | — |  |
+| `ADMINTOOL` | `true` | Per-domain tool registration toggles. Set false to suppress a domain. |
+| `AGREEMENTSTOOL` | `true` |  |
+| `APPLICATIONSTOOL` | `true` |  |
+| `AUDITTOOL` | `true` |  |
+| `AUTHTOOL` | `true` |  |
+| `CALENDARTOOL` | `true` |  |
+| `CHATTOOL` | `true` |  |
+| `COMMUNICATIONSTOOL` | `true` |  |
+| `CONNECTIONSTOOL` | `true` |  |
+| `CONTACTSTOOL` | `true` |  |
+| `DEVICESTOOL` | `true` |  |
+| `DIRECTORYTOOL` | `true` |  |
+| `DOCUMENTTOOL` | `true` |  |
+| `DOMAINSTOOL` | `true` |  |
+| `EDUCATIONTOOL` | `true` |  |
+| `EMPLOYEE_EXPERIENCETOOL` | `true` |  |
+| `FILESTOOL` | `true` |  |
+| `GROUPSTOOL` | `true` |  |
+| `IDENTITYTOOL` | `true` |  |
+| `INTUNETOOL` | `true` |  |
+| `KGTOOL` | `true` |  |
+| `MAILTOOL` | `true` |  |
+| `METATOOL` | `true` |  |
+| `NOTESTOOL` | `true` |  |
+| `ORGANIZATIONTOOL` | `true` |  |
+| `PLACESTOOL` | `true` |  |
+| `POLICIESTOOL` | `true` |  |
+| `POWER_PLATFORMTOOL` | `true` |  |
+| `PRINTTOOL` | `true` |  |
+| `PRIVACYTOOL` | `true` |  |
+| `REPORTSTOOL` | `true` |  |
+| `SEARCHTOOL` | `true` |  |
+| `SECURITYTOOL` | `true` |  |
+| `SITESTOOL` | `true` |  |
+| `SOLUTIONSTOOL` | `true` |  |
+| `STORAGETOOL` | `true` |  |
+| `SUBSCRIPTIONSTOOL` | `true` |  |
+| `TASKSTOOL` | `true` |  |
+| `TEAMSTOOL` | `true` |  |
+| `USERTOOL` | `true` |  |
+| `WINDOWS_COMPANIONTOOL` | `true` |  |
+| `TRANSPORT` | `stdio` | Local MCP defaults. Require an authenticated transport before non-loopback use. |
+| `HOST` | `127.0.0.1` |  |
+| `PORT` | `8000` |  |
+| `AUTH_TYPE` | `oidc` |  |
+
+#### Inherited scion-sdk variables (apply to every connector)
+
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `MCP_TOOL_MODE` | `intent` | Tool surface: `intent` \| `condensed` \| `verbose` \| `both` |
+| `MCP_ENABLED_TOOLS` | — | Comma-separated tool allow-list |
+| `MCP_DISABLED_TOOLS` | — | Comma-separated tool deny-list |
+| `MCP_ENABLED_TAGS` | — | Comma-separated tag allow-list |
+| `MCP_DISABLED_TAGS` | — | Comma-separated tag deny-list |
+| `EUNOMIA_TYPE` | `none` | Authorization mode: `none` \| `embedded` \| `remote` |
+| `EUNOMIA_POLICY_FILE` | `mcp_policies.json` | Embedded Eunomia policy file |
+| `EUNOMIA_REMOTE_URL` | — | Remote Eunomia authorization server URL |
+| `ENABLE_OTEL` | `False` | Enable OpenTelemetry export |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector endpoint |
+| `MCP_CLIENT_AUTH` | — | Outbound MCP child auth: `oidc-client-credentials` \| `basic` \| `none` |
+| `OIDC_CLIENT_ID` | — | OIDC client id (service-account auth) |
+| `OIDC_CLIENT_SECRET_REF` | `secret://identity/oidc-client-secret` | Runtime secret reference for the OIDC service account |
+| `MCP_BASIC_AUTH_USERNAME` | — | HTTP Basic username (`MCP_CLIENT_AUTH=basic`) |
+| `MCP_BASIC_AUTH_PASSWORD_REF` | `secret://identity/mcp-basic-password` | Runtime secret reference for HTTP Basic auth (`MCP_CLIENT_AUTH=basic`) |
+| `DEBUG` | `False` | Verbose logging |
+| `PYTHONUNBUFFERED` | `1` | Unbuffered stdout (recommended in containers) |
+| `MCP_URL` | `http://localhost:8000/mcp` | URL of the MCP server the agent connects to |
+| `PROVIDER` | — | Operator-configured LLM provider for the agent |
+| `MODEL_ID` | — | Operator-configured model id for the agent |
+
+_79 package + 21 inherited variable(s). Auto-generated from `.env.example` + the shared scion-sdk set — do not edit._
+<!-- ENV-VARS-TABLE:END -->
+
+---
 
 ## Documentation
 
@@ -863,6 +909,8 @@ storage, and network policy.
 The MkDocs navigation is defined in `mkdocs.yml`; strict documentation builds are a
 release gate.
 
+---
+
 ## Development
 
 ```bash
@@ -876,6 +924,25 @@ uv run mkdocs build --strict
 ```
 
 See `AGENTS.md` for current-only, privacy, security, and change-discipline rules.
+
+---
+
+## Repository Owners
+
+<img width="100%" height="180em" src="https://github-readme-stats.vercel.app/api?username=example&show_icons=true&hide_border=true&&count_private=true&include_all_commits=true" />
+
+![GitHub followers](https://img.shields.io/github/followers/example)
+![GitHub User's stars](https://img.shields.io/github/stars/example)
+
+---
+
+## Contribute
+
+Contributions are welcome! Please ensure code quality by running local checks before submitting pull requests:
+- Format code using `ruff format .`
+- Lint code using `ruff check .`
+- Validate type-safety with `mypy .`
+- Run test suites using `pytest`
 
 <!-- BEGIN scion-sdk-deployment (generated; do not edit between markers) -->
 
